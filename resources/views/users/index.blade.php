@@ -16,11 +16,6 @@
         </a>
     </div>
 
-    @if(session('success'))
-        <div class="mb-4 p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-sm text-green-600 dark:text-green-400">
-            {{ session('success') }}
-        </div>
-    @endif
 
     <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
         @if($users->isEmpty())

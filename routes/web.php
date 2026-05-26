@@ -8,7 +8,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
 /* ── Public ───────────────────────────────────────────── */
-Route::get('/', fn () => redirect()->route('dashboard'));
+Route::get('/', fn() => redirect()->route('dashboard'));
 
 /* ── Authenticated ────────────────────────────────────── */
 Route::middleware('auth')->group(function () {
@@ -32,7 +32,7 @@ Route::middleware('auth')->group(function () {
         ->name('deploy-requests.reject');
 
     // Manajemen Aplikasi (khusus Project Manager)
-    Route::middleware('role:project_manager')->group(function () {
+    Route::middleware('role:admin')->group(function () {
         Route::resource('applications', ApplicationController::class);
     });
 
@@ -48,4 +48,4 @@ Route::middleware('auth')->group(function () {
         ->name('notifications.read');
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

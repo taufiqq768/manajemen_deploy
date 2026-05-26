@@ -13,13 +13,14 @@ class DeployRequestController extends Controller
 {
     public function __construct(
         protected NotificationService $notif,
-        protected AppSyncService      $appSync,
-    ) {}
+        protected AppSyncService $appSync,
+    ) {
+    }
 
     /** List semua request (filter by role & status) */
     public function index(Request $request)
     {
-        $user  = auth()->user();
+        $user = auth()->user();
         $query = DeployRequest::with(['application', 'requester', 'approver']);
 
         if ($user->isProgrammer()) {
@@ -35,7 +36,7 @@ class DeployRequestController extends Controller
         }
 
         $deployRequests = $query->latest()->paginate(10)->withQueryString();
-        $applications   = Application::orderBy('name')->get();
+        $applications = Application::orderBy('name')->get();
 
         return view('deploy-requests.index', compact('deployRequests', 'applications'));
     }
@@ -49,7 +50,7 @@ class DeployRequestController extends Controller
             session()->flash('warning', 'Sync daftar aplikasi dari API gagal: ' . $syncResult->summary());
         }
 
-        $user         = auth()->user();
+        $user = auth()->user();
         $applications = Application::orderBy('name')->get(); // semua programmer akses semua app
 
         return view('deploy-requests.create', compact('applications'));
@@ -59,12 +60,12 @@ class DeployRequestController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'application_id'   => 'required|exists:applications,id',
-            'version'          => 'required|string|max:50',
-            'release_notes'    => 'required|string',
-            'release_impact'   => 'nullable|string',
+            'application_id' => 'required|exists:applications,id',
+            'version' => 'required|string|max:50',
+            'release_notes' => 'required|string',
+            'release_impact' => 'nullable|string',
             'document_support' => 'nullable|file|mimes:pdf,doc,docx,jpg,txt,png|max:2048', // max 2MB
-            'scheduled_at'     => 'nullable|date',
+            'scheduled_at' => 'nullable|date',
         ]);
 
         $docPath = null;
@@ -76,22 +77,22 @@ class DeployRequestController extends Controller
             ...$validated,
             'document_support' => $docPath,
             'requester_id' => auth()->id(),
-            'status'       => 'pending',
-            'environment'  => 'production',
+            'status' => 'pending',
+            'environment' => 'production',
         ]);
 
         // Kirim notifikasi ke semua Project Manager (in-app + WA + email)
         $appName = $deploy->application->name;
-        $pms     = User::where('role', 'project_manager')->get();
+        $pms = User::where('role', 'project_manager')->get();
 
         foreach ($pms as $pm) {
             $this->notif->send(
-                user:            $pm,
+                user: $pm,
                 deployRequestId: $deploy->id,
-                title:           'Request Deploy Baru 🚀',
-                message:         "Request deploy *{$appName}* v{$deploy->version} menunggu persetujuan Anda.",
-                detail:          "Diajukan oleh: " . auth()->user()->name,
-                type:            'new',
+                title: 'Request Deploy Baru 🚀',
+                message: "Request deploy *{$appName}* {$deploy->version} menunggu persetujuan Anda.",
+                detail: "Diajukan oleh: " . auth()->user()->name,
+                type: 'new',
             );
         }
 
@@ -123,12 +124,12 @@ class DeployRequestController extends Controller
         $this->authorize('update', $deployRequest);
 
         $validated = $request->validate([
-            'application_id'   => 'required|exists:applications,id',
-            'version'          => 'required|string|max:50',
-            'release_notes'    => 'required|string',
-            'release_impact'   => 'nullable|string',
+            'application_id' => 'required|exists:applications,id',
+            'version' => 'required|string|max:50',
+            'release_notes' => 'required|string',
+            'release_impact' => 'nullable|string',
             'document_support' => 'nullable|file|mimes:pdf,doc,docx,jpg,txt,png|max:2048',
-            'scheduled_at'     => 'nullable|date',
+            'scheduled_at' => 'nullable|date',
         ]);
 
         $data = $validated;
@@ -157,22 +158,22 @@ class DeployRequestController extends Controller
         $this->authorize('decide', $deployRequest);
 
         $deployRequest->update([
-            'status'      => 'approved',
+            'status' => 'approved',
             'approver_id' => auth()->id(),
             'approved_at' => now(),
         ]);
 
         // Beritahu requester (programmer) via in-app + WA + email
         $requester = $deployRequest->requester;
-        $appName   = $deployRequest->application->name;
+        $appName = $deployRequest->application->name;
 
         $this->notif->send(
-            user:            $requester,
+            user: $requester,
             deployRequestId: $deployRequest->id,
-            title:           'Deploy Disetujui ✅',
-            message:         "Request deploy *{$appName}* v{$deployRequest->version} telah *disetujui*.",
-            detail:          "Disetujui oleh: " . auth()->user()->name,
-            type:            'approved',
+            title: 'Deploy Disetujui ✅',
+            message: "Request deploy *{$appName}* {$deployRequest->version} telah *disetujui*.",
+            detail: "Disetujui oleh: " . auth()->user()->name,
+            type: 'approved',
         );
 
         return back()->with('success', 'Request deploy telah disetujui.');
@@ -188,22 +189,22 @@ class DeployRequestController extends Controller
         ]);
 
         $deployRequest->update([
-            'status'           => 'rejected',
-            'approver_id'      => auth()->id(),
+            'status' => 'rejected',
+            'approver_id' => auth()->id(),
             'rejection_reason' => $request->rejection_reason,
         ]);
 
         // Beritahu requester (programmer) via in-app + WA + email
         $requester = $deployRequest->requester;
-        $appName   = $deployRequest->application->name;
+        $appName = $deployRequest->application->name;
 
         $this->notif->send(
-            user:            $requester,
+            user: $requester,
             deployRequestId: $deployRequest->id,
-            title:           'Deploy Ditolak ❌',
-            message:         "Request deploy *{$appName}* v{$deployRequest->version} telah *ditolak*.",
-            detail:          "Alasan: {$request->rejection_reason}",
-            type:            'rejected',
+            title: 'Deploy Ditolak ❌',
+            message: "Request deploy *{$appName}* {$deployRequest->version} telah *ditolak*.",
+            detail: "Alasan: {$request->rejection_reason}",
+            type: 'rejected',
         );
 
         return back()->with('error', 'Request deploy telah ditolak.');
