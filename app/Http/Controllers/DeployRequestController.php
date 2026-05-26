@@ -63,12 +63,18 @@ class DeployRequestController extends Controller
             'version'          => 'required|string|max:50',
             'release_notes'    => 'required|string',
             'release_impact'   => 'nullable|string',
-            'document_support' => 'nullable|string',
+            'document_support' => 'nullable|file|mimes:pdf,doc,docx,jpg,txt,png|max:2048', // max 2MB
             'scheduled_at'     => 'nullable|date',
         ]);
 
+        $docPath = null;
+        if ($request->hasFile('document_support')) {
+            $docPath = $request->file('document_support')->store('documents', 'public');
+        }
+
         $deploy = DeployRequest::create([
             ...$validated,
+            'document_support' => $docPath,
             'requester_id' => auth()->id(),
             'status'       => 'pending',
             'environment'  => 'production',
@@ -121,12 +127,23 @@ class DeployRequestController extends Controller
             'version'          => 'required|string|max:50',
             'release_notes'    => 'required|string',
             'release_impact'   => 'nullable|string',
-            'document_support' => 'nullable|string',
+            'document_support' => 'nullable|file|mimes:pdf,doc,docx,jpg,txt,png|max:2048',
             'scheduled_at'     => 'nullable|date',
         ]);
 
+        $data = $validated;
+        if ($request->hasFile('document_support')) {
+            if ($deployRequest->document_support) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($deployRequest->document_support);
+            }
+            $data['document_support'] = $request->file('document_support')->store('documents', 'public');
+        } else {
+            // Biarkan dokumen lama jika tidak ada file baru di-upload
+            unset($data['document_support']);
+        }
+
         $deployRequest->update([
-            ...$validated,
+            ...$data,
             'status' => 'pending', // reset ke pending setelah revisi
         ]);
 

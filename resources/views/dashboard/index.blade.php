@@ -4,15 +4,16 @@
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         @php
         $cards = [
-            ['label' => 'Total Request', 'value' => $stats['total'],    'color' => 'indigo',  'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'],
-            ['label' => 'Pending',       'value' => $stats['pending'],   'color' => 'yellow',  'icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'],
-            ['label' => 'Approved',      'value' => $stats['approved'],  'color' => 'green',   'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'],
-            ['label' => 'Rejected',      'value' => $stats['rejected'],  'color' => 'red',     'icon' => 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z'],
+            ['label' => 'Total Request', 'status' => '',           'value' => $stats['total'],    'color' => 'indigo',  'icon' => 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2'],
+            ['label' => 'Pending',       'status' => 'pending',    'value' => $stats['pending'],  'color' => 'yellow',  'icon' => 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'],
+            ['label' => 'Approved',      'status' => 'approved',   'value' => $stats['approved'], 'color' => 'green',   'icon' => 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z'],
+            ['label' => 'Rejected',      'status' => 'rejected',   'value' => $stats['rejected'], 'color' => 'red',     'icon' => 'M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z'],
         ];
         @endphp
 
         @foreach($cards as $card)
-        <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex flex-col gap-3 hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+        <a href="{{ route('deploy-requests.index', ['status' => $card['status']]) }}" 
+           class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-5 flex flex-col gap-3 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-md transition-all group cursor-pointer block">
             <div class="flex items-center justify-between">
                 <p class="text-xs text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">{{ $card['label'] }}</p>
                 <div class="w-8 h-8 rounded-lg
@@ -33,8 +34,8 @@
                     </svg>
                 </div>
             </div>
-            <p class="text-3xl font-bold text-slate-900 dark:text-white">{{ $card['value'] }}</p>
-        </div>
+            <p class="text-3xl font-bold text-slate-900 dark:text-white group-hover:scale-105 origin-left transition-transform">{{ $card['value'] }}</p>
+        </a>
         @endforeach
     </div>
 

@@ -72,7 +72,7 @@
             </a>
             @endif
 
-            @if($user->isAdmin())
+            @if($user->isProjectManager())
             <a href="{{ route('applications.index') }}"
                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
                       {{ request()->routeIs('applications.*') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
@@ -81,6 +81,17 @@
                           d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                 </svg>
                 Aplikasi
+            </a>
+            @endif
+
+            @if($user->isAdmin())
+            <a href="{{ route('users.index') }}"
+               class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
+                      {{ request()->routeIs('users.*') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                Manajemen User
             </a>
             @endif
 
@@ -115,18 +126,32 @@
                 </div>
                 <div class="min-w-0 flex-1">
                     <p class="text-sm font-medium text-slate-900 dark:text-white truncate">{{ $user->name }}</p>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">{{ $user->role === 'project_manager' ? 'Project Manager' : 'Programmer' }}</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">
+                        @if($user->role === 'project_manager') Project Manager
+                        @elseif($user->role === 'admin') Administrator
+                        @else Programmer
+                        @endif
+                    </p>
                 </div>
+                <div class="flex items-center gap-1">
+                    <a href="{{ route('profile.edit') }}" title="Ganti Password"
+                       class="p-1.5 text-slate-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </a>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf
                     <button type="submit" title="Logout"
-                            class="text-slate-400 hover:text-red-400 transition-colors">
+                            class="p-1.5 text-slate-400 hover:text-red-500 dark:hover:text-red-400 transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
                         </svg>
                     </button>
                 </form>
+            </div>
             </div>
         </div>
     </aside>
@@ -152,9 +177,19 @@
             <div class="ml-auto flex items-center gap-3">
                 {{-- Role badge --}}
                 <span class="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium
-                      {{ $user->isProjectManager() ? 'bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30' : 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30' }}">
-                    <span class="w-1.5 h-1.5 rounded-full {{ $user->isProjectManager() ? 'bg-purple-400' : 'bg-indigo-400' }}"></span>
-                    {{ $user->isProjectManager() ? 'Project Manager' : 'Programmer' }}
+                      @if($user->isAdmin()) bg-red-500/20 text-red-700 dark:text-red-300 border border-red-500/30
+                      @elseif($user->isProjectManager()) bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-500/30
+                      @else bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-500/30
+                      @endif">
+                    <span class="w-1.5 h-1.5 rounded-full
+                        @if($user->isAdmin()) bg-red-400
+                        @elseif($user->isProjectManager()) bg-purple-400
+                        @else bg-indigo-400
+                        @endif"></span>
+                    @if($user->isAdmin()) Administrator
+                    @elseif($user->isProjectManager()) Project Manager
+                    @else Programmer
+                    @endif
                 </span>
 
                 {{-- Theme toggle button --}}

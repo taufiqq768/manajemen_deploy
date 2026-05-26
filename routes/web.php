@@ -36,6 +36,12 @@ Route::middleware('auth')->group(function () {
         Route::resource('applications', ApplicationController::class);
     });
 
+    // Manajemen User (khusus Admin)
+    Route::middleware('role:admin')->group(function () {
+        Route::resource('users', \App\Http\Controllers\UserController::class)->except(['show', 'destroy']);
+        Route::post('/users/{user}/reset-password', [\App\Http\Controllers\UserController::class, 'resetPassword'])->name('users.reset-password');
+    });
+
     // Notifikasi
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])

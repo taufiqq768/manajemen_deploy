@@ -11,6 +11,11 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
+        // Administrator hanya bertugas di User Management
+        if ($user->isAdmin()) {
+            return redirect()->route('users.index');
+        }
+
         if ($user->isProjectManager()) {
             $stats = [
                 'total'    => DeployRequest::count(),
@@ -21,7 +26,7 @@ class DashboardController extends Controller
 
             $recentRequests = DeployRequest::with(['application', 'requester'])
                 ->latest()
-                ->take(5)
+                ->take(7)
                 ->get();
         } else {
             $stats = [
@@ -34,7 +39,7 @@ class DashboardController extends Controller
             $recentRequests = DeployRequest::with(['application'])
                 ->where('requester_id', $user->id)
                 ->latest()
-                ->take(5)
+                ->take(7)
                 ->get();
         }
 
