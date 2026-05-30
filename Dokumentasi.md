@@ -116,4 +116,67 @@ MAIL_FROM_NAME="${APP_NAME}"
 - Jika ingin merubah warna dan format *tampilan Email*, ubah pada `resources/views/emails/deploy-notification.blade.php`.
 
 ---
+
+## 🚢 Panduan Deploy ke Server Production
+
+Ikuti langkah-langkah di bawah ini secara berurutan untuk men-*deploy* aplikasi ini dari tahap pengembangan (*development*) ke *server production* (VPS / Shared Hosting):
+
+### 1. Persiapan File
+- *Upload* seluruh kode aplikasi ke *server* Anda, atau gunakan Git (`git clone https://github.com/taufiqq768/manajemen_deploy.git`).
+- Arahkan konfigurasi web *server* (Nginx/Apache) ke direktori `public` di dalam *folder* aplikasi ini.
+
+### 2. Salin dan Atur File Lingkungan (Environment)
+```bash
+cp .env.example .env
+```
+- Buka *file* `.env` lalu sesuaikan *credential* Database, kredensial Mail, URL web (`APP_URL`), dan parameter lainnya.
+- Ubah `APP_ENV=production` dan `APP_DEBUG=false` demi alasan keamanan.
+
+### 3. Instalasi Dependency Backend (Composer)
+Jalankan instalasi modul PHP tanpa mengikutsertakan modul *testing/dev*:
+```bash
+composer install --optimize-autoloader --no-dev
+```
+
+### 4. Build Aset Frontend (Node.js & Tailwind)
+Karena aplikasi ini menggunakan Vite & Tailwind CSS, Anda **wajib** mengompilasi CSS dan JS agar desainnya berjalan baik di *production*.
+```bash
+npm install
+npm run build
+```
+*(Langkah ini akan menghasilkan folder `public/build` yang berisi aset siap pakai).*
+
+### 5. Generate Key & Atur Database
+Buat kunci enkripsi aplikasi (jika belum) dan jalankan migrasi database.
+```bash
+php artisan key:generate
+php artisan migrate --force
+```
+*(Opsional: Jika ini adalah server yang benar-benar baru dan kosong, Anda bisa menjalankan `php artisan db:seed --force` untuk memasukkan akun default).*
+
+### 6. Hubungkan Folder Penyimpanan (Storage)
+Sistem memiliki fitur lampiran *upload* dokumen pdf/gambar, jadi Anda **wajib** membuat *symlink*:
+```bash
+php artisan storage:link
+```
+*Pastikan konfigurasi `APP_URL` di `.env` sudah sesuai dengan alamat domain aplikasi Anda agar link download berfungsi dengan benar.*
+
+### 7. Atur Izin Akses Folder (Permissions)
+Server Linux butuh akses menulis (`write`) ke folder `storage` dan `bootstrap/cache`:
+```bash
+chmod -R 775 storage bootstrap/cache
+chown -R www-data:www-data storage bootstrap/cache
+```
+*(Ganti `www-data` sesuai dengan *user web server* Anda, misalnya `nginx` atau `apache`).*
+
+### 8. Optimasi Performa Aplikasi
+Langkah terakhir yang sangat penting untuk server *production* agar Laravel berjalan super cepat:
+```bash
+php artisan optimize
+php artisan view:cache
+```
+
+Jika sewaktu-waktu Anda merubah isi `.env`, jangan lupa untuk me-reset *cache* ini dengan perintah `php artisan optimize:clear` lalu jalankan `php artisan optimize` kembali.
+
+---
 *Dokumentasi ini dibuat untuk mempermudah serah terima sistem, pemeliharaan (maintenance), dan pengenalan bagi pengguna baru.*

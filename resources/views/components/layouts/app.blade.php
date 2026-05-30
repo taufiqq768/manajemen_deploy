@@ -173,7 +173,7 @@
         </div>
 
         {{-- ═══════════════════════════ MAIN ═══════════════════════════ --}}
-        <div class="flex-1 flex flex-col lg:ml-64 min-h-full">
+        <div class="flex-1 flex flex-col lg:ml-64 min-h-full min-w-0">
 
             {{-- Top bar --}}
             <header
