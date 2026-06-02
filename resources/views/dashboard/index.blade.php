@@ -91,8 +91,8 @@
                         <td class="px-5 py-4 text-slate-600 dark:text-slate-400">{{ $req->requester->name }}</td>
                         @endif
                         <td class="px-5 py-4 text-slate-500 dark:text-slate-400 text-xs">
-                            <span class="block">{{ $req->created_at->format('d M Y') }}</span>
-                            <span class="text-slate-400 dark:text-slate-600">{{ $req->created_at->format('H:i') }}</span>
+                            <span class="block">{{ $req->created_at->addHours(7)->format('d M Y') }}</span>
+                            <span class="text-slate-400 dark:text-slate-600">{{ $req->created_at->addHours(7)->format('H:i') }}</span>
                         </td>
                         <td class="px-5 py-4 text-xs">
                             @if($req->scheduled_at)
@@ -106,6 +106,11 @@
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $badge['class'] }}">
                                 {{ $badge['label'] }}
                             </span>
+                            @if($req->isApproved() && $req->approved_at)
+                                <span class="block mt-1 text-[10px] text-slate-500 dark:text-slate-400">
+                                    {{ $req->approved_at->addHours(7)->format('d/m/Y H:i') }}
+                                </span>
+                            @endif
                         </td>
                         <td class="px-5 py-4 text-right">
                             <a href="{{ route('deploy-requests.show', $req) }}"

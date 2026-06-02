@@ -62,7 +62,7 @@
                 <div>
                     <p class="text-xs text-slate-400 dark:text-slate-500 mb-1">Tanggal Pengajuan</p>
                     <p class="text-sm text-slate-900 dark:text-white">
-                        {{ $deployRequest->created_at->format('d M Y, H:i') }}
+                        {{ $deployRequest->created_at->addHours(7)->format('d M Y, H:i') }}
                     </p>
                 </div>
                 <div>
@@ -71,12 +71,29 @@
                         {{ $deployRequest->scheduled_at ? $deployRequest->scheduled_at->format('d M Y, H:i') : '—' }}
                     </p>
                 </div>
-                <!-- <div>
-                    <p class="text-xs text-slate-400 dark:text-slate-500 mb-1">Diputuskan oleh</p>
+                <div>
+                    <p class="text-xs text-slate-400 dark:text-slate-500 mb-1">Status</p>
+                    <div>
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-medium {{ $badge['class'] }}">
+                            {{ $badge['label'] }}
+                        </span>
+                    </div>
+                </div>
+
+                @if($deployRequest->isApproved() && $deployRequest->approved_at)
+                <div>
+                    <p class="text-xs text-slate-400 dark:text-slate-500 mb-1">Disetujui Pada</p>
                     <p class="text-sm text-slate-900 dark:text-white">
+                        {{ $deployRequest->approved_at->addHours(7)->format('d M Y, H:i') }}
+                    </p>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 dark:text-slate-500 mb-1">Disetujui Oleh</p>
+                    <p class="text-sm text-slate-900 dark:text-white font-medium">
                         {{ $deployRequest->approver ? $deployRequest->approver->name : '—' }}
                     </p>
-                </div> -->
+                </div>
+                @endif
             </div>
         </div>
 

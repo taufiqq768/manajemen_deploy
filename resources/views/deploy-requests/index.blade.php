@@ -79,9 +79,9 @@
                         @if(auth()->user()->isProjectManager())
                         <th class="px-5 py-3 text-left">Pemohon</th>
                         @endif
-                        <th class="px-5 py-3 text-left">Jadwal Deploy</th>
+                        <th class="px-5 py-3 text-left">Tgl. Pengajuan</th>
+                        <th class="px-5 py-3 text-left">Rencana Deploy</th>
                         <th class="px-5 py-3 text-left">Status</th>
-                        <th class="px-5 py-3 text-left">Diajukan</th>
                         <th class="px-5 py-3 text-right">Aksi</th>
                     </tr>
                 </thead>
@@ -95,15 +95,28 @@
                         @if(auth()->user()->isProjectManager())
                         <td class="px-5 py-4 text-slate-600 dark:text-slate-400">{{ $req->requester->name }}</td>
                         @endif
-                        <td class="px-5 py-4 text-slate-500 dark:text-slate-400">
-                            {{ $req->scheduled_at ? $req->scheduled_at->format('d M Y H:i') : '—' }}
+                        <td class="px-5 py-4 text-slate-500 dark:text-slate-400 text-xs">
+                            <span class="block">{{ $req->created_at->addHours(7)->format('d M Y') }}</span>
+                            <span class="text-slate-400 dark:text-slate-600">{{ $req->created_at->addHours(7)->format('H:i') }}</span>
+                        </td>
+                        <td class="px-5 py-4 text-xs">
+                            @if($req->scheduled_at)
+                                <span class="block text-slate-700 dark:text-slate-300">{{ $req->scheduled_at->format('d M Y') }}</span>
+                                <span class="text-slate-400 dark:text-slate-500">{{ $req->scheduled_at->format('H:i') }}</span>
+                            @else
+                                <span class="text-slate-300 dark:text-slate-600">—</span>
+                            @endif
                         </td>
                         <td class="px-5 py-4">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $badge['class'] }}">
                                 {{ $badge['label'] }}
                             </span>
+                            @if($req->isApproved() && $req->approved_at)
+                                <span class="block mt-1 text-[10px] text-slate-500 dark:text-slate-400">
+                                    {{ $req->approved_at->addHours(7)->format('d/m/Y H:i') }}
+                                </span>
+                            @endif
                         </td>
-                        <td class="px-5 py-4 text-slate-400 dark:text-slate-500 text-xs">{{ $req->created_at->format('d M Y') }}</td>
                         <td class="px-5 py-4 text-right">
                             <a href="{{ route('deploy-requests.show', $req) }}"
                                class="text-indigo-500 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 text-xs transition-colors">
