@@ -61,6 +61,7 @@ class DeployRequestController extends Controller
     {
         $validated = $request->validate([
             'application_id' => 'required|exists:applications,id',
+            'jenis' => 'required|in:Bug,CR',
             'version' => 'required|string|max:50',
             'release_notes' => 'required|string',
             'release_impact' => 'nullable|string',
@@ -125,6 +126,7 @@ class DeployRequestController extends Controller
 
         $validated = $request->validate([
             'application_id' => 'required|exists:applications,id',
+            'jenis' => 'required|in:Bug,CR',
             'version' => 'required|string|max:50',
             'release_notes' => 'required|string',
             'release_impact' => 'nullable|string',

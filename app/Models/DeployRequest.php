@@ -11,6 +11,7 @@ class DeployRequest extends Model
 
     protected $fillable = [
         'application_id',
+        'jenis',
         'requester_id',
         'approver_id',
         'version',

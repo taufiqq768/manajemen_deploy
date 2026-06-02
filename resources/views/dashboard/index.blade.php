@@ -70,6 +70,7 @@
                     <tr>
                         <th class="px-5 py-3 text-left">Aplikasi</th>
                         <th class="px-5 py-3 text-left">Versi</th>
+                        <th class="px-5 py-3 text-left">Jenis</th>
                         @if(auth()->user()->isProjectManager())
                         <th class="px-5 py-3 text-left">Pemohon</th>
                         @endif
@@ -85,6 +86,7 @@
                     <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
                         <td class="px-5 py-4 font-medium text-slate-900 dark:text-white">{{ $req->application->name }}</td>
                         <td class="px-5 py-4 text-slate-500 dark:text-slate-300 font-mono text-xs">{{ $req->version }}</td>
+                        <td class="px-5 py-4 text-slate-500 dark:text-slate-400 text-xs">{{ $req->jenis }}</td>
                         @if(auth()->user()->isProjectManager())
                         <td class="px-5 py-4 text-slate-600 dark:text-slate-400">{{ $req->requester->name }}</td>
                         @endif

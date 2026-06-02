@@ -70,6 +70,22 @@
                 </div>
 
                 <div>
+                    <label for="jenis" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                        Jenis Request <span class="text-red-500">*</span>
+                    </label>
+                    <select id="jenis" name="jenis" required
+                            class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5
+                                   focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('jenis') border-red-500 @enderror">
+                        <option value="">Pilih Jenis</option>
+                        <option value="CR" {{ old('jenis', $deployRequest->jenis) == 'CR' ? 'selected' : '' }}>Change Request (CR)</option>
+                        <option value="Bug" {{ old('jenis', $deployRequest->jenis) == 'Bug' ? 'selected' : '' }}>Bug Fixing</option>
+                    </select>
+                    @error('jenis')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
                     <label for="document_support" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                         Dokumen Pendukung <span class="text-xs text-slate-500">(opsional, max 2MB, format: pdf, doc, jpg, png, txt)</span>
                     </label>

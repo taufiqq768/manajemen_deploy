@@ -54,6 +54,12 @@
                     </p>
                 </div>
                 <div>
+                    <p class="text-xs text-slate-400 dark:text-slate-500 mb-1">Jenis Request</p>
+                    <p class="text-sm text-slate-900 dark:text-white font-medium">
+                        {{ $deployRequest->jenis === 'CR' ? 'Change Request (CR)' : 'Bug Fixing' }}
+                    </p>
+                </div>
+                <div>
                     <p class="text-xs text-slate-400 dark:text-slate-500 mb-1">Tanggal Pengajuan</p>
                     <p class="text-sm text-slate-900 dark:text-white">
                         {{ $deployRequest->created_at->format('d M Y, H:i') }}
