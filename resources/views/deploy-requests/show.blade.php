@@ -17,8 +17,11 @@
             <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
                 <div>
                     <div class="flex items-center gap-3 mb-2">
-                        <h2 class="text-xl font-bold text-slate-900 dark:text-white">
+                        <h2 class="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
                             {{ $deployRequest->application->name }}
+                            @if($deployRequest->ticket_number)
+                                <span class="text-sm font-mono text-slate-500 bg-slate-100 dark:bg-slate-800/50 px-2.5 py-0.5 rounded border border-slate-200 dark:border-slate-700 tracking-tight">{{ $deployRequest->ticket_number }}</span>
+                            @endif
                         </h2>
                         <!-- <span
                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {{ $badge['class'] }}">

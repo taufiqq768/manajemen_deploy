@@ -10,6 +10,7 @@ class DeployRequest extends Model
     use HasFactory;
 
     protected $fillable = [
+        'ticket_number',
         'application_id',
         'jenis',
         'requester_id',

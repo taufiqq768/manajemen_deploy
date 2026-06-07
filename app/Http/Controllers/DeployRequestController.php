@@ -74,8 +74,39 @@ class DeployRequestController extends Controller
             $docPath = $request->file('document_support')->store('documents', 'public');
         }
 
+        $now = now();
+        $year = $now->format('Y');
+        $month = $now->format('n');
+        
+        $romanMonths = [
+            1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
+            7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII'
+        ];
+        $romanMonth = $romanMonths[$month];
+
+        // Get last request of the current month
+        $lastRequest = DeployRequest::whereYear('created_at', $year)
+            ->whereMonth('created_at', $month)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        $urut = 1;
+        if ($lastRequest && $lastRequest->ticket_number) {
+            $parts = explode('/', $lastRequest->ticket_number);
+            if (count($parts) == 4) {
+                $urut = (int) $parts[3] + 1;
+            } else {
+                // fallback if ticket_number format is broken, just count
+                $urut = DeployRequest::whereYear('created_at', $year)->whereMonth('created_at', $month)->count() + 1;
+            }
+        }
+        
+        $nomorUrut = str_pad($urut, 4, '0', STR_PAD_LEFT);
+        $ticketNumber = "DM/{$year}/{$romanMonth}/{$nomorUrut}";
+
         $deploy = DeployRequest::create([
             ...$validated,
+            'ticket_number' => $ticketNumber,
             'document_support' => $docPath,
             'requester_id' => auth()->id(),
             'status' => 'pending',
@@ -90,7 +121,7 @@ class DeployRequestController extends Controller
             $this->notif->send(
                 user: $pm,
                 deployRequestId: $deploy->id,
-                title: 'Request Deploy Baru 🚀',
+                title: "[{$deploy->ticket_number}] Request Deploy Baru 🚀",
                 message: "Request deploy *{$appName}* {$deploy->version} menunggu persetujuan Anda.",
                 detail: "Diajukan oleh: " . auth()->user()->name,
                 type: 'new',
@@ -172,7 +203,7 @@ class DeployRequestController extends Controller
         $this->notif->send(
             user: $requester,
             deployRequestId: $deployRequest->id,
-            title: 'Deploy Disetujui ✅',
+            title: "[{$deployRequest->ticket_number}] Deploy Disetujui ✅",
             message: "Request deploy *{$appName}* {$deployRequest->version} telah *disetujui*.",
             detail: "Disetujui oleh: " . auth()->user()->name,
             type: 'approved',
@@ -203,7 +234,7 @@ class DeployRequestController extends Controller
         $this->notif->send(
             user: $requester,
             deployRequestId: $deployRequest->id,
-            title: 'Deploy Ditolak ❌',
+            title: "[{$deployRequest->ticket_number}] Deploy Ditolak ❌",
             message: "Request deploy *{$appName}* {$deployRequest->version} telah *ditolak*.",
             detail: "Alasan: {$request->rejection_reason}",
             type: 'rejected',

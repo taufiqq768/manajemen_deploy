@@ -19,6 +19,16 @@
                 @csrf
                 @method('PATCH')
 
+                @if($deployRequest->ticket_number)
+                <div>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                        Nomor Tiket
+                    </label>
+                    <input type="text" value="{{ $deployRequest->ticket_number }}" readonly disabled
+                           class="w-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-sm rounded-lg px-3 py-2.5 cursor-not-allowed font-mono">
+                </div>
+                @endif
+
                 <div>
                     <label for="application_id" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                         Aplikasi <span class="text-red-500">*</span>
