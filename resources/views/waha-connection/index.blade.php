@@ -182,6 +182,8 @@
                     stroke: { curve: 'stepline', width: 2 },
                     xaxis: {
                         type: 'datetime',
+                        min: new Date().getTime() - (24 * 60 * 60 * 1000), // 24 hours ago
+                        max: new Date().getTime(), // now
                         labels: {
                             style: { colors: isDarkMode ? '#94a3b8' : '#64748b' },
                             datetimeUTC: false
