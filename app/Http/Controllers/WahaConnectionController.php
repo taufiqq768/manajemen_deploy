@@ -80,6 +80,15 @@ class WahaConnectionController extends Controller
             ];
         })->values()->toArray();
 
+        // If no logs exist yet, prepend a data point from 24 hours ago 
+        // so the chart can draw a line instead of being empty.
+        if (count($chartData) === 0) {
+            $chartData[] = [
+                now()->subHours(24)->timestamp * 1000,
+                $status === 'WORKING' ? 1 : 0
+            ];
+        }
+
         // Append the current live status to the chart so it extends to "now"
         $chartData[] = [
             now()->timestamp * 1000,
