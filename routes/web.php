@@ -40,6 +40,9 @@ Route::middleware('auth')->group(function () {
     Route::middleware('role:admin')->group(function () {
         Route::resource('users', \App\Http\Controllers\UserController::class)->except(['show', 'destroy']);
         Route::post('/users/{user}/reset-password', [\App\Http\Controllers\UserController::class, 'resetPassword'])->name('users.reset-password');
+        
+        // Cek Koneksi WAHA
+        Route::get('/waha-connection', [\App\Http\Controllers\WahaConnectionController::class, 'index'])->name('waha-connection.index');
     });
 
     // Notifikasi

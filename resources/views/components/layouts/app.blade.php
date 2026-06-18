@@ -101,6 +101,15 @@
                         </svg>
                         Manajemen User
                     </a>
+
+                    <a href="{{ route('waha-connection.index') }}"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
+                          {{ request()->routeIs('waha-connection.*') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                        <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                        </svg>
+                        Cek Koneksi WAHA
+                    </a>
                 @endif
 
 
