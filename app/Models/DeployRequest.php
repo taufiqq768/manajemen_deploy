@@ -24,7 +24,28 @@ class DeployRequest extends Model
         'scheduled_at',
         'approved_at',
         'rejection_reason',
+        'url_token',
     ];
+
+    /**
+     * Get the route key for the model.
+     */
+    public function getRouteKeyName()
+    {
+        return 'url_token';
+    }
+
+    /**
+     * The "booted" method of the model.
+     */
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            if (empty($model->url_token)) {
+                $model->url_token = \Illuminate\Support\Str::random(10);
+            }
+        });
+    }
 
     protected function casts(): array
     {

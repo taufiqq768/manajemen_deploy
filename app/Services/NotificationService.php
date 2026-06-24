@@ -108,7 +108,9 @@ class NotificationService
         }
 
         // Tambahkan link ke sistem
-        $detailUrl = route('deploy-requests.show', $deployRequestId);
+        $deployRequest = \App\Models\DeployRequest::find($deployRequestId);
+        $detailUrl = $deployRequest ? route('deploy-requests.show', $deployRequest) : route('dashboard');
+        
         $lines[] = '';
         $lines[] = $separator;
         $lines[] = "🔗 *Lihat detail:*";

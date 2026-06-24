@@ -55,7 +55,8 @@ class DeployNotificationMail extends Mailable
     public function detailUrl(): ?string
     {
         if (!$this->deployRequestId) return null;
-        return url('/deploy-requests/' . $this->deployRequestId);
+        $deployRequest = \App\Models\DeployRequest::find($this->deployRequestId);
+        return $deployRequest ? route('deploy-requests.show', $deployRequest) : null;
     }
 
     public function bannerColor(): string
