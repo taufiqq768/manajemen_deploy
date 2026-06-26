@@ -45,6 +45,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/waha-connection', [\App\Http\Controllers\WahaConnectionController::class, 'index'])->name('waha-connection.index');
     });
 
+    // IT Work Hub (Mockup UI)
+    Route::prefix('it-work-hub')->name('it-work-hub.')->group(function () {
+        Route::get('/dashboard', [\App\Http\Controllers\ItWorkHubController::class, 'dashboard'])->name('dashboard');
+        Route::get('/longlist', [\App\Http\Controllers\ItWorkHubController::class, 'longlist'])->name('longlist');
+        Route::get('/create', [\App\Http\Controllers\ItWorkHubController::class, 'create'])->name('create');
+        Route::get('/show/{id}', [\App\Http\Controllers\ItWorkHubController::class, 'show'])->name('show');
+        Route::get('/activities/{id}', [\App\Http\Controllers\ItWorkHubController::class, 'activities'])->name('activities');
+        Route::get('/repository', [\App\Http\Controllers\ItWorkHubController::class, 'repository'])->name('repository');
+    });
+
     // Notifikasi
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markRead'])

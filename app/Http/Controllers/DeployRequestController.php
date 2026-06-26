@@ -35,6 +35,18 @@ class DeployRequestController extends Controller
             $query->where('application_id', $request->application_id);
         }
 
+        if ($request->filled('jenis')) {
+            $query->where('jenis', $request->jenis);
+        }
+
+        if ($request->filled('start_date')) {
+            $query->whereDate('created_at', '>=', $request->start_date);
+        }
+
+        if ($request->filled('end_date')) {
+            $query->whereDate('created_at', '<=', $request->end_date);
+        }
+
         $deployRequests = $query->latest()->paginate(10)->withQueryString();
         $applications = Application::orderBy('name')->get();
 

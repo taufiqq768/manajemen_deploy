@@ -25,7 +25,7 @@
 
     {{-- Filter --}}
     <form method="GET" action="{{ route('deploy-requests.index') }}"
-          class="flex flex-wrap gap-3 mb-6">
+          class="flex flex-wrap items-center gap-3 mb-6">
         <select name="status"
                 class="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             <option value="">Semua Status</option>
@@ -36,7 +36,7 @@
 
         @if(auth()->user()->isProjectManager())
         <select name="application_id"
-                class="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                class="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 max-w-[200px]">
             <option value="">Semua Aplikasi</option>
             @foreach($applications as $app)
             <option value="{{ $app->id }}" {{ request('application_id') == $app->id ? 'selected' : '' }}>
@@ -46,11 +46,26 @@
         </select>
         @endif
 
+        <select name="jenis"
+                class="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="">Semua Jenis</option>
+            <option value="CR" {{ request('jenis') === 'CR' ? 'selected' : '' }}>CR (Change Request)</option>
+            <option value="Bug" {{ request('jenis') === 'Bug' ? 'selected' : '' }}>Bug</option>
+        </select>
+
+        <div class="flex items-center gap-2">
+            <input type="date" name="start_date" value="{{ request('start_date') }}"
+                   class="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" title="Dari Tanggal">
+            <span class="text-slate-500">-</span>
+            <input type="date" name="end_date" value="{{ request('end_date') }}"
+                   class="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500" title="Sampai Tanggal">
+        </div>
+
         <button type="submit"
                 class="px-4 py-2 bg-slate-700 dark:bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition-colors">
             Filter
         </button>
-        @if(request()->hasAny(['status','application_id']))
+        @if(request()->hasAny(['status','application_id','jenis','start_date','end_date']))
         <a href="{{ route('deploy-requests.index') }}"
            class="px-4 py-2 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white text-sm transition-colors">
             Reset

@@ -7,6 +7,7 @@
     <meta name="description" content="Sistem manajemen pengajuan dan persetujuan deploy aplikasi ke production.">
     <title>{{ isset($title) ? $title . ' — ' : '' }}Manajemen Deploy</title>
     <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" />
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     {{-- Prevent flash of wrong theme --}}
     <script>
@@ -67,6 +68,38 @@
                     </svg>
                     Deploy Requests
                 </a>
+
+                {{-- IT Work Hub Section --}}
+                @if(auth()->check() && auth()->user()->isAdmin())
+                <div class="pt-4 pb-1">
+                    <p class="px-3 text-xs font-bold tracking-wider text-slate-400 uppercase">IT Work Hub</p>
+                </div>
+
+                <a href="{{ route('it-work-hub.dashboard') }}"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
+                      {{ request()->routeIs('it-work-hub.dashboard') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                    <i class="ti ti-chart-bar text-lg flex-shrink-0"></i>
+                    Dashboard
+                </a>
+
+                <a href="{{ route('it-work-hub.longlist') }}"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
+                      {{ request()->routeIs('it-work-hub.longlist', 'it-work-hub.create', 'it-work-hub.show', 'it-work-hub.activities') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                    <i class="ti ti-code text-lg flex-shrink-0"></i>
+                    App Dev
+                </a>
+
+                <a href="{{ route('it-work-hub.repository') }}"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
+                      {{ request()->routeIs('it-work-hub.repository') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                    <i class="ti ti-file-text text-lg flex-shrink-0"></i>
+                    Repository Doc
+                </a>
+                @endif
+
+                <div class="pt-4 pb-1">
+                    <p class="px-3 text-xs font-bold tracking-wider text-slate-400 uppercase">Deploy System</p>
+                </div>
 
                 @if($user->isProgrammer())
                     <a href="{{ route('deploy-requests.create') }}"
