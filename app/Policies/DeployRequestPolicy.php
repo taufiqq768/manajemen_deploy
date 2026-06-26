@@ -18,6 +18,6 @@ class DeployRequestPolicy
     /** Hanya Project Manager yang bisa approve/reject */
     public function decide(User $user, DeployRequest $deployRequest): bool
     {
-        return $user->isProjectManager() && $deployRequest->isPending();
+        return ($user->isProjectManager() || $user->isAdmin()) && $deployRequest->isPending();
     }
 }

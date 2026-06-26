@@ -71,7 +71,7 @@
                         <th class="px-5 py-3 text-left">Aplikasi</th>
                         <th class="px-5 py-3 text-left">Versi</th>
                         <th class="px-5 py-3 text-left">Jenis</th>
-                        @if(auth()->user()->isProjectManager())
+                        @if(auth()->user()->isProjectManager() || auth()->user()->isAdmin())
                         <th class="px-5 py-3 text-left">Pemohon</th>
                         @endif
                         <th class="px-5 py-3 text-left">Tgl. Pengajuan</th>
@@ -90,7 +90,7 @@
                         </td>
                         <td class="px-5 py-4 text-slate-500 dark:text-slate-300 font-mono text-xs">{{ $req->version }}</td>
                         <td class="px-5 py-4 text-slate-500 dark:text-slate-400 text-xs">{{ $req->jenis }}</td>
-                        @if(auth()->user()->isProjectManager())
+                        @if(auth()->user()->isProjectManager() || auth()->user()->isAdmin())
                         <td class="px-5 py-4 text-slate-600 dark:text-slate-400">{{ $req->requester->name }}</td>
                         @endif
                         <td class="px-5 py-4 text-slate-500 dark:text-slate-400 text-xs">

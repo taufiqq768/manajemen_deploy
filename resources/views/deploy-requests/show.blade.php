@@ -160,7 +160,7 @@
         </div>
 
         {{-- Approve / Reject form (PM only, jika pending) --}}
-        @if(auth()->user()->isProjectManager() && $deployRequest->isPending())
+        @if((auth()->user()->isProjectManager() || auth()->user()->isAdmin()) && $deployRequest->isPending())
             <div class="mt-6 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
                 <h3 class="text-sm font-semibold text-slate-900 dark:text-white mb-5">Keputusan</h3>
 

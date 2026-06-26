@@ -5,7 +5,7 @@
         <div>
             <h2 class="text-xl font-bold text-slate-900 dark:text-white">Deploy Requests</h2>
             <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-                @if(auth()->user()->isProjectManager())
+                @if(auth()->user()->isProjectManager() || auth()->user()->isAdmin())
                     Semua request pengajuan deploy masuk
                 @else
                     Request deploy yang Anda ajukan
@@ -34,7 +34,7 @@
             <option value="rejected" {{ request('status') === 'rejected'  ? 'selected' : '' }}>Rejected</option>
         </select>
 
-        @if(auth()->user()->isProjectManager())
+        @if(auth()->user()->isProjectManager() || auth()->user()->isAdmin())
         <select name="application_id"
                 class="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 max-w-[200px]">
             <option value="">Semua Aplikasi</option>
@@ -91,7 +91,7 @@
                         <th class="px-5 py-3 text-left">Aplikasi</th>
                         <th class="px-5 py-3 text-left">Versi</th>
                         <th class="px-5 py-3 text-left">Jenis</th>
-                        @if(auth()->user()->isProjectManager())
+                        @if(auth()->user()->isProjectManager() || auth()->user()->isAdmin())
                         <th class="px-5 py-3 text-left">Pemohon</th>
                         @endif
                         <th class="px-5 py-3 text-left">Tgl. Pengajuan</th>
@@ -110,7 +110,7 @@
                         </td>
                         <td class="px-5 py-4 text-slate-500 dark:text-slate-300 font-mono text-xs">{{ $req->version }}</td>
                         <td class="px-5 py-4 text-slate-500 dark:text-slate-400 text-xs">{{ $req->jenis }}</td>
-                        @if(auth()->user()->isProjectManager())
+                        @if(auth()->user()->isProjectManager() || auth()->user()->isAdmin())
                         <td class="px-5 py-4 text-slate-600 dark:text-slate-400">{{ $req->requester->name }}</td>
                         @endif
                         <td class="px-5 py-4 text-slate-500 dark:text-slate-400 text-xs">

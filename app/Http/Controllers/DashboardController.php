@@ -11,12 +11,7 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        // Administrator hanya bertugas di User Management
-        if ($user->isAdmin()) {
-            return redirect()->route('users.index');
-        }
-
-        if ($user->isProjectManager()) {
+        if ($user->isProjectManager() || $user->isAdmin()) {
             $stats = [
                 'total'    => DeployRequest::count(),
                 'pending'  => DeployRequest::where('status', 'pending')->count(),
