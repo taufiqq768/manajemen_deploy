@@ -21,27 +21,27 @@
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
                 <p class="text-xs font-medium text-slate-500 uppercase">Total Project</p>
-                <p class="text-2xl font-bold text-slate-800 dark:text-white mt-1">24</p>
+                <p class="text-2xl font-bold text-slate-800 dark:text-white mt-1">{{ $stats['total'] }}</p>
             </div>
             <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
                 <p class="text-xs font-medium text-slate-500 uppercase">Not Started</p>
-                <p class="text-2xl font-bold text-slate-800 dark:text-white mt-1">3</p>
+                <p class="text-2xl font-bold text-slate-800 dark:text-white mt-1">{{ $stats['not_started'] }}</p>
             </div>
             <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
                 <p class="text-xs font-medium text-green-600 uppercase">Live</p>
-                <p class="text-2xl font-bold text-green-700 dark:text-green-500 mt-1">12</p>
+                <p class="text-2xl font-bold text-green-700 dark:text-green-500 mt-1">{{ $stats['live'] }}</p>
             </div>
             <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
                 <p class="text-xs font-medium text-purple-600 uppercase">Live w/ CR</p>
-                <p class="text-2xl font-bold text-purple-700 dark:text-purple-500 mt-1">5</p>
+                <p class="text-2xl font-bold text-purple-700 dark:text-purple-500 mt-1">{{ $stats['live_cr'] }}</p>
             </div>
             <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
                 <p class="text-xs font-medium text-amber-600 uppercase">Live w/ Bug</p>
-                <p class="text-2xl font-bold text-amber-700 dark:text-amber-500 mt-1">2</p>
+                <p class="text-2xl font-bold text-amber-700 dark:text-amber-500 mt-1">{{ $stats['live_bug'] }}</p>
             </div>
             <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
                 <p class="text-xs font-medium text-red-600 uppercase">Hold/Retired</p>
-                <p class="text-2xl font-bold text-red-700 dark:text-red-500 mt-1">2</p>
+                <p class="text-2xl font-bold text-red-700 dark:text-red-500 mt-1">{{ $stats['hold'] }}</p>
             </div>
         </div>
 
@@ -79,105 +79,68 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
-                        <!-- Mock Data Row 1 -->
+                        @forelse($projects as $index => $project)
                         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                             <td class="px-2 py-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-move text-center"><i class="ti ti-grip-vertical text-lg"></i></td>
-                            <td class="px-4 py-3 text-center font-medium">1</td>
-                            <td class="px-4 py-3 font-semibold text-slate-800 dark:text-slate-200">IT Work Hub</td>
-                            <td class="px-4 py-3 text-xs max-w-xs truncate" title="Pusat manajemen dan pemantauan project IT">Pusat manajemen dan pemantauan project IT</td>
+                            <td class="px-4 py-3 text-center font-medium">{{ $projects->firstItem() + $index }}</td>
+                            <td class="px-4 py-3 font-semibold text-slate-800 dark:text-slate-200">{{ $project->name }}</td>
+                            <td class="px-4 py-3 text-xs max-w-xs truncate" title="{{ $project->description }}">{{ $project->description ?? '-' }}</td>
                             <td class="px-4 py-3 text-center">
-                                <span class="px-2 py-1 rounded text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400">HIGH</span>
+                                @if($project->priority === 'High')
+                                    <span class="px-2 py-1 rounded text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400">HIGH</span>
+                                @elseif($project->priority === 'Medium')
+                                    <span class="px-2 py-1 rounded text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400">MEDIUM</span>
+                                @else
+                                    <span class="px-2 py-1 rounded text-[10px] font-bold bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400">LOW</span>
+                                @endif
                             </td>
-                            <td class="px-4 py-3 text-xs">Squad Alpha</td>
+                            <td class="px-4 py-3 text-xs">
+                                @if($project->squads->count() > 0)
+                                    {{ $project->squads->pluck('name')->join(', ') }}
+                                @else
+                                    <span class="text-slate-400 italic">Belum ada</span>
+                                @endif
+                            </td>
                             <td class="px-4 py-3 text-center">
-                                <span class="px-2 py-1 rounded text-[10px] font-bold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">NOT STARTED</span>
+                                @php
+                                    $statusColors = [
+                                        'Not Started' => 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+                                        'Live' => 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
+                                        'Live w/ CR' => 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
+                                        'Live w/ Bug' => 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
+                                        'Hold' => 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
+                                        'Retired' => 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300',
+                                    ];
+                                    $color = $statusColors[$project->status] ?? 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400';
+                                @endphp
+                                <span class="px-2 py-1 rounded text-[10px] font-bold {{ $color }}">{{ strtoupper($project->status) }}</span>
                             </td>
                             <td class="px-4 py-3 text-center">
                                 <div class="flex items-center justify-center gap-2">
                                     <div class="w-16 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                                        <div class="bg-[#639922] h-full" style="width: 15%"></div>
+                                        <div class="bg-[#639922] h-full" style="width: {{ $project->progress }}%"></div>
                                     </div>
-                                    <span class="text-xs font-semibold">15%</span>
+                                    <span class="text-xs font-semibold">{{ $project->progress }}%</span>
                                 </div>
                             </td>
-                            <td class="px-4 py-3 text-xs">Divisi IT</td>
+                            <td class="px-4 py-3 text-xs">{{ $project->bpo ?? '-' }}</td>
                             <td class="px-4 py-3 text-center">
-                                <a href="{{ route('it-work-hub.show', 1) }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-medium rounded-md transition-colors">
+                                <a href="{{ route('it-work-hub.show', $project->id) }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-medium rounded-md transition-colors">
                                     Detail <i class="ti ti-arrow-right"></i>
                                 </a>
                             </td>
                         </tr>
-                        
-                        <!-- Mock Data Row 2 -->
-                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                            <td class="px-2 py-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-move text-center"><i class="ti ti-grip-vertical text-lg"></i></td>
-                            <td class="px-4 py-3 text-center font-medium">2</td>
-                            <td class="px-4 py-3 font-semibold text-slate-800 dark:text-slate-200">Manajemen Deploy</td>
-                            <td class="px-4 py-3 text-xs max-w-xs truncate" title="Sistem pengajuan release ke production">Sistem pengajuan release ke production</td>
-                            <td class="px-4 py-3 text-center">
-                                <span class="px-2 py-1 rounded text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400">MEDIUM</span>
-                            </td>
-                            <td class="px-4 py-3 text-xs">Squad Beta</td>
-                            <td class="px-4 py-3 text-center">
-                                <span class="px-2 py-1 rounded text-[10px] font-bold bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400">LIVE</span>
-                            </td>
-                            <td class="px-4 py-3 text-center">
-                                <div class="flex items-center justify-center gap-2">
-                                    <div class="w-16 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                                        <div class="bg-green-500 h-full" style="width: 100%"></div>
-                                    </div>
-                                    <span class="text-xs font-semibold">100%</span>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3 text-xs">Operasional</td>
-                            <td class="px-4 py-3 text-center">
-                                <a href="{{ route('it-work-hub.show', 2) }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-medium rounded-md transition-colors">
-                                    Detail <i class="ti ti-arrow-right"></i>
-                                </a>
-                            </td>
+                        @empty
+                        <tr>
+                            <td colspan="10" class="px-4 py-8 text-center text-slate-500">Belum ada project yang ditambahkan.</td>
                         </tr>
-
-                        <!-- Mock Data Row 3 -->
-                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                            <td class="px-2 py-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-move text-center"><i class="ti ti-grip-vertical text-lg"></i></td>
-                            <td class="px-4 py-3 text-center font-medium">3</td>
-                            <td class="px-4 py-3 font-semibold text-slate-800 dark:text-slate-200">HRIS Dashboard</td>
-                            <td class="px-4 py-3 text-xs max-w-xs truncate" title="Dashboard analitik kepegawaian">Dashboard analitik kepegawaian</td>
-                            <td class="px-4 py-3 text-center">
-                                <span class="px-2 py-1 rounded text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400">HIGH</span>
-                            </td>
-                            <td class="px-4 py-3 text-xs">Squad Gamma</td>
-                            <td class="px-4 py-3 text-center">
-                                <span class="px-2 py-1 rounded text-[10px] font-bold bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400">LIVE WITH CR</span>
-                            </td>
-                            <td class="px-4 py-3 text-center">
-                                <div class="flex items-center justify-center gap-2">
-                                    <div class="w-16 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                                        <div class="bg-purple-500 h-full" style="width: 90%"></div>
-                                    </div>
-                                    <span class="text-xs font-semibold">90%</span>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3 text-xs">SDM</td>
-                            <td class="px-4 py-3 text-center">
-                                <a href="{{ route('it-work-hub.show', 3) }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-medium rounded-md transition-colors">
-                                    Detail <i class="ti ti-arrow-right"></i>
-                                </a>
-                            </td>
-                        </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
             
-            <div class="px-4 py-3 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
-                <div>Menampilkan 1 hingga 3 dari 24 project</div>
-                <div class="flex gap-1">
-                    <button class="px-2 py-1 border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 opacity-50 cursor-not-allowed">Prev</button>
-                    <button class="px-2 py-1 border border-slate-300 dark:border-slate-700 rounded bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 font-medium">1</button>
-                    <button class="px-2 py-1 border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700">2</button>
-                    <button class="px-2 py-1 border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700">3</button>
-                    <button class="px-2 py-1 border border-slate-300 dark:border-slate-700 rounded bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700">Next</button>
-                </div>
+            <div class="px-4 py-3 border-t border-slate-200 dark:border-slate-800">
+                {{ $projects->links() }}
             </div>
         </div>
     </div>

@@ -3,19 +3,33 @@
 
     <div class="max-w-5xl mx-auto space-y-6">
         <div class="flex items-center gap-4">
-            <a href="{{ route('it-work-hub.longlist') }}" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800">
+            <a href="{{ route('it-work-hub.longlist') }}"
+                class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800">
                 <i class="ti ti-arrow-left text-xl"></i>
             </a>
             <div class="flex-1 flex justify-between items-center">
                 <div>
                     <div class="flex items-center gap-3">
-                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">IT Work Hub</h2>
-                        <span class="px-2 py-1 rounded text-[10px] font-bold bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400">NOT STARTED</span>
+                        <h2 class="text-2xl font-bold text-slate-800 dark:text-white">{{ $project->name }}</h2>
+                        @php
+                            $statusColors = [
+                                'Not Started' => 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+                                'Live' => 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
+                                'Live w/ CR' => 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
+                                'Live w/ Bug' => 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
+                                'Hold' => 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
+                                'Retired' => 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300',
+                            ];
+                            $color = $statusColors[$project->status] ?? 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400';
+                        @endphp
+                        <span
+                            class="px-2 py-1 rounded text-[10px] font-bold {{ $color }}">{{ strtoupper($project->status) }}</span>
                     </div>
-                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Pusat manajemen dan pemantauan project IT</p>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">{{ $project->description ?? '-' }}</p>
                 </div>
                 <div>
-                    <a href="{{ route('it-work-hub.activities', 1) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors">
+                    <a href="{{ route('it-work-hub.activities', $project->id) }}"
+                        class="inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow-sm transition-colors">
                         <i class="ti ti-activity"></i> Detail Aktivitas
                     </a>
                 </div>
@@ -23,12 +37,13 @@
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            
+
             {{-- Kolom Kiri: Info Umum --}}
             <div class="lg:col-span-2 space-y-6">
-                
+
                 {{-- Card Info Umum --}}
-                <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                <div
+                    class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
                     <div class="p-4 border-b border-slate-200 dark:border-slate-800 bg-[#F1EFE8] dark:bg-slate-800/50">
                         <h3 class="text-sm font-semibold text-slate-800 dark:text-white flex items-center gap-2">
                             <i class="ti ti-info-circle"></i> Informasi Project
@@ -37,35 +52,38 @@
                     <div class="p-5 grid grid-cols-2 gap-4">
                         <div>
                             <p class="text-xs text-slate-500 mb-1">Squad / Tim</p>
-                            <p class="font-medium text-sm text-slate-800 dark:text-slate-200">Squad Alpha</p>
+                            <p class="font-medium text-sm text-slate-800 dark:text-slate-200">
+                                {{ $project->squads->count() > 0 ? $project->squads->pluck('name')->join(', ') : '-' }}
+                            </p>
                         </div>
                         <div>
                             <p class="text-xs text-slate-500 mb-1">BPO</p>
-                            <p class="font-medium text-sm text-slate-800 dark:text-slate-200">Divisi IT</p>
+                            <p class="font-medium text-sm text-slate-800 dark:text-slate-200">{{ $project->bpo ?? '-' }}
+                            </p>
                         </div>
                         <div>
                             <p class="text-xs text-slate-500 mb-1">Priority</p>
-                            <p class="font-medium text-sm text-red-600">High</p>
+                            <p class="font-medium text-sm text-red-600">{{ $project->priority }}</p>
                         </div>
-                        <div>
-                            <p class="text-xs text-slate-500 mb-1">Dokumen BRD</p>
-                            <p class="font-medium text-sm text-slate-800 dark:text-slate-200">-</p>
-                        </div>
+
                         <div class="col-span-2">
                             <p class="text-xs text-slate-500 mb-1">Progress Keseluruhan</p>
                             <div class="flex items-center gap-3">
                                 <div class="flex-1 h-2 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-                                    <div class="bg-[#639922] h-full" style="width: 15%"></div>
+                                    <div class="bg-[#639922] h-full" style="width: {{ $project->progress }}%"></div>
                                 </div>
-                                <span class="text-sm font-bold text-slate-700 dark:text-slate-300">15%</span>
+                                <span
+                                    class="text-sm font-bold text-slate-700 dark:text-slate-300">{{ $project->progress }}%</span>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 {{-- Card Pain Point --}}
-                <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-                    <div class="p-4 border-b border-slate-200 dark:border-slate-800 bg-[#F1EFE8] dark:bg-slate-800/50 flex justify-between items-center">
+                <div
+                    class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                    <div
+                        class="p-4 border-b border-slate-200 dark:border-slate-800 bg-[#F1EFE8] dark:bg-slate-800/50 flex justify-between items-center">
                         <h3 class="text-sm font-semibold text-slate-800 dark:text-white flex items-center gap-2">
                             <i class="ti ti-alert-triangle"></i> Pain Point
                         </h3>
@@ -73,20 +91,19 @@
                     <div class="p-5 space-y-4">
                         <div>
                             <p class="text-xs text-slate-500 mb-1">Uraian Masalah</p>
-                            <p class="text-sm text-slate-700 dark:text-slate-300">Data project terpencar di berbagai file Excel sehingga sulit dilacak statusnya secara real-time.</p>
+                            <p class="text-sm text-slate-700 dark:text-slate-300">
+                                {!! nl2br(e($project->pain_point_uraian ?? '-')) !!}</p>
                         </div>
                         <div>
                             <p class="text-xs text-slate-500 mb-1">Impact (Dampak)</p>
-                            <p class="text-sm text-slate-700 dark:text-slate-300">Reporting lambat, sering terjadi miskomunikasi terkait status fitur.</p>
+                            <p class="text-sm text-slate-700 dark:text-slate-300">
+                                {!! nl2br(e($project->pain_point_impact ?? '-')) !!}</p>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <p class="text-xs text-slate-500 mb-1">PIC Pain Point</p>
-                                <p class="text-sm text-slate-700 dark:text-slate-300">Budi Santoso</p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-slate-500 mb-1">Tanggal</p>
-                                <p class="text-sm text-slate-700 dark:text-slate-300">01 Juni 2026</p>
+                                <p class="text-xs text-slate-500 mb-1">Tanggal Identifikasi</p>
+                                <p class="text-sm text-slate-700 dark:text-slate-300">
+                                    {{ $project->created_at->format('d M Y') }}</p>
                             </div>
                         </div>
                     </div>
@@ -97,102 +114,124 @@
 
         {{-- Bagian Bawah: PIR & Dokumen (Full Width) --}}
         <div class="space-y-6">
-            
+
             {{-- Card Post Implementation Review (Tabel) --}}
-            <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-                <div class="p-4 border-b border-slate-200 dark:border-slate-800 bg-[#F1EFE8] dark:bg-slate-800/50 flex justify-between items-center">
+            <div
+                class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                <div
+                    class="p-4 border-b border-slate-200 dark:border-slate-800 bg-[#F1EFE8] dark:bg-slate-800/50 flex justify-between items-center">
                     <h3 class="text-sm font-semibold text-slate-800 dark:text-white flex items-center gap-2">
                         <i class="ti ti-checklist"></i> Post Implementation Review
                     </h3>
-                    <button class="px-3 py-1.5 bg-[#639922] hover:bg-[#3B6D11] text-white text-xs font-medium rounded-md transition-colors">
+                    <button onclick="addRow('tbody-pir')"
+                        class="px-3 py-1.5 bg-[#639922] hover:bg-[#3B6D11] text-white text-xs font-medium rounded-md transition-colors">
                         + Tambah Review
                     </button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm text-slate-600 dark:text-slate-400">
-                        <thead class="bg-slate-200 dark:bg-slate-800 text-xs uppercase font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-300 dark:border-slate-700">
+                        <thead
+                            class="bg-slate-200 dark:bg-slate-800 text-xs uppercase font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-300 dark:border-slate-700">
                             <tr>
                                 <th class="px-4 py-3">Uraian</th>
                                 <th class="px-4 py-3 w-32">Tanggal</th>
                                 <th class="px-4 py-3 w-48">File (Upload)</th>
                                 <th class="px-4 py-3 w-32 text-center">Link</th>
+                                <th class="px-2 py-3 w-16 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
-                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                                <td class="px-4 py-3 text-sm">Review paska go-live fase 1 menunjukkan performa stabil.</td>
-                                <td class="px-4 py-3 text-xs">25 Jun 2026</td>
-                                <td class="px-4 py-3">
-                                    <div class="flex items-center gap-2">
-                                        <i class="ti ti-file-text text-blue-500"></i>
-                                        <a href="#" class="text-xs hover:underline truncate">PIR_Report.pdf</a>
+                        <tbody id="tbody-pir" class="divide-y divide-slate-200 dark:divide-slate-800">
+                            @php $pirs = $project->documents->where('type', 'PIR'); @endphp
+                            @forelse($pirs as $pir)
+                            <tr data-id="{{ $pir->id }}" class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                                <td class="px-2 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm px-2 py-1.5 rounded" value="{{ $pir->description }}"></td>
+                                <td class="px-2 py-1 w-32"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="{{ $pir->document_date ? \Carbon\Carbon::parse($pir->document_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-2 py-1 w-64">
+                                    <div class="flex flex-col gap-1">
+                                        @if($pir->file_path)
+                                            <a href="{{ asset('storage/' . $pir->file_path) }}" target="_blank" class="text-xs text-blue-500 hover:underline truncate w-full" title="Lihat file saat ini"><i class="ti ti-file-text"></i> Lihat File Saat Ini</a>
+                                        @endif
+                                        <div class="flex items-center gap-2">
+                                            <label class="cursor-pointer flex-shrink-0 bg-blue-50 hover:bg-blue-100 text-blue-700 p-1.5 rounded transition-colors" title="Upload File Baru">
+                                                <i class="ti ti-upload text-sm"></i>
+                                                <input type="file" class="hidden" onchange="this.parentElement.nextElementSibling.textContent = this.files[0] ? this.files[0].name : 'Belum pilih file'">
+                                            </label>
+                                            <span class="text-[10px] text-slate-400 truncate w-40" title="Nama file baru">Belum pilih file</span>
+                                        </div>
                                     </div>
                                 </td>
-                                <td class="px-4 py-3 text-center">
-                                    <a href="#" class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300" title="Buka Link">
-                                        <i class="ti ti-external-link text-lg"></i>
-                                    </a>
+                                <td class="px-2 py-1 w-32"><input type="url" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded text-center" value="{{ $pir->link }}" placeholder="https://..."></td>
+                                <td class="px-2 py-1 w-16 text-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button type="button" class="text-white bg-[#639922] hover:bg-[#3B6D11] rounded px-1.5 py-1 transition-colors mr-1" title="Simpan Baris" onclick="saveRow(this, 'PIR')"><i class="ti ti-device-floppy"></i></button>
+                                    <button type="button" class="text-white bg-red-500 hover:bg-red-600 rounded px-1.5 py-1 transition-colors" title="Hapus Baris" onclick="removeRow(this)"><i class="ti ti-trash"></i></button>
                                 </td>
                             </tr>
-                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                                <td class="px-4 py-3 text-slate-500 italic text-center" colspan="4">Belum ada review tambahan.</td>
+                            @empty
+                            <tr class="empty-state hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                <td class="px-4 py-8 text-slate-500 italic text-center" colspan="5">Belum ada review tambahan.</td>
                             </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
             </div>
 
             {{-- Card Dokumen Pendukung (Tabel) --}}
-            <div class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-                <div class="p-4 border-b border-slate-200 dark:border-slate-800 bg-[#F1EFE8] dark:bg-slate-800/50 flex justify-between items-center">
+            <div
+                class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                <div
+                    class="p-4 border-b border-slate-200 dark:border-slate-800 bg-[#F1EFE8] dark:bg-slate-800/50 flex justify-between items-center">
                     <h3 class="text-sm font-semibold text-slate-800 dark:text-white flex items-center gap-2">
                         <i class="ti ti-paperclip"></i> Dokumen Pendukung
                     </h3>
-                    <button class="px-3 py-1.5 bg-[#639922] hover:bg-[#3B6D11] text-white text-xs font-medium rounded-md transition-colors">
+                    <button onclick="addRow('tbody-doc')"
+                        class="px-3 py-1.5 bg-[#639922] hover:bg-[#3B6D11] text-white text-xs font-medium rounded-md transition-colors">
                         + Tambah Dokumen
                     </button>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm text-slate-600 dark:text-slate-400">
-                        <thead class="bg-slate-200 dark:bg-slate-800 text-xs uppercase font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-300 dark:border-slate-700">
+                        <thead
+                            class="bg-slate-200 dark:bg-slate-800 text-xs uppercase font-semibold text-slate-700 dark:text-slate-300 border-b border-slate-300 dark:border-slate-700">
                             <tr>
                                 <th class="px-4 py-3">Uraian</th>
                                 <th class="px-4 py-3 w-32">Tanggal</th>
-                                <th class="px-4 py-3 w-48">File (Upload)</th>
+                                <th class="px-4 py-3 w-64">File (Upload)</th>
                                 <th class="px-4 py-3 w-32 text-center">Link</th>
+                                <th class="px-2 py-3 w-16 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
-                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                                <td class="px-4 py-3 text-sm">Dokumen Spesifikasi Kebutuhan Sistem (SRS)</td>
-                                <td class="px-4 py-3 text-xs">20 Jun 2026</td>
-                                <td class="px-4 py-3">
-                                    <div class="flex items-center gap-2">
-                                        <i class="ti ti-file-text text-blue-500"></i>
-                                        <a href="#" class="text-xs hover:underline truncate">SRS_IT_Work_Hub.docx</a>
+                        <tbody id="tbody-doc" class="divide-y divide-slate-200 dark:divide-slate-800">
+                            @php $docs = $project->documents->where('type', 'Dokumen'); @endphp
+                            @forelse($docs as $doc)
+                            <tr data-id="{{ $doc->id }}" class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                                <td class="px-2 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm px-2 py-1.5 rounded" value="{{ $doc->description }}"></td>
+                                <td class="px-2 py-1 w-32"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="{{ $doc->document_date ? \Carbon\Carbon::parse($doc->document_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-2 py-1 w-64">
+                                    <div class="flex flex-col gap-1">
+                                        @if($doc->file_path)
+                                            <a href="{{ asset('storage/' . $doc->file_path) }}" target="_blank" class="text-xs text-blue-500 hover:underline truncate w-full" title="Lihat file saat ini"><i class="ti ti-file-text"></i> Lihat File Saat Ini</a>
+                                        @endif
+                                        <div class="flex items-center gap-2">
+                                            <label class="cursor-pointer flex-shrink-0 bg-blue-50 hover:bg-blue-100 text-blue-700 p-1.5 rounded transition-colors" title="Upload File Baru">
+                                                <i class="ti ti-upload text-sm"></i>
+                                                <input type="file" class="hidden" onchange="this.parentElement.nextElementSibling.textContent = this.files[0] ? this.files[0].name : 'Belum pilih file'">
+                                            </label>
+                                            <span class="text-[10px] text-slate-400 truncate w-40" title="Nama file baru">Belum pilih file</span>
+                                        </div>
                                     </div>
                                 </td>
-                                <td class="px-4 py-3 text-center">
-                                    <a href="#" class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300" title="Buka Link">
-                                        <i class="ti ti-external-link text-lg"></i>
-                                    </a>
+                                <td class="px-2 py-1 w-32"><input type="url" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded text-center" value="{{ $doc->link }}" placeholder="https://..."></td>
+                                <td class="px-2 py-1 w-16 text-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <button type="button" class="text-white bg-[#639922] hover:bg-[#3B6D11] rounded px-1.5 py-1 transition-colors mr-1" title="Simpan Baris" onclick="saveRow(this, 'Dokumen')"><i class="ti ti-device-floppy"></i></button>
+                                    <button type="button" class="text-white bg-red-500 hover:bg-red-600 rounded px-1.5 py-1 transition-colors" title="Hapus Baris" onclick="removeRow(this)"><i class="ti ti-trash"></i></button>
                                 </td>
                             </tr>
-                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                                <td class="px-4 py-3 text-sm">Mockup Desain UI/UX Fase 1</td>
-                                <td class="px-4 py-3 text-xs">22 Jun 2026</td>
-                                <td class="px-4 py-3">
-                                    <div class="flex items-center gap-2">
-                                        <i class="ti ti-file-text text-blue-500"></i>
-                                        <a href="#" class="text-xs hover:underline truncate">Mockup_UI_Fase1.pdf</a>
-                                    </div>
-                                </td>
-                                <td class="px-4 py-3 text-center">
-                                    <a href="https://figma.com" target="_blank" class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300" title="Buka Link Figma">
-                                        <i class="ti ti-external-link text-lg"></i>
-                                    </a>
-                                </td>
+                            @empty
+                            <tr class="empty-state hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                <td class="px-4 py-8 text-slate-500 italic text-center" colspan="5">Belum ada dokumen pendukung.</td>
                             </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -200,4 +239,123 @@
 
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        function addRow(tbodyId) {
+            const tbody = document.getElementById(tbodyId);
+            const emptyRow = tbody.querySelector('.empty-state');
+            if (emptyRow) emptyRow.remove();
+
+            const type = tbodyId === 'tbody-pir' ? 'PIR' : 'Dokumen';
+
+            const template = `
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                    <td class="px-2 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm px-2 py-1.5 rounded" placeholder="Uraian..."></td>
+                    <td class="px-2 py-1 w-32"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded"></td>
+                    <td class="px-2 py-1 w-64">
+                        <div class="flex flex-col gap-1">
+                            <div class="flex items-center gap-2">
+                                <label class="cursor-pointer flex-shrink-0 bg-blue-50 hover:bg-blue-100 text-blue-700 p-1.5 rounded transition-colors" title="Upload File">
+                                    <i class="ti ti-upload text-sm"></i>
+                                    <input type="file" class="hidden" onchange="this.parentElement.nextElementSibling.textContent = this.files[0] ? this.files[0].name : 'Belum pilih file'">
+                                </label>
+                                <span class="text-[10px] text-slate-400 truncate w-40" title="Nama file">Belum pilih file</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-2 py-1 w-32"><input type="url" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded text-center" placeholder="https://..."></td>
+                    <td class="px-2 py-1 w-16 text-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button type="button" class="text-white bg-[#639922] hover:bg-[#3B6D11] rounded px-1.5 py-1 transition-colors mr-1" title="Simpan Baris" onclick="saveRow(this, '${type}')"><i class="ti ti-device-floppy"></i></button>
+                        <button type="button" class="text-white bg-red-500 hover:bg-red-600 rounded px-1.5 py-1 transition-colors" title="Hapus Baris" onclick="removeRow(this)"><i class="ti ti-trash"></i></button>
+                    </td>
+                </tr>
+            `;
+            tbody.insertAdjacentHTML('beforeend', template);
+        }
+
+        async function saveRow(btn, type) {
+            const tr = btn.closest('tr');
+            const inputs = tr.querySelectorAll('input');
+            const documentId = tr.dataset.id || '';
+            const formData = new FormData();
+
+            formData.append('_token', '{{ csrf_token() }}');
+            if (documentId) formData.append('document_id', documentId);
+            formData.append('type', type);
+            formData.append('description', inputs[0].value);
+            formData.append('document_date', inputs[1].value);
+            if (inputs[2].files.length > 0) {
+                formData.append('file', inputs[2].files[0]);
+            }
+            formData.append('link', inputs[3].value);
+
+            const icon = btn.querySelector('i');
+            const originalIcon = icon.className;
+            icon.className = 'ti ti-loader animate-spin';
+
+            try {
+                const response = await fetch("{{ route('it-work-hub.documents.save', $project->id) }}", {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    let errMsg = 'Gagal menyimpan. ';
+                    if (errorData.errors) {
+                        errMsg += Object.values(errorData.errors).flat().join(', ');
+                    } else if (errorData.message) {
+                        errMsg += errorData.message;
+                    }
+                    throw new Error(errMsg);
+                }
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    tr.dataset.id = result.document.id;
+                    icon.className = 'ti ti-check text-white';
+                    setTimeout(() => icon.className = originalIcon, 2000);
+                } else {
+                    throw new Error(result.message || 'Gagal menyimpan');
+                }
+            } catch (error) {
+                console.error(error);
+                alert(error.message);
+                icon.className = 'ti ti-alert-circle text-white';
+                setTimeout(() => icon.className = originalIcon, 2000);
+            }
+        }
+
+        async function removeRow(btn) {
+            const tr = btn.closest('tr');
+            const documentId = tr.dataset.id;
+
+            if (documentId) {
+                if(!confirm('Yakin ingin menghapus dokumen ini?')) return;
+
+                const icon = btn.querySelector('i');
+                icon.className = 'ti ti-loader animate-spin';
+
+                try {
+                    const response = await fetch(`/it-work-hub/documents/${documentId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        }
+                    });
+                    const result = await response.json();
+                    if (!result.success) throw new Error('Gagal menghapus');
+                } catch (error) {
+                    console.error(error);
+                    icon.className = 'ti ti-alert-circle text-red-500';
+                    return;
+                }
+            }
+            tr.remove();
+        }
+    </script>
+    @endpush
 </x-layouts.app>

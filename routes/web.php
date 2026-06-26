@@ -45,13 +45,22 @@ Route::middleware('auth')->group(function () {
         Route::get('/waha-connection', [\App\Http\Controllers\WahaConnectionController::class, 'index'])->name('waha-connection.index');
     });
 
-    // IT Work Hub (Mockup UI)
+    // IT Work Hub
     Route::prefix('it-work-hub')->name('it-work-hub.')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\ItWorkHubController::class, 'dashboard'])->name('dashboard');
         Route::get('/longlist', [\App\Http\Controllers\ItWorkHubController::class, 'longlist'])->name('longlist');
         Route::get('/create', [\App\Http\Controllers\ItWorkHubController::class, 'create'])->name('create');
+        Route::post('/store', [\App\Http\Controllers\ItWorkHubController::class, 'store'])->name('store');
         Route::get('/show/{id}', [\App\Http\Controllers\ItWorkHubController::class, 'show'])->name('show');
+        
+        // Activities
         Route::get('/activities/{id}', [\App\Http\Controllers\ItWorkHubController::class, 'activities'])->name('activities');
+        Route::post('/activities/{id}/save', [\App\Http\Controllers\ItWorkHubController::class, 'updateActivities'])->name('activities.save');
+        
+        // Documents
+        Route::post('/documents/{id}/save', [\App\Http\Controllers\ItWorkHubController::class, 'storeDocument'])->name('documents.save');
+        Route::delete('/documents/{id}', [\App\Http\Controllers\ItWorkHubController::class, 'destroyDocument'])->name('documents.destroy');
+
         Route::get('/repository', [\App\Http\Controllers\ItWorkHubController::class, 'repository'])->name('repository');
     });
 

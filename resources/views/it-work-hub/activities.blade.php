@@ -6,11 +6,16 @@
             <a href="{{ route('it-work-hub.longlist') }}" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800">
                 <i class="ti ti-arrow-left text-xl"></i>
             </a>
-            <div>
-                <h2 class="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
-                    IT Work Hub <span class="text-slate-400 font-normal text-lg">| Detail Aktivitas</span>
-                </h2>
-                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">Kelola daftar fitur awal, change request (CR), dan pelaporan bug.</p>
+            <div class="flex-1 flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                        {{ $project->name }} <span class="text-slate-400 font-normal text-lg">| Detail Aktivitas</span>
+                    </h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">{{ $project->description ?? '-' }}</p>
+                </div>
+                <button onclick="saveAllActivities()" id="btn-save-all" class="px-5 py-2.5 bg-[#639922] hover:bg-[#3B6D11] text-white font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-2">
+                    <i class="ti ti-device-floppy"></i> Simpan Semua Perubahan
+                </button>
             </div>
         </div>
 
@@ -56,58 +61,42 @@
                             </tr>
                         </thead>
                         <tbody id="tbody-fitur" class="divide-y divide-slate-200 dark:divide-slate-800">
-                            <!-- Mock Data Row 1 -->
-                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                            @php $fiturActivities = $project->activities->where('type', 'Fitur')->sortBy('sort_order'); @endphp
+                            @forelse($fiturActivities as $index => $activity)
+                            <tr data-id="{{ $activity->id }}" class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
                                 <td class="px-2 py-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-move text-center"><i class="ti ti-grip-vertical text-lg"></i></td>
-                                <td class="px-2 py-1 text-center font-medium text-slate-500 row-number"><span class="number-text">1</span></td>
-                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm font-medium text-slate-800 dark:text-slate-200 px-2 py-1.5 rounded" value="Membuat UI Mockup App Dev"></td>
-                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="2026-06-20"></td>
-                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="2026-06-25"></td>
-                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-red-500 px-1 py-1.5 rounded" value="2026-06-26"></td>
-                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded" value="Revisi desain tabel"></td>
+                                <td class="px-2 py-1 text-center font-medium text-slate-500 row-number"><span class="number-text">{{ $loop->iteration }}</span></td>
+                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm font-medium text-slate-800 dark:text-slate-200 px-2 py-1.5 rounded" value="{{ $activity->name }}"></td>
+                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="{{ $activity->start_date ? \Carbon\Carbon::parse($activity->start_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="{{ $activity->end_date ? \Carbon\Carbon::parse($activity->end_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-red-500 px-1 py-1.5 rounded" value="{{ $activity->adjusted_date ? \Carbon\Carbon::parse($activity->adjusted_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded" value="{{ $activity->description }}"></td>
                                 <td class="px-1 py-1">
-                                    <div class="flex items-center gap-1 bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 rounded px-1.5 py-1">
-                                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-200 text-slate-700 text-[10px] font-semibold">Frontend</span>
-                                        <input type="text" class="flex-1 bg-transparent border-none focus:ring-0 text-xs p-0" placeholder="...">
-                                    </div>
+                                    <select multiple class="input-pics w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] px-1 py-1 rounded h-14">
+                                        @foreach($users as $user)
+                                            <option value="{{ $user->id }}" {{ $activity->pics->contains('id', $user->id) ? 'selected' : '' }}>{{ $user->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </td>
-                                <td class="px-1 py-1 text-center"><input type="url" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-indigo-600 px-2 py-1.5 rounded text-center" value="https://docs.google.com/test"></td>
+                                <td class="px-1 py-1 text-center"><input type="url" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-indigo-600 px-2 py-1.5 rounded text-center" value="{{ $activity->document_link }}"></td>
                                 <td class="px-1 py-1">
                                     <select class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold text-blue-700 px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
-                                        <option value="Not Started">NOT STARTED</option>
-                                        <option value="Programming" selected>PROGRAMMING</option>
-                                        <option value="Tech Testing">TECH TESTING</option>
-                                        <option value="Done">DONE</option>
+                                        <option value="Not Started" {{ $activity->status == 'Not Started' ? 'selected' : '' }}>NOT STARTED</option>
+                                        <option value="Ureq Analysis" {{ $activity->status == 'Ureq Analysis' ? 'selected' : '' }}>UREQ ANALYSIS</option>
+                                        <option value="Programming" {{ $activity->status == 'Programming' ? 'selected' : '' }}>PROGRAMMING</option>
+                                        <option value="Tech Testing" {{ $activity->status == 'Tech Testing' ? 'selected' : '' }}>TECH TESTING</option>
+                                        <option value="SIT" {{ $activity->status == 'SIT' ? 'selected' : '' }}>SIT</option>
+                                        <option value="UAT" {{ $activity->status == 'UAT' ? 'selected' : '' }}>UAT</option>
+                                        <option value="Done" {{ $activity->status == 'Done' ? 'selected' : '' }}>DONE</option>
                                     </select>
                                 </td>
                                 <td class="px-2 py-1 text-center opacity-0 group-hover:opacity-100 transition-opacity"><button type="button" class="text-slate-400 hover:text-red-500 transition-colors" title="Hapus Baris" onclick="removeRow(this)"><i class="ti ti-trash"></i></button></td>
                             </tr>
-                            <!-- Mock Data Row 2 -->
-                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
-                                <td class="px-2 py-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-move text-center"><i class="ti ti-grip-vertical text-lg"></i></td>
-                                <td class="px-2 py-1 text-center font-medium text-slate-500 row-number"><span class="number-text">2</span></td>
-                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm font-medium text-slate-800 dark:text-slate-200 px-2 py-1.5 rounded" value="Database Migration & Models"></td>
-                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="2026-06-27"></td>
-                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="2026-06-30"></td>
-                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded"></td>
-                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded" value="-"></td>
-                                <td class="px-1 py-1">
-                                    <div class="flex items-center gap-1 bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 rounded px-1.5 py-1">
-                                        <span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-slate-200 text-slate-700 text-[10px] font-semibold">Backend</span>
-                                        <input type="text" class="flex-1 bg-transparent border-none focus:ring-0 text-xs p-0" placeholder="...">
-                                    </div>
-                                </td>
-                                <td class="px-1 py-1 text-center"><input type="url" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-indigo-600 px-2 py-1.5 rounded text-center" placeholder="https://..."></td>
-                                <td class="px-1 py-1">
-                                    <select class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold text-slate-500 px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
-                                        <option value="Not Started" selected>NOT STARTED</option>
-                                        <option value="Programming">PROGRAMMING</option>
-                                        <option value="Tech Testing">TECH TESTING</option>
-                                        <option value="Done">DONE</option>
-                                    </select>
-                                </td>
-                                <td class="px-2 py-1 text-center opacity-0 group-hover:opacity-100 transition-opacity"><button type="button" class="text-slate-400 hover:text-red-500 transition-colors" title="Hapus Baris" onclick="removeRow(this)"><i class="ti ti-trash"></i></button></td>
+                            @empty
+                            <tr class="empty-state">
+                                <td class="px-3 py-8 text-center text-slate-400" colspan="11">Belum ada data Fitur. Klik "Tambah Baris" untuk menginput data.</td>
                             </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -140,9 +129,42 @@
                             </tr>
                         </thead>
                         <tbody id="tbody-cr" class="divide-y divide-slate-200 dark:divide-slate-800">
+                            @php $crActivities = $project->activities->where('type', 'CR')->sortBy('sort_order'); @endphp
+                            @forelse($crActivities as $index => $activity)
+                            <tr data-id="{{ $activity->id }}" class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                                <td class="px-2 py-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-move text-center"><i class="ti ti-grip-vertical text-lg"></i></td>
+                                <td class="px-2 py-1 text-center font-medium text-slate-500 row-number"><span class="number-text">{{ $loop->iteration }}</span></td>
+                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm font-medium text-slate-800 dark:text-slate-200 px-2 py-1.5 rounded" value="{{ $activity->name }}"></td>
+                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="{{ $activity->start_date ? \Carbon\Carbon::parse($activity->start_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="{{ $activity->end_date ? \Carbon\Carbon::parse($activity->end_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-red-500 px-1 py-1.5 rounded" value="{{ $activity->adjusted_date ? \Carbon\Carbon::parse($activity->adjusted_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded" value="{{ $activity->description }}"></td>
+                                <td class="px-1 py-1">
+                                    <select multiple class="input-pics w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] px-1 py-1 rounded h-14">
+                                        @foreach($users as $user)
+                                            <option value="{{ $user->id }}" {{ $activity->pics->contains('id', $user->id) ? 'selected' : '' }}>{{ $user->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td class="px-1 py-1 text-center"><input type="url" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-indigo-600 px-2 py-1.5 rounded text-center" value="{{ $activity->document_link }}"></td>
+                                <td class="px-1 py-1">
+                                    <select class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold text-blue-700 px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
+                                        <option value="Not Started" {{ $activity->status == 'Not Started' ? 'selected' : '' }}>NOT STARTED</option>
+                                        <option value="Ureq Analysis" {{ $activity->status == 'Ureq Analysis' ? 'selected' : '' }}>UREQ ANALYSIS</option>
+                                        <option value="Programming" {{ $activity->status == 'Programming' ? 'selected' : '' }}>PROGRAMMING</option>
+                                        <option value="Tech Testing" {{ $activity->status == 'Tech Testing' ? 'selected' : '' }}>TECH TESTING</option>
+                                        <option value="SIT" {{ $activity->status == 'SIT' ? 'selected' : '' }}>SIT</option>
+                                        <option value="UAT" {{ $activity->status == 'UAT' ? 'selected' : '' }}>UAT</option>
+                                        <option value="Done" {{ $activity->status == 'Done' ? 'selected' : '' }}>DONE</option>
+                                    </select>
+                                </td>
+                                <td class="px-2 py-1 text-center opacity-0 group-hover:opacity-100 transition-opacity"><button type="button" class="text-slate-400 hover:text-red-500 transition-colors" title="Hapus Baris" onclick="removeRow(this)"><i class="ti ti-trash"></i></button></td>
+                            </tr>
+                            @empty
                             <tr class="empty-state">
                                 <td class="px-3 py-8 text-center text-slate-400" colspan="11">Belum ada data Change Request. Klik "Tambah Baris CR" untuk menginput data.</td>
                             </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -175,9 +197,42 @@
                             </tr>
                         </thead>
                         <tbody id="tbody-bug" class="divide-y divide-slate-200 dark:divide-slate-800">
+                            @php $bugActivities = $project->activities->where('type', 'Bug')->sortBy('sort_order'); @endphp
+                            @forelse($bugActivities as $index => $activity)
+                            <tr data-id="{{ $activity->id }}" class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
+                                <td class="px-2 py-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-move text-center"><i class="ti ti-grip-vertical text-lg"></i></td>
+                                <td class="px-2 py-1 text-center font-medium text-slate-500 row-number"><span class="number-text">{{ $loop->iteration }}</span></td>
+                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm font-medium text-slate-800 dark:text-slate-200 px-2 py-1.5 rounded" value="{{ $activity->name }}"></td>
+                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="{{ $activity->start_date ? \Carbon\Carbon::parse($activity->start_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="{{ $activity->end_date ? \Carbon\Carbon::parse($activity->end_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-red-500 px-1 py-1.5 rounded" value="{{ $activity->adjusted_date ? \Carbon\Carbon::parse($activity->adjusted_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded" value="{{ $activity->description }}"></td>
+                                <td class="px-1 py-1">
+                                    <select multiple class="input-pics w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] px-1 py-1 rounded h-14">
+                                        @foreach($users as $user)
+                                            <option value="{{ $user->id }}" {{ $activity->pics->contains('id', $user->id) ? 'selected' : '' }}>{{ $user->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td class="px-1 py-1 text-center"><input type="url" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-indigo-600 px-2 py-1.5 rounded text-center" value="{{ $activity->document_link }}"></td>
+                                <td class="px-1 py-1">
+                                    <select class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold text-blue-700 px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
+                                        <option value="Not Started" {{ $activity->status == 'Not Started' ? 'selected' : '' }}>NOT STARTED</option>
+                                        <option value="Ureq Analysis" {{ $activity->status == 'Ureq Analysis' ? 'selected' : '' }}>UREQ ANALYSIS</option>
+                                        <option value="Programming" {{ $activity->status == 'Programming' ? 'selected' : '' }}>PROGRAMMING</option>
+                                        <option value="Tech Testing" {{ $activity->status == 'Tech Testing' ? 'selected' : '' }}>TECH TESTING</option>
+                                        <option value="SIT" {{ $activity->status == 'SIT' ? 'selected' : '' }}>SIT</option>
+                                        <option value="UAT" {{ $activity->status == 'UAT' ? 'selected' : '' }}>UAT</option>
+                                        <option value="Done" {{ $activity->status == 'Done' ? 'selected' : '' }}>DONE</option>
+                                    </select>
+                                </td>
+                                <td class="px-2 py-1 text-center opacity-0 group-hover:opacity-100 transition-opacity"><button type="button" class="text-slate-400 hover:text-red-500 transition-colors" title="Hapus Baris" onclick="removeRow(this)"><i class="ti ti-trash"></i></button></td>
+                            </tr>
+                            @empty
                             <tr class="empty-state">
                                 <td class="px-3 py-8 text-center text-slate-400" colspan="11">Belum ada laporan Bug. Klik "Tambah Baris Bug" untuk menginput data.</td>
                             </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -197,9 +252,11 @@
             <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-red-500 px-1 py-1.5 rounded"></td>
             <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded" placeholder="Keterangan..."></td>
             <td class="px-1 py-1">
-                <div class="flex items-center gap-1 bg-transparent hover:bg-slate-100 dark:hover:bg-slate-800 rounded px-1.5 py-1">
-                    <input type="text" class="flex-1 bg-transparent border-none focus:ring-0 text-xs p-0" placeholder="Pilih PIC...">
-                </div>
+                <select multiple class="input-pics w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] px-1 py-1 rounded h-14">
+                    @foreach($users as $user)
+                        <option value="{{ $user->id }}">{{ $user->name }}</option>
+                    @endforeach
+                </select>
             </td>
             <td class="px-1 py-1 text-center"><input type="url" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-indigo-600 px-2 py-1.5 rounded text-center" placeholder="https://..."></td>
             <td class="px-1 py-1">
@@ -208,8 +265,8 @@
                     <option value="Ureq Analysis">UREQ ANALYSIS</option>
                     <option value="Programming">PROGRAMMING</option>
                     <option value="Tech Testing">TECH TESTING</option>
-                    <option value="UAT">UAT</option>
                     <option value="SIT">SIT</option>
+                    <option value="UAT">UAT</option>
                     <option value="Done">DONE</option>
                 </select>
             </td>
@@ -217,14 +274,96 @@
         </tr>
     </template>
 
+    @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            ['tbody-fitur', 'tbody-cr', 'tbody-bug'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) {
+                    new Sortable(el, {
+                        handle: '.cursor-move',
+                        animation: 150,
+                        onEnd: function() {
+                            const rows = el.querySelectorAll('tr:not(.empty-state)');
+                            rows.forEach((row, idx) => {
+                                row.querySelector('.number-text').textContent = idx + 1;
+                            });
+                        }
+                    });
+                }
+            });
+        });
+
+        async function saveAllActivities() {
+            const btn = document.getElementById('btn-save-all');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="ti ti-loader animate-spin"></i> Menyimpan...';
+            btn.disabled = true;
+
+            const activities = [];
+            const types = ['fitur', 'cr', 'bug'];
+            
+            types.forEach(type => {
+                const tbody = document.getElementById('tbody-' + type);
+                const rows = tbody.querySelectorAll('tr:not(.empty-state)');
+                
+                rows.forEach((row, index) => {
+                    const inputs = row.querySelectorAll('input, select');
+                    const activity = {
+                        id: row.dataset.id || null,
+                        type: type === 'fitur' ? 'Fitur' : (type === 'cr' ? 'CR' : 'Bug'),
+                        sort_order: index + 1,
+                        name: inputs[0].value,
+                        start_date: inputs[1].value,
+                        end_date: inputs[2].value,
+                        adjusted_date: inputs[3].value,
+                        description: inputs[4].value,
+                        pics: Array.from(inputs[5].selectedOptions).map(opt => opt.value),
+                        document_link: inputs[6].value,
+                        status: inputs[7].value
+                    };
+                    if (activity.name.trim() !== '') {
+                        activities.push(activity);
+                    }
+                });
+            });
+
+            try {
+                const response = await fetch("{{ route('it-work-hub.activities.save', $project->id) }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ activities })
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    btn.innerHTML = '<i class="ti ti-check"></i> Tersimpan';
+                    btn.classList.replace('bg-[#639922]', 'bg-blue-600');
+                    setTimeout(() => window.location.reload(), 1000);
+                } else {
+                    throw new Error('Save failed');
+                }
+            } catch (error) {
+                console.error(error);
+                btn.innerHTML = '<i class="ti ti-alert-circle"></i> Gagal';
+                btn.classList.replace('bg-[#639922]', 'bg-red-600');
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    btn.classList.replace('bg-red-600', 'bg-[#639922]');
+                }, 2000);
+            }
+        }
+
         function switchTab(tab) {
-            // Sembunyikan semua konten tab
             document.getElementById('tab-content-fitur').classList.add('hidden');
             document.getElementById('tab-content-cr').classList.add('hidden');
             document.getElementById('tab-content-bug').classList.add('hidden');
             
-            // Reset gaya tombol tab (hilangkan status aktif)
             const btnFitur = document.getElementById('tab-btn-fitur');
             const btnCr = document.getElementById('tab-btn-cr');
             const btnBug = document.getElementById('tab-btn-bug');
@@ -232,13 +371,11 @@
             const inactiveClass = ['font-medium', 'text-slate-500', 'hover:text-slate-700', 'dark:hover:text-slate-300'];
             const activeClass = ['font-semibold', 'border-b-2', 'border-[#639922]', 'text-[#639922]', 'bg-white', 'dark:bg-slate-900', 'rounded-t-lg'];
             
-            // Remove active classes
             [btnFitur, btnCr, btnBug].forEach(btn => {
                 btn.classList.remove(...activeClass);
                 btn.classList.add(...inactiveClass);
             });
             
-            // Tampilkan konten tab yang dipilih dan beri gaya aktif
             document.getElementById('tab-content-' + tab).classList.remove('hidden');
             const activeBtn = document.getElementById('tab-btn-' + tab);
             activeBtn.classList.remove(...inactiveClass);
@@ -247,23 +384,14 @@
 
         function addRow(tbodyId) {
             const tbody = document.getElementById(tbodyId);
-            
-            // Hilangkan tulisan "Belum ada data" jika ada
             const emptyState = tbody.querySelector('.empty-state');
-            if (emptyState) {
-                emptyState.remove();
-            }
+            if (emptyState) emptyState.remove();
 
-            // Ambil template
             const template = document.getElementById('row-template');
             const newRow = template.content.cloneNode(true);
             
-            // Hitung nomor urut terbaru
             const trs = tbody.querySelectorAll('tr:not(.empty-state)');
-            const newIndex = trs.length + 1;
-            newRow.querySelector('.number-text').textContent = newIndex;
-
-            // Append baris baru
+            newRow.querySelector('.number-text').textContent = trs.length + 1;
             tbody.appendChild(newRow);
         }
 
@@ -272,13 +400,11 @@
             const tbody = tr.parentElement;
             tr.remove();
 
-            // Update penomoran
             const remainingTrs = tbody.querySelectorAll('tr:not(.empty-state)');
             remainingTrs.forEach((row, index) => {
                 row.querySelector('.number-text').textContent = index + 1;
             });
 
-            // Munculkan empty state jika tabel kosong
             if (remainingTrs.length === 0) {
                 const emptyRow = document.createElement('tr');
                 emptyRow.className = 'empty-state';
@@ -287,4 +413,5 @@
             }
         }
     </script>
+    @endpush
 </x-layouts.app>

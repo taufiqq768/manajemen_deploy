@@ -16,7 +16,19 @@
 
         <div
             class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-            <form action="#" class="p-6 space-y-8">
+            <form action="{{ route('it-work-hub.store') }}" method="POST" class="p-6 space-y-8">
+                @csrf
+
+                {{-- Flash Error --}}
+                @if ($errors->any())
+                    <div class="p-4 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-lg text-sm mb-6">
+                        <ul class="list-disc list-inside">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
                 {{-- Bagian 1: Informasi Umum --}}
                 <div class="space-y-4">
@@ -28,83 +40,62 @@
                         <div class="space-y-1 md:col-span-2">
                             <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Nama Project <span
                                     class="text-red-500">*</span></label>
-                            <input type="text"
+                            <input type="text" name="name" required value="{{ old('name') }}"
                                 class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]"
                                 placeholder="Contoh: Aplikasi Absensi Wajah">
                         </div>
 
                         <div class="space-y-1 md:col-span-2">
                             <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Uraian Singkat</label>
-                            <textarea rows="3"
+                            <textarea rows="3" name="description"
                                 class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]"
-                                placeholder="Deskripsi singkat tentang project..."></textarea>
+                                placeholder="Deskripsi singkat tentang project...">{{ old('description') }}</textarea>
                         </div>
 
                         <div class="space-y-1">
-                            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Priority</label>
-                            <select
+                            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Priority <span class="text-red-500">*</span></label>
+                            <select name="priority" required
                                 class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]">
-                                <option>High</option>
-                                <option>Medium</option>
-                                <option>Low</option>
+                                <option value="High" {{ old('priority') == 'High' ? 'selected' : '' }}>High</option>
+                                <option value="Medium" {{ old('priority') == 'Medium' ? 'selected' : '' }}>Medium</option>
+                                <option value="Low" {{ old('priority') == 'Low' ? 'selected' : '' }}>Low</option>
                             </select>
                         </div>
 
                         <div class="space-y-1">
-                            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Status Awal</label>
-                            <select
+                            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Status Awal <span class="text-red-500">*</span></label>
+                            <select name="status" required
                                 class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]">
-                                <option>Not Started</option>
-                                <option>Live</option>
-                                <option>Hold</option>
+                                <option value="Not Started" {{ old('status') == 'Not Started' ? 'selected' : '' }}>Not Started</option>
+                                <option value="Live" {{ old('status') == 'Live' ? 'selected' : '' }}>Live</option>
+                                <option value="Hold" {{ old('status') == 'Hold' ? 'selected' : '' }}>Hold</option>
                             </select>
                         </div>
 
                         <div class="space-y-1">
-                            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Squad / Tim <span
-                                    class="font-normal text-slate-400 text-xs">(Bisa multi-person)</span></label>
-                            <div
-                                class="flex flex-wrap items-center gap-1.5 p-1.5 w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 focus-within:border-[#639922] focus-within:ring-1 focus-within:ring-[#639922]">
-                                <span
-                                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium border border-slate-200 dark:border-slate-700">
-                                    Tim Alpha
-                                    <button type="button" class="text-slate-400 hover:text-red-500"><i
-                                            class="ti ti-x"></i></button>
-                                </span>
-                                <span
-                                    class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium border border-slate-200 dark:border-slate-700">
-                                    Budi
-                                    <button type="button" class="text-slate-400 hover:text-red-500"><i
-                                            class="ti ti-x"></i></button>
-                                </span>
-                                <input type="text"
-                                    class="flex-1 min-w-[120px] bg-transparent border-none focus:ring-0 text-sm p-0.5 outline-none"
-                                    placeholder="Ketik nama...">
-                            </div>
+                            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Squad / Tim <span class="text-red-500">*</span> <span
+                                    class="font-normal text-slate-400 text-xs">(Gunakan Ctrl/Cmd untuk pilih lebih dari 1)</span></label>
+                            
+                            <select name="squads[]" multiple required class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922] h-32">
+                                @foreach($users as $user)
+                                    <option value="{{ $user->id }}">{{ $user->name }} ({{ ucfirst($user->role) }})</option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="space-y-1">
                             <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Business Process Owner
                                 (BPO)</label>
-                            <input type="text"
+                            <input type="text" name="bpo" value="{{ old('bpo') }}"
                                 class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]"
                                 placeholder="Divisi terkait">
                         </div>
 
                         <div class="space-y-1">
                             <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Progress Awal
-                                (%)</label>
-                            <input type="number" min="0" max="100"
-                                class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]"
-                                value="0">
-                        </div>
-
-                        <div class="space-y-1">
-                            <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Nomor Dokumen
-                                BRD</label>
-                            <input type="text"
-                                class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]"
-                                placeholder="Opsional">
+                                (%) <span class="text-red-500">*</span></label>
+                            <input type="number" name="progress" min="0" max="100" required value="{{ old('progress', 0) }}"
+                                class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]">
                         </div>
                     </div>
                 </div>
@@ -119,17 +110,17 @@
                         <div class="space-y-1 md:col-span-2">
                             <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Uraian Pain
                                 Point</label>
-                            <textarea rows="3"
+                            <textarea rows="3" name="pain_point_uraian"
                                 class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]"
-                                placeholder="Apa masalah yang ingin diselesaikan?"></textarea>
+                                placeholder="Apa masalah yang ingin diselesaikan?">{{ old('pain_point_uraian') }}</textarea>
                         </div>
 
                         <div class="space-y-1 md:col-span-2">
                             <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Impact
                                 (Dampak)</label>
-                            <textarea rows="3"
+                            <textarea rows="3" name="pain_point_impact"
                                 class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]"
-                                placeholder="Dampak dari pain point tersebut"></textarea>
+                                placeholder="Dampak dari pain point tersebut">{{ old('pain_point_impact') }}</textarea>
                         </div>
                     </div>
                 </div>
@@ -139,7 +130,7 @@
                         class="px-5 py-2.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium rounded-lg shadow-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
                         Batal
                     </a>
-                    <button type="button" onclick="window.location.href='{{ route('it-work-hub.longlist') }}'"
+                    <button type="submit"
                         class="px-5 py-2.5 bg-[#639922] hover:bg-[#3B6D11] text-white font-medium rounded-lg shadow-sm transition-colors">
                         Simpan Project
                     </button>

@@ -357,6 +357,7 @@
             applyTheme(theme);
         })();
     </script>
+    @stack('scripts')
 </body>
 
 </html>

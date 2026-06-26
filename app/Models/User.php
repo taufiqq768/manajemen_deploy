@@ -73,6 +73,18 @@ class User extends Authenticatable
         return $this->hasMany(Notification::class);
     }
 
+    /** IT Work Hub: Project dimana user ini sebagai Squad */
+    public function itWhProjects()
+    {
+        return $this->belongsToMany(ItWhProject::class, 'it_wh_project_user', 'user_id', 'it_wh_project_id');
+    }
+
+    /** IT Work Hub: Aktivitas dimana user ini sebagai PIC */
+    public function itWhActivities()
+    {
+        return $this->belongsToMany(ItWhActivity::class, 'it_wh_activity_user', 'user_id', 'it_wh_activity_id');
+    }
+
     /** Jumlah notifikasi yang belum dibaca */
     public function unreadNotificationsCount(): int
     {
