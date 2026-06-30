@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('notifications', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->foreignId('deploy_request_id')->constrained('deploy_requests')->cascadeOnDelete();
-            $table->string('title', 200);
-            $table->text('message');
-            $table->enum('type', ['in_app', 'email'])->default('in_app');
-            $table->boolean('is_read')->default(false);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('notifications')) {
+            Schema::create('notifications', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+                $table->foreignId('deploy_request_id')->constrained('deploy_requests')->cascadeOnDelete();
+                $table->string('title', 200);
+                $table->text('message');
+                $table->enum('type', ['in_app', 'email'])->default('in_app');
+                $table->boolean('is_read')->default(false);
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -28,6 +30,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('notifications');
+        if (Schema::hasTable('notifications')) {
+            Schema::dropIfExists('notifications');
+        }
     }
 };

@@ -63,7 +63,13 @@ class DeployRequestController extends Controller
         }
 
         $user = auth()->user();
-        $applications = Application::orderBy('name')->get(); // semua programmer akses semua app
+        if ($user->isProgrammer()) {
+            $applications = Application::whereHas('pics', function ($q) use ($user) {
+                $q->where('users.id', $user->id);
+            })->orderBy('name')->get();
+        } else {
+            $applications = Application::orderBy('name')->get();
+        }
 
         return view('deploy-requests.create', compact('applications'));
     }
@@ -71,8 +77,23 @@ class DeployRequestController extends Controller
     /** Simpan request baru */
     public function store(Request $request)
     {
+        $user = auth()->user();
         $validated = $request->validate([
-            'application_id' => 'required|exists:applications,id',
+            'application_id' => [
+                'required',
+                'exists:applications,id',
+                function ($attribute, $value, $fail) use ($user) {
+                    if ($user->isProgrammer()) {
+                        $isPic = \DB::table('application_user')
+                            ->where('application_id', $value)
+                            ->where('user_id', $user->id)
+                            ->exists();
+                        if (!$isPic) {
+                            $fail('Anda bukan PIC untuk aplikasi ini.');
+                        }
+                    }
+                }
+            ],
             'jenis' => 'required|in:Bug,CR',
             'version' => 'required|string|max:50',
             'release_notes' => 'required|string',
@@ -157,7 +178,14 @@ class DeployRequestController extends Controller
     {
         $this->authorize('update', $deployRequest);
 
-        $applications = Application::orderBy('name')->get(); // semua app tersedia
+        $user = auth()->user();
+        if ($user->isProgrammer()) {
+            $applications = Application::whereHas('pics', function ($q) use ($user) {
+                $q->where('users.id', $user->id);
+            })->orderBy('name')->get();
+        } else {
+            $applications = Application::orderBy('name')->get();
+        }
 
         return view('deploy-requests.edit', compact('deployRequest', 'applications'));
     }
@@ -167,8 +195,23 @@ class DeployRequestController extends Controller
     {
         $this->authorize('update', $deployRequest);
 
+        $user = auth()->user();
         $validated = $request->validate([
-            'application_id' => 'required|exists:applications,id',
+            'application_id' => [
+                'required',
+                'exists:applications,id',
+                function ($attribute, $value, $fail) use ($user) {
+                    if ($user->isProgrammer()) {
+                        $isPic = \DB::table('application_user')
+                            ->where('application_id', $value)
+                            ->where('user_id', $user->id)
+                            ->exists();
+                        if (!$isPic) {
+                            $fail('Anda bukan PIC untuk aplikasi ini.');
+                        }
+                    }
+                }
+            ],
             'jenis' => 'required|in:Bug,CR',
             'version' => 'required|string|max:50',
             'release_notes' => 'required|string',

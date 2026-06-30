@@ -11,14 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('applications', function (Blueprint $table) {
-            $table->id();
-            $table->string('name', 100);
-            $table->text('description')->nullable();
-            $table->string('repo_url', 255)->nullable();
-            $table->foreignId('pic_user_id')->constrained('users')->cascadeOnDelete();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('applications')) {
+            Schema::create('applications', function (Blueprint $table) {
+                $table->id();
+                $table->string('name', 100);
+                $table->text('description')->nullable();
+                $table->string('repo_url', 255)->nullable();
+                $table->foreignId('pic_user_id')->constrained('users')->cascadeOnDelete();
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -26,6 +28,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('applications');
+        if (Schema::hasTable('applications')) {
+            Schema::dropIfExists('applications');
+        }
     }
 };

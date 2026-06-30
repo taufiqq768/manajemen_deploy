@@ -11,20 +11,22 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('it_wh_projects', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->text('description')->nullable();
-            $table->string('priority')->default('Medium');
-            $table->string('status')->default('Not Started');
-            $table->string('bpo')->nullable();
-            $table->integer('progress')->default(0);
-            $table->string('brd_document')->nullable();
-            $table->text('pain_point_uraian')->nullable();
-            $table->text('pain_point_impact')->nullable();
-            $table->integer('sort_order')->default(0);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('it_wh_projects')) {
+            Schema::create('it_wh_projects', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->text('description')->nullable();
+                $table->string('priority')->default('Medium');
+                $table->string('status')->default('Not Started');
+                $table->string('bpo')->nullable();
+                $table->integer('progress')->default(0);
+                $table->string('brd_document')->nullable();
+                $table->text('pain_point_uraian')->nullable();
+                $table->text('pain_point_impact')->nullable();
+                $table->integer('sort_order')->default(0);
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -32,6 +34,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('it_wh_projects');
+        if (Schema::hasTable('it_wh_projects')) {
+            Schema::dropIfExists('it_wh_projects');
+        }
     }
 };

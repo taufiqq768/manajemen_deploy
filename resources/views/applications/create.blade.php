@@ -43,11 +43,45 @@
                 </div>
 
                 <div>
+                    <label for="app_url" class="block text-sm font-medium text-slate-300 mb-1.5">URL Live / App</label>
+                    <input type="url" id="app_url" name="app_url" value="{{ old('app_url') }}"
+                           placeholder="https://app.example.com"
+                           class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5
+                                  focus:outline-none focus:ring-2 focus:ring-indigo-500
+                                  @error('app_url') border-red-500 @enderror">
+                    @error('app_url') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
+                    <label for="version" class="block text-sm font-medium text-slate-300 mb-1.5">Versi Aplikasi</label>
+                    <input type="text" id="version" name="version" value="{{ old('version') }}"
+                           placeholder="contoh: 1.0.0"
+                           class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5
+                                  focus:outline-none focus:ring-2 focus:ring-indigo-500
+                                  @error('version') border-red-500 @enderror">
+                    @error('version') <p class="mt-1 text-xs text-red-400">{{ $message }}</p> @enderror
+                </div>
+
+                <div>
                     <label for="description" class="block text-sm font-medium text-slate-300 mb-1.5">Deskripsi</label>
                     <textarea id="description" name="description" rows="3"
                               placeholder="Deskripsi singkat aplikasi..."
                               class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5
                                      focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y">{{ old('description') }}</textarea>
+                </div>
+
+                <div>
+                    <label for="pic_ids" class="block text-sm font-medium text-slate-300 mb-1.5">Pilih PIC (Programmer)</label>
+                    <select id="pic_ids" name="pic_ids[]" multiple
+                            class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5
+                                   focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[120px]">
+                        @foreach($programmers as $programmer)
+                            <option value="{{ $programmer->id }}" {{ in_array($programmer->id, old('pic_ids', [])) ? 'selected' : '' }}>
+                                {{ $programmer->name }} ({{ $programmer->email }})
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="text-xs text-slate-500 mt-1.5">Tahan Ctrl (Windows) / Cmd (Mac) untuk memilih lebih dari satu PIC.</p>
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-2">

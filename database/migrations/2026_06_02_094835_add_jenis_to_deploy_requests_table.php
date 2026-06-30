@@ -11,9 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('deploy_requests', function (Blueprint $table) {
-            $table->enum('jenis', ['Bug', 'CR'])->after('application_id')->default('CR');
-        });
+        if (Schema::hasTable('deploy_requests')) {
+            Schema::table('deploy_requests', function (Blueprint $table) {
+                if (!Schema::hasColumn('deploy_requests', 'jenis')) {
+                    $table->enum('jenis', ['Bug', 'CR'])->after('application_id')->default('CR');
+                }
+            });
+        }
     }
 
     /**
@@ -21,8 +25,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('deploy_requests', function (Blueprint $table) {
-            $table->dropColumn('jenis');
-        });
+        if (Schema::hasTable('deploy_requests')) {
+            Schema::table('deploy_requests', function (Blueprint $table) {
+                if (Schema::hasColumn('deploy_requests', 'jenis')) {
+                    $table->dropColumn('jenis');
+                }
+            });
+        }
     }
 };

@@ -85,6 +85,12 @@ class User extends Authenticatable
         return $this->belongsToMany(ItWhActivity::class, 'it_wh_activity_user', 'user_id', 'it_wh_activity_id');
     }
 
+    /** Aplikasi yang dikelola oleh programmer ini */
+    public function applications()
+    {
+        return $this->belongsToMany(Application::class, 'application_user', 'user_id', 'application_id');
+    }
+
     /** Jumlah notifikasi yang belum dibaca */
     public function unreadNotificationsCount(): int
     {

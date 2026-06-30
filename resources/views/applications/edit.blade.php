@@ -39,6 +39,21 @@
                                      focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y">{{ old('description', $application->description) }}</textarea>
                 </div>
 
+                <div>
+                    <label for="pic_ids" class="block text-sm font-medium text-slate-300 mb-1.5">Pilih PIC (Programmer)</label>
+                    <select id="pic_ids" name="pic_ids[]" multiple
+                            class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5
+                                   focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[120px]">
+                        @foreach($programmers as $programmer)
+                            <option value="{{ $programmer->id }}" 
+                                {{ in_array($programmer->id, old('pic_ids', $application->pics->pluck('id')->toArray())) ? 'selected' : '' }}>
+                                {{ $programmer->name }} ({{ $programmer->email }})
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="text-xs text-slate-500 mt-1.5">Tahan Ctrl (Windows) / Cmd (Mac) untuk memilih lebih dari satu PIC.</p>
+                </div>
+
                 <div class="flex items-center justify-end gap-3 pt-2">
                     <a href="{{ route('applications.index') }}"
                        class="px-5 py-2.5 text-sm text-slate-400 hover:text-white transition-colors">Batal</a>

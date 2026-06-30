@@ -11,13 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('waha_connection_logs', function (Blueprint $table) {
-            $table->id();
-            $table->string('status')->comment('WORKING, STOPPED, STARTING, error, dll');
-            $table->integer('response_time_ms')->nullable();
-            $table->text('error_message')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('waha_connection_logs')) {
+            Schema::create('waha_connection_logs', function (Blueprint $table) {
+                $table->id();
+                $table->string('status')->comment('WORKING, STOPPED, STARTING, error, dll');
+                $table->integer('response_time_ms')->nullable();
+                $table->text('error_message')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**
@@ -25,6 +27,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('waha_connection_logs');
+        if (Schema::hasTable('waha_connection_logs')) {
+            Schema::dropIfExists('waha_connection_logs');
+        }
     }
 };

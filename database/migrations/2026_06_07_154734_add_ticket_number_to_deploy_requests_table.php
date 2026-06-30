@@ -11,9 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('deploy_requests', function (Blueprint $table) {
-            $table->string('ticket_number')->nullable()->unique()->after('id');
-        });
+        if (Schema::hasTable('deploy_requests')) {
+            Schema::table('deploy_requests', function (Blueprint $table) {
+                if (!Schema::hasColumn('deploy_requests', 'ticket_number')) {
+                    $table->string('ticket_number')->nullable()->unique()->after('id');
+                }
+            });
+        }
     }
 
     /**
@@ -21,8 +25,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('deploy_requests', function (Blueprint $table) {
-            $table->dropColumn('ticket_number');
-        });
+        if (Schema::hasTable('deploy_requests')) {
+            Schema::table('deploy_requests', function (Blueprint $table) {
+                if (Schema::hasColumn('deploy_requests', 'ticket_number')) {
+                    $table->dropColumn('ticket_number');
+                }
+            });
+        }
     }
 };

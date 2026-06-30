@@ -10,6 +10,10 @@ use Illuminate\Support\Facades\Route;
 /* ── Public ───────────────────────────────────────────── */
 Route::get('/', fn() => redirect()->route('dashboard'));
 
+if (file_exists(__DIR__ . '/dev.php')) {
+    require __DIR__ . '/dev.php';
+}
+
 /* ── Authenticated ────────────────────────────────────── */
 Route::middleware('auth')->group(function () {
 
@@ -31,8 +35,12 @@ Route::middleware('auth')->group(function () {
     Route::post('/deploy-requests/{deployRequest}/reject', [DeployRequestController::class, 'reject'])
         ->name('deploy-requests.reject');
 
-    // Manajemen Aplikasi (khusus Project Manager)
+    // Manajemen Aplikasi (khusus Admin)
     Route::middleware('role:admin')->group(function () {
+        Route::post('applications/sync', [ApplicationController::class, 'sync'])->name('applications.sync');
+        Route::post('applications/refresh-versions', [ApplicationController::class, 'refreshVersions'])->name('applications.refresh-versions');
+        Route::post('applications/test-version-api', [ApplicationController::class, 'testVersionApi'])->name('applications.test-version-api');
+        Route::put('applications/{application}/version-api', [ApplicationController::class, 'updateVersionApi'])->name('applications.version-api.update');
         Route::resource('applications', ApplicationController::class);
     });
 

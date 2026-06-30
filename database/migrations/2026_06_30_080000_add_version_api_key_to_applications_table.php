@@ -6,27 +6,29 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         if (Schema::hasTable('applications')) {
             Schema::table('applications', function (Blueprint $table) {
-                // Hapus foreign key constraint terlebih dahulu, lalu drop kolom jika ada
-                if (Schema::hasColumn('applications', 'pic_user_id')) {
-                    try {
-                        $table->dropForeign(['pic_user_id']);
-                    } catch (\Exception $e) {}
-                    $table->dropColumn('pic_user_id');
+                if (!Schema::hasColumn('applications', 'version_api_key')) {
+                    $table->string('version_api_key', 100)->nullable()->after('version_api_write')->default('version');
                 }
             });
         }
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         if (Schema::hasTable('applications')) {
             Schema::table('applications', function (Blueprint $table) {
-                if (!Schema::hasColumn('applications', 'pic_user_id')) {
-                    $table->foreignId('pic_user_id')->nullable()->constrained('users')->cascadeOnDelete();
+                if (Schema::hasColumn('applications', 'version_api_key')) {
+                    $table->dropColumn('version_api_key');
                 }
             });
         }

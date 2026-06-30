@@ -11,10 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasTable('it_wh_activity_user')) {
-            Schema::create('it_wh_activity_user', function (Blueprint $table) {
+        if (!Schema::hasTable('application_user')) {
+            Schema::create('application_user', function (Blueprint $table) {
                 $table->id();
-                $table->foreignId('it_wh_activity_id')->constrained()->cascadeOnDelete();
+                $table->foreignId('application_id')->constrained()->cascadeOnDelete();
                 $table->foreignId('user_id')->constrained()->cascadeOnDelete();
                 $table->timestamps();
             });
@@ -26,8 +26,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        if (Schema::hasTable('it_wh_activity_user')) {
-            Schema::dropIfExists('it_wh_activity_user');
+        if (Schema::hasTable('application_user')) {
+            Schema::dropIfExists('application_user');
         }
     }
 };

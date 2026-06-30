@@ -3,32 +3,55 @@
 namespace App\Http\Controllers;
 
 use App\Models\Application;
+use App\Models\User;
+use App\Services\AppSyncService;
 use Illuminate\Http\Request;
 
 class ApplicationController extends Controller
 {
+    public function __construct(protected AppSyncService $appSync)
+    {
+    }
+
     public function index()
     {
-        // Tidak load 'pic' lagi karena kolom dihapus
-        $applications = Application::orderBy('name')->paginate(15);
+        // Load data dari database lokal beserta relasi pics
+        $applications = Application::with('pics')->orderBy('name')->paginate(15);
+        
+        $programmers = User::where('role', 'programmer')->get();
 
-        return view('applications.index', compact('applications'));
+        return view('applications.index', compact('applications', 'programmers'));
+    }
+
+    public function sync()
+    {
+        $this->appSync->sync();
+        return redirect()->route('applications.index')->with('success', 'Data aplikasi berhasil disinkronkan dari GUP API.');
     }
 
     public function create()
     {
-        return view('applications.create');
+        $programmers = User::where('role', 'programmer')->get();
+        return view('applications.create', compact('programmers'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'        => 'required|string|max:100',
-            'description' => 'nullable|string',
-            'repo_url'    => 'nullable|url|max:255',
+            'name'              => 'required|string|max:100',
+            'description'       => 'nullable|string',
+            'repo_url'          => 'nullable|url|max:255',
+            'app_url'           => 'nullable|url|max:255',
+            'version'           => 'nullable|string|max:50',
+            'version_api_get'   => 'nullable|url|max:255',
+            'version_api_write' => 'nullable|url|max:255',
+            'version_api_key'   => 'nullable|string|max:100',
+            'pic_ids'           => 'nullable|array',
+            'pic_ids.*'         => 'exists:users,id',
         ]);
 
-        Application::create($validated);
+        $application = Application::create($validated);
+        $application->pics()->sync($request->input('pic_ids', []));
 
         return redirect()->route('applications.index')
             ->with('success', 'Aplikasi berhasil ditambahkan.');
@@ -36,21 +59,234 @@ class ApplicationController extends Controller
 
     public function edit(Application $application)
     {
-        return view('applications.edit', compact('application'));
+        $programmers = User::where('role', 'programmer')->get();
+        return view('applications.edit', compact('application', 'programmers'));
     }
 
     public function update(Request $request, Application $application)
     {
         $validated = $request->validate([
-            'name'        => 'required|string|max:100',
-            'description' => 'nullable|string',
-            'repo_url'    => 'nullable|url|max:255',
+            'name'              => 'required|string|max:100',
+            'description'       => 'nullable|string',
+            'repo_url'          => 'nullable|url|max:255',
+            'app_url'           => 'nullable|url|max:255',
+            'version'           => 'nullable|string|max:50',
+            'version_api_get'   => 'nullable|url|max:255',
+            'version_api_write' => 'nullable|url|max:255',
+            'version_api_key'   => 'nullable|string|max:100',
+            'pic_ids'           => 'nullable|array',
+            'pic_ids.*'         => 'exists:users,id',
+        ]);
+
+        $application->update($validated);
+        $application->pics()->sync($request->input('pic_ids', []));
+
+        return redirect()->route('applications.index')
+            ->with('success', 'Aplikasi berhasil diperbarui.');
+    }
+
+    public function updateVersionApi(Request $request, Application $application)
+    {
+        $validated = $request->validate([
+            'version_api_get'   => 'nullable|url|max:255',
+            'version_api_write' => 'nullable|url|max:255',
+            'version_api_key'   => 'nullable|string|max:100',
         ]);
 
         $application->update($validated);
 
-        return redirect()->route('applications.index')
-            ->with('success', 'Aplikasi berhasil diperbarui.');
+        // Fetch version immediately if version_api_get is configured
+        if ($application->version_api_get) {
+            try {
+                $response = \Illuminate\Support\Facades\Http::timeout(3)->get($application->version_api_get);
+                if ($response->successful()) {
+                    $version = null;
+                    $contentType = $response->header('Content-Type');
+                    if (str_contains($contentType, 'application/json') || is_array($response->json())) {
+                        $data = $response->json();
+                        $keyPath = $application->version_api_key ?: 'version';
+                        $version = data_get($data, $keyPath);
+                        if ($version === null && !$application->version_api_key) {
+                            $version = data_get($data, 'version') ?: data_get($data, 'versi') ?: data_get($data, 'data.version');
+                        }
+                    } else {
+                        $version = trim($response->body());
+                    }
+
+                    if ($version !== null) {
+                        if (is_array($version) || is_object($version)) {
+                            $version = json_encode($version);
+                        }
+                        $version = strip_tags((string) $version);
+                        $version = substr(trim($version), 0, 50);
+                        if ($version !== '') {
+                            $application->update(['version' => $version]);
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("Gagal fetch versi saat update API untuk {$application->name}: " . $e->getMessage());
+            }
+        }
+
+        $message = 'Konfigurasi API Versi untuk ' . $application->name . ' berhasil diperbarui.';
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'version' => $application->version
+            ]);
+        }
+
+        return redirect()->route('applications.index')->with('success', $message);
+    }
+
+    public function refreshVersions(Request $request)
+    {
+        $applications = Application::whereNotNull('version_api_get')->get();
+        
+        $successCount = 0;
+        $failCount = 0;
+        $details = [];
+
+        foreach ($applications as $app) {
+            try {
+                $response = \Illuminate\Support\Facades\Http::timeout(3)->get($app->version_api_get);
+                
+                if ($response->successful()) {
+                    $version = null;
+                    
+                    // Cek jika response berbentuk JSON
+                    $contentType = $response->header('Content-Type');
+                    if (str_contains($contentType, 'application/json') || is_array($response->json())) {
+                        $data = $response->json();
+                        // Gunakan key custom yang diatur oleh user (mendukung dot-notation seperti data.no_versi)
+                        $keyPath = $app->version_api_key ?: 'version';
+                        $version = data_get($data, $keyPath);
+                        
+                        // Jika key custom tidak ditemukan, coba cari key-key umum
+                        if ($version === null && !$app->version_api_key) {
+                            $version = data_get($data, 'version') ?: data_get($data, 'versi') ?: data_get($data, 'data.version');
+                        }
+
+                        if ($version === null) {
+                            $failCount++;
+                            $details[] = "{$app->name}: Key JSON tidak cocok/ditemukan";
+                            continue;
+                        }
+                    } else {
+                        $version = trim($response->body());
+                    }
+                    
+                    // Cek jika null/object/array karena json decode bermasalah
+                    if (is_array($version) || is_object($version)) {
+                        $version = json_encode($version);
+                    }
+
+                    // Bersihkan tag html/whitespace jika ada
+                    $version = strip_tags((string) $version);
+                    $version = substr(trim($version), 0, 50);
+
+                    if ($version !== '') {
+                        $app->update(['version' => $version]);
+                        $successCount++;
+                    } else {
+                        $failCount++;
+                        $details[] = "{$app->name}: Respon kosong";
+                    }
+                } else {
+                    $failCount++;
+                    $details[] = "{$app->name}: HTTP {$response->status()}";
+                }
+            } catch (\Throwable $e) {
+                $failCount++;
+                $details[] = "{$app->name}: Koneksi gagal";
+                \Illuminate\Support\Facades\Log::warning("Gagal fetch versi untuk {$app->name}: " . $e->getMessage());
+            }
+        }
+
+        $message = "Pembaruan versi selesai. Berhasil: {$successCount}, Gagal: {$failCount}.";
+        if (!empty($details)) {
+            $message .= " (" . implode(', ', $details) . ")";
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'success_count' => $successCount,
+                'fail_count' => $failCount
+            ]);
+        }
+
+        return redirect()->route('applications.index')->with('success', $message);
+    }
+
+    public function testVersionApi(Request $request)
+    {
+        $validated = $request->validate([
+            'version_api_get' => 'required|url|max:255',
+            'version_api_key' => 'nullable|string|max:100',
+        ]);
+
+        try {
+            $response = \Illuminate\Support\Facades\Http::timeout(5)->get($validated['version_api_get']);
+            
+            if ($response->successful()) {
+                $version = null;
+                $contentType = $response->header('Content-Type');
+                $isJson = str_contains($contentType, 'application/json') || is_array($response->json());
+                
+                if ($isJson) {
+                    $data = $response->json();
+                    $keyPath = $validated['version_api_key'] ?: 'version';
+                    $version = data_get($data, $keyPath);
+                    
+                    if ($version === null && !$validated['version_api_key']) {
+                        $version = data_get($data, 'version') ?: data_get($data, 'versi') ?: data_get($data, 'data.version');
+                    }
+
+                    if ($version === null) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'Respon berupa JSON, tetapi key field "' . ($validated['version_api_key'] ?: 'version') . '" tidak ditemukan atau nilainya kosong.'
+                        ]);
+                    }
+                } else {
+                    $version = trim($response->body());
+                }
+
+                if (is_array($version) || is_object($version)) {
+                    $version = json_encode($version);
+                }
+
+                $version = strip_tags((string) $version);
+                $version = substr(trim($version), 0, 50);
+
+                if ($version !== '') {
+                    return response()->json([
+                        'success' => true,
+                        'version' => $version
+                    ]);
+                } else {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Gagal membaca versi dari respon API (respon kosong).'
+                    ]);
+                }
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'API merespon dengan status code ' . $response->status()
+                ]);
+            }
+        } catch (\Throwable $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error koneksi: ' . $e->getMessage()
+            ]);
+        }
     }
 
     public function destroy(Application $application)

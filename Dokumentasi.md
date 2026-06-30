@@ -68,9 +68,11 @@ Berikut adalah skenario standar atau alur kerja (*SOP*) di dalam aplikasi:
    - **Email**: Email elegan berformat HTML lengkap dengan status (warna merah/hijau) dan tombol CTA.
    - **WhatsApp (WAHA)**: Pesan teks rapi yang langsung terkirim ke nomor WA *user*.
 3. **Sinkronisasi Aplikasi (API)**: PM dapat menekan tombol *Sync dari HCIS* untuk menarik daftar aplikasi secara otomatis dari API pusat, tanpa harus menginput manual.
-4. **File Upload Secure**: Sistem mengizinkan dan memvalidasi tipe *file* spesifik (PDF, DOC, DOCX, JPG, PNG) untuk keperluan dokumen administratif rilis.
-5. **Dark Mode & Responsive UI**: Dibangun dengan *Tailwind CSS*, mendukung pergantian tema Terang/Gelap dan mulus dibuka di perangkat seluler (*mobile-friendly*).
-6. **Sistem Terisolasi untuk Admin**: Keamanan terjaga karena profil *user* dan *password* dikunci dan dikendalikan sepenuhnya oleh Administrator.
+4. **Manajemen PIC Multi-Select**: Setiap aplikasi dapat memiliki beberapa PIC (Programmer) yang dipilih menggunakan UI Tom Select (multi-select dropdown). PIC ini akan otomatis terhubung ke alur rilis/deploy request.
+5. **Integrasi Versi API**: Pengambilan versi aplikasi secara otomatis melalui API GET internal masing-masing aplikasi. Mendukung key JSON dinamis (menggunakan dot-notation seperti `data.no_versi`), fitur AJAX refresh ber-spinner pada tabel utama, serta fitur interaktif **"Tes Get Versi"** di dalam modal untuk validasi real-time sebelum disimpan.
+6. **File Upload Secure**: Sistem mengizinkan dan memvalidasi tipe *file* spesifik (PDF, DOC, DOCX, JPG, PNG) untuk keperluan dokumen administratif rilis.
+7. **Dark Mode & Responsive UI**: Dibangun dengan *Tailwind CSS*, mendukung pergantian tema Terang/Gelap dan mulus dibuka di perangkat seluler (*mobile-friendly*).
+8. **Sistem Terisolasi untuk Admin**: Keamanan terjaga karena profil *user* dan *password* dikunci dan dikendalikan sepenuhnya oleh Administrator.
 
 ---
 

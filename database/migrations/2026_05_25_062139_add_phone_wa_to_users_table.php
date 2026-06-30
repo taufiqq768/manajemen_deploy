@@ -11,10 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            // Nomor WhatsApp (format internasional tanpa +, contoh: 628123456789)
-            $table->string('phone_wa', 20)->nullable()->after('email');
-        });
+        if (Schema::hasTable('users')) {
+            Schema::table('users', function (Blueprint $table) {
+                if (!Schema::hasColumn('users', 'phone_wa')) {
+                    // Nomor WhatsApp (format internasional tanpa +, contoh: 628123456789)
+                    $table->string('phone_wa', 20)->nullable()->after('email');
+                }
+            });
+        }
     }
 
     /**
@@ -22,8 +26,12 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('phone_wa');
-        });
+        if (Schema::hasTable('users')) {
+            Schema::table('users', function (Blueprint $table) {
+                if (Schema::hasColumn('users', 'phone_wa')) {
+                    $table->dropColumn('phone_wa');
+                }
+            });
+        }
     }
 };

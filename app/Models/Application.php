@@ -15,6 +15,10 @@ class Application extends Model
         'description',
         'repo_url',
         'app_url',
+        'version',
+        'version_api_get',
+        'version_api_write',
+        'version_api_key',
         'synced_at',
     ];
 
@@ -31,5 +35,11 @@ class Application extends Model
     public function deployRequests()
     {
         return $this->hasMany(DeployRequest::class);
+    }
+
+    /** PIC (programmer) yang ditugaskan ke aplikasi ini */
+    public function pics()
+    {
+        return $this->belongsToMany(User::class, 'application_user', 'application_id', 'user_id');
     }
 }
