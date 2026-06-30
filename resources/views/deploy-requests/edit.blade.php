@@ -162,7 +162,7 @@
                                 <input id="jenis_besar" name="jenis[]" type="checkbox" value="perubahan_besar"
                                        {{ in_array('perubahan_besar', $selectedJenis) ? 'checked' : '' }}
                                        class="w-4 h-4 text-indigo-600 border-slate-300 dark:border-slate-700 rounded focus:ring-indigo-500 bg-white dark:bg-slate-800"
-                                       onchange="calculateNewVersion()">
+                                       onchange="updateFormStates()">
                             </div>
                             <div class="ml-3 text-sm flex items-center gap-1.5">
                                 <label for="jenis_besar" class="font-medium text-slate-700 dark:text-slate-200 cursor-pointer">Perubahan Besar</label>
@@ -186,7 +186,7 @@
                                 <input id="jenis_kecil" name="jenis[]" type="checkbox" value="perubahan_kecil"
                                        {{ in_array('perubahan_kecil', $selectedJenis) ? 'checked' : '' }}
                                        class="w-4 h-4 text-indigo-600 border-slate-300 dark:border-slate-700 rounded focus:ring-indigo-500 bg-white dark:bg-slate-800"
-                                       onchange="calculateNewVersion()">
+                                       onchange="updateFormStates()">
                             </div>
                             <div class="ml-3 text-sm flex items-center gap-1.5">
                                 <label for="jenis_kecil" class="font-medium text-slate-700 dark:text-slate-200 cursor-pointer">Perubahan Kecil</label>
@@ -210,7 +210,7 @@
                                 <input id="jenis_bug" name="jenis[]" type="checkbox" value="bug_fixing"
                                        {{ in_array('bug_fixing', $selectedJenis) ? 'checked' : '' }}
                                        class="w-4 h-4 text-indigo-600 border-slate-300 dark:border-slate-700 rounded focus:ring-indigo-500 bg-white dark:bg-slate-800"
-                                       onchange="calculateNewVersion()">
+                                       onchange="updateFormStates()">
                             </div>
                             <div class="ml-3 text-sm flex items-center gap-1.5">
                                 <label for="jenis_bug" class="font-medium text-slate-700 dark:text-slate-200 cursor-pointer">Bug Fixing</label>

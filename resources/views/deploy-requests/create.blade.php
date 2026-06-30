@@ -152,7 +152,7 @@
                                     <input id="jenis_besar" name="jenis[]" type="checkbox" value="perubahan_besar"
                                            {{ is_array(old('jenis')) && in_array('perubahan_besar', old('jenis')) ? 'checked' : '' }}
                                            class="w-4 h-4 text-indigo-600 border-slate-300 dark:border-slate-700 rounded focus:ring-indigo-500 bg-white dark:bg-slate-800"
-                                           onchange="calculateNewVersion()">
+                                           onchange="updateFormStates()">
                                 </div>
                                 <div class="ml-3 text-sm flex items-center gap-1.5">
                                     <label for="jenis_besar" class="font-medium text-slate-700 dark:text-slate-200 cursor-pointer">Perubahan Besar</label>
@@ -176,7 +176,7 @@
                                     <input id="jenis_kecil" name="jenis[]" type="checkbox" value="perubahan_kecil"
                                            {{ is_array(old('jenis')) && in_array('perubahan_kecil', old('jenis')) ? 'checked' : '' }}
                                            class="w-4 h-4 text-indigo-600 border-slate-300 dark:border-slate-700 rounded focus:ring-indigo-500 bg-white dark:bg-slate-800"
-                                           onchange="calculateNewVersion()">
+                                           onchange="updateFormStates()">
                                 </div>
                                 <div class="ml-3 text-sm flex items-center gap-1.5">
                                     <label for="jenis_kecil" class="font-medium text-slate-700 dark:text-slate-200 cursor-pointer">Perubahan Kecil</label>
@@ -200,7 +200,7 @@
                                     <input id="jenis_bug" name="jenis[]" type="checkbox" value="bug_fixing"
                                            {{ is_array(old('jenis')) && in_array('bug_fixing', old('jenis')) ? 'checked' : '' }}
                                            class="w-4 h-4 text-indigo-600 border-slate-300 dark:border-slate-700 rounded focus:ring-indigo-500 bg-white dark:bg-slate-800"
-                                           onchange="calculateNewVersion()">
+                                           onchange="updateFormStates()">
                                 </div>
                                 <div class="ml-3 text-sm flex items-center gap-1.5">
                                     <label for="jenis_bug" class="font-medium text-slate-700 dark:text-slate-200 cursor-pointer">Bug Fixing</label>
