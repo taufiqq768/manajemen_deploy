@@ -115,7 +115,7 @@
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                             Jenis Request <span class="text-red-500">*</span>
                         </label>
-                        <div class="space-y-3 p-4 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-slate-200 dark:border-slate-800">
+                        <div class="space-y-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                             {{-- Perubahan Besar --}}
                             <div class="flex items-start">
                                 <div class="flex items-center h-5">
@@ -125,7 +125,7 @@
                                            onchange="calculateNewVersion()">
                                 </div>
                                 <div class="ml-3 text-sm flex items-center gap-1.5">
-                                    <label for="jenis_besar" class="font-medium text-slate-700 dark:text-slate-300 cursor-pointer">Perubahan Besar</label>
+                                    <label for="jenis_besar" class="font-medium text-slate-700 dark:text-slate-200 cursor-pointer">Perubahan Besar</label>
                                     
                                     <!-- Tooltip container -->
                                     <div class="relative group inline-block">
@@ -149,7 +149,7 @@
                                            onchange="calculateNewVersion()">
                                 </div>
                                 <div class="ml-3 text-sm flex items-center gap-1.5">
-                                    <label for="jenis_kecil" class="font-medium text-slate-700 dark:text-slate-300 cursor-pointer">Perubahan Kecil</label>
+                                    <label for="jenis_kecil" class="font-medium text-slate-700 dark:text-slate-200 cursor-pointer">Perubahan Kecil</label>
                                     
                                     <!-- Tooltip container -->
                                     <div class="relative group inline-block">
@@ -173,7 +173,7 @@
                                            onchange="calculateNewVersion()">
                                 </div>
                                 <div class="ml-3 text-sm flex items-center gap-1.5">
-                                    <label for="jenis_bug" class="font-medium text-slate-700 dark:text-slate-300 cursor-pointer">Bug Fixing</label>
+                                    <label for="jenis_bug" class="font-medium text-slate-700 dark:text-slate-200 cursor-pointer">Bug Fixing</label>
                                     
                                     <!-- Tooltip container -->
                                     <div class="relative group inline-block">
