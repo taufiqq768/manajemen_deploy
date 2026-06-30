@@ -51,6 +51,37 @@
                         @enderror
                     </div>
 
+                    {{-- Versi & Jadwal --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                Versi / Release <span class="text-red-500">*</span>
+                            </label>
+                            <input type="text" id="version" name="version" value="{{ old('version') }}" readonly required
+                                placeholder="Pilih aplikasi" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm rounded-lg px-3 py-2.5
+                                              focus:outline-none cursor-not-allowed font-mono
+                                              @error('version') border-red-500 @enderror">
+                            <p class="text-[11px] text-slate-500 mt-1">Versi saat ini. Naik otomatis setelah disetujui PM.</p>
+                            @error('version')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label for="scheduled_at"
+                                class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                Jadwal Deploy
+                            </label>
+                            <input type="datetime-local" id="scheduled_at" name="scheduled_at"
+                                value="{{ old('scheduled_at') }}" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5
+                                              focus:outline-none focus:ring-2 focus:ring-indigo-500
+                                              @error('scheduled_at') border-red-500 @enderror">
+                            @error('scheduled_at')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+                    </div>
+
                     {{-- Jenis Request --}}
                     <div>
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
@@ -126,37 +157,6 @@
                         @error('jenis')
                             <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                         @enderror
-                    </div>
-
-                    {{-- Versi & Jadwal --}}
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                                Versi / Release <span class="text-red-500">*</span>
-                            </label>
-                            <input type="text" id="version" name="version" value="{{ old('version') }}" readonly required
-                                placeholder="Pilih aplikasi" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm rounded-lg px-3 py-2.5
-                                              focus:outline-none cursor-not-allowed font-mono
-                                              @error('version') border-red-500 @enderror">
-                            <p class="text-[11px] text-slate-500 mt-1">Versi saat ini. Naik otomatis setelah disetujui PM.</p>
-                            @error('version')
-                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div>
-
-                        <div>
-                            <label for="scheduled_at"
-                                class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                                Jadwal Deploy
-                            </label>
-                            <input type="datetime-local" id="scheduled_at" name="scheduled_at"
-                                value="{{ old('scheduled_at') }}" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5
-                                              focus:outline-none focus:ring-2 focus:ring-indigo-500
-                                              @error('scheduled_at') border-red-500 @enderror">
-                            @error('scheduled_at')
-                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                            @enderror
-                        </div>
                     </div>
 
                     {{-- Release Notes (dynamic per jenis) --}}

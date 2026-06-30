@@ -19,6 +19,41 @@
                 @csrf
                 @method('PATCH')
 
+                @php
+                    $selectedJenis = is_array(old('jenis', $deployRequest->jenis)) 
+                        ? old('jenis', $deployRequest->jenis) 
+                        : (is_string(old('jenis', $deployRequest->jenis)) ? json_decode(old('jenis', $deployRequest->jenis), true) : []);
+                    if (!is_array($selectedJenis)) {
+                        $selectedJenis = explode(',', str_replace(['[', ']', '"'], '', old('jenis', $deployRequest->jenis)));
+                    }
+                    $selectedJenis = array_map('trim', $selectedJenis);
+                    
+                    // Map old string values to new categories
+                    if (in_array('Bug', $selectedJenis)) {
+                        $selectedJenis[] = 'bug_fixing';
+                    }
+                    if (in_array('CR', $selectedJenis)) {
+                        $selectedJenis[] = 'perubahan_kecil';
+                    }
+
+                    // Map release notes
+                    $notes = is_array(old('release_notes', $deployRequest->release_notes)) 
+                        ? old('release_notes', $deployRequest->release_notes) 
+                        : (is_string(old('release_notes', $deployRequest->release_notes)) ? json_decode(old('release_notes', $deployRequest->release_notes), true) : []);
+                    
+                    if (!is_array($notes)) {
+                        $legacyNotesStr = old('release_notes', $deployRequest->release_notes);
+                        $notes = [];
+                        if (in_array('bug_fixing', $selectedJenis)) {
+                            $notes['bug_fixing'] = $legacyNotesStr;
+                        } elseif (in_array('perubahan_besar', $selectedJenis)) {
+                            $notes['perubahan_besar'] = $legacyNotesStr;
+                        } else {
+                            $notes['perubahan_kecil'] = $legacyNotesStr;
+                        }
+                    }
+                @endphp
+
                 @if($deployRequest->ticket_number)
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
@@ -64,97 +99,10 @@
                     </div>
                 </div>
 
-                {{-- Release Notes --}}
-                <div id="release_notes_section" class="space-y-4 hidden">
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
-                        Catatan Rilis (Release Notes) <span class="text-red-500">*</span>
-                    </label>
-                    
-                    {{-- Besar --}}
-                    <div id="notes_besar_container" class="hidden space-y-1.5">
-                        <label for="release_notes_besar" class="block text-xs font-semibold text-slate-500 dark:text-slate-400">
-                            Catatan Rilis: Perubahan Besar <span class="text-red-500">*</span>
-                        </label>
-                        <textarea id="release_notes_besar" name="release_notes[perubahan_besar]" rows="3"
-                            placeholder="Jelaskan detail perubahan besar yang dilakukan..."
-                            class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y @error('release_notes.perubahan_besar') border-red-500 @enderror">{{ $notes['perubahan_besar'] ?? '' }}</textarea>
-                        @error('release_notes.perubahan_besar')
-                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    {{-- Kecil --}}
-                    <div id="notes_kecil_container" class="hidden space-y-1.5">
-                        <label for="release_notes_kecil" class="block text-xs font-semibold text-slate-500 dark:text-slate-400">
-                            Catatan Rilis: Perubahan Kecil <span class="text-red-500">*</span>
-                        </label>
-                        <textarea id="release_notes_kecil" name="release_notes[perubahan_kecil]" rows="3"
-                            placeholder="Jelaskan detail perubahan kecil / fitur minor..."
-                            class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y @error('release_notes.perubahan_kecil') border-red-500 @enderror">{{ $notes['perubahan_kecil'] ?? '' }}</textarea>
-                        @error('release_notes.perubahan_kecil')
-                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                        @enderror
-                    </div>
-
-                    {{-- Bug --}}
-                    <div id="notes_bug_container" class="hidden space-y-1.5">
-                        <label for="release_notes_bug" class="block text-xs font-semibold text-slate-500 dark:text-slate-400">
-                            Catatan Rilis: Bug Fixing <span class="text-red-500">*</span>
-                        </label>
-                        <textarea id="release_notes_bug" name="release_notes[bug_fixing]" rows="3"
-                            placeholder="Jelaskan detail perbaikan bug / error..."
-                            class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y @error('release_notes.bug_fixing') border-red-500 @enderror">{{ $notes['bug_fixing'] ?? '' }}</textarea>
-                        @error('release_notes.bug_fixing')
-                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                        @enderror
-                    </div>
-                </div>
-
-                <div>
-                    <label for="release_impact" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Dampak / Impact</label>
-                    <textarea id="release_impact" name="release_impact" rows="3"
-                              class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5
-                                     focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y">{{ old('release_impact', $deployRequest->release_impact) }}</textarea>
-                </div>
-
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                         Jenis Request <span class="text-red-500">*</span>
                     </label>
-                    @php
-                        $selectedJenis = is_array(old('jenis', $deployRequest->jenis)) 
-                            ? old('jenis', $deployRequest->jenis) 
-                            : (is_string(old('jenis', $deployRequest->jenis)) ? json_decode(old('jenis', $deployRequest->jenis), true) : []);
-                        if (!is_array($selectedJenis)) {
-                            $selectedJenis = explode(',', str_replace(['[', ']', '"'], '', old('jenis', $deployRequest->jenis)));
-                        }
-                        $selectedJenis = array_map('trim', $selectedJenis);
-                        
-                        // Map old string values to new categories
-                        if (in_array('Bug', $selectedJenis)) {
-                            $selectedJenis[] = 'bug_fixing';
-                        }
-                        if (in_array('CR', $selectedJenis)) {
-                            $selectedJenis[] = 'perubahan_kecil';
-                        }
-
-                        // Map release notes
-                        $notes = is_array(old('release_notes', $deployRequest->release_notes)) 
-                            ? old('release_notes', $deployRequest->release_notes) 
-                            : (is_string(old('release_notes', $deployRequest->release_notes)) ? json_decode(old('release_notes', $deployRequest->release_notes), true) : []);
-                        
-                        if (!is_array($notes)) {
-                            $legacyNotesStr = old('release_notes', $deployRequest->release_notes);
-                            $notes = [];
-                            if (in_array('bug_fixing', $selectedJenis)) {
-                                $notes['bug_fixing'] = $legacyNotesStr;
-                            } elseif (in_array('perubahan_besar', $selectedJenis)) {
-                                $notes['perubahan_besar'] = $legacyNotesStr;
-                            } else {
-                                $notes['perubahan_kecil'] = $legacyNotesStr;
-                            }
-                        }
-                    @endphp
                     <div class="space-y-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                         {{-- Perubahan Besar --}}
                         <div class="flex items-start">
@@ -166,8 +114,6 @@
                             </div>
                             <div class="ml-3 text-sm flex items-center gap-1.5">
                                 <label for="jenis_besar" class="font-medium text-slate-700 dark:text-slate-200 cursor-pointer">Perubahan Besar</label>
-                                
-                                <!-- Tooltip container -->
                                 <div class="relative group inline-block">
                                     <svg class="w-3.5 h-3.5 text-slate-400 cursor-pointer hover:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -190,8 +136,6 @@
                             </div>
                             <div class="ml-3 text-sm flex items-center gap-1.5">
                                 <label for="jenis_kecil" class="font-medium text-slate-700 dark:text-slate-200 cursor-pointer">Perubahan Kecil</label>
-                                
-                                <!-- Tooltip container -->
                                 <div class="relative group inline-block">
                                     <svg class="w-3.5 h-3.5 text-slate-400 cursor-pointer hover:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -214,8 +158,6 @@
                             </div>
                             <div class="ml-3 text-sm flex items-center gap-1.5">
                                 <label for="jenis_bug" class="font-medium text-slate-700 dark:text-slate-200 cursor-pointer">Bug Fixing</label>
-                                
-                                <!-- Tooltip container -->
                                 <div class="relative group inline-block">
                                     <svg class="w-3.5 h-3.5 text-slate-400 cursor-pointer hover:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -231,6 +173,56 @@
                     @error('jenis')
                         <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                     @enderror
+                </div>
+
+                {{-- Release Notes --}}
+                <div id="release_notes_section" class="space-y-4 hidden">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                        Catatan Rilis (Release Notes) <span class="text-red-500">*</span>
+                    </label>
+                    
+                    <div id="notes_besar_container" class="hidden space-y-1.5">
+                        <label for="release_notes_besar" class="block text-xs font-semibold text-slate-500 dark:text-slate-400">
+                            Catatan Rilis: Perubahan Besar <span class="text-red-500">*</span>
+                        </label>
+                        <textarea id="release_notes_besar" name="release_notes[perubahan_besar]" rows="3"
+                            placeholder="Jelaskan detail perubahan besar yang dilakukan..."
+                            class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y @error('release_notes.perubahan_besar') border-red-500 @enderror">{{ $notes['perubahan_besar'] ?? '' }}</textarea>
+                        @error('release_notes.perubahan_besar')
+                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div id="notes_kecil_container" class="hidden space-y-1.5">
+                        <label for="release_notes_kecil" class="block text-xs font-semibold text-slate-500 dark:text-slate-400">
+                            Catatan Rilis: Perubahan Kecil <span class="text-red-500">*</span>
+                        </label>
+                        <textarea id="release_notes_kecil" name="release_notes[perubahan_kecil]" rows="3"
+                            placeholder="Jelaskan detail perubahan kecil / fitur minor..."
+                            class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y @error('release_notes.perubahan_kecil') border-red-500 @enderror">{{ $notes['perubahan_kecil'] ?? '' }}</textarea>
+                        @error('release_notes.perubahan_kecil')
+                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div id="notes_bug_container" class="hidden space-y-1.5">
+                        <label for="release_notes_bug" class="block text-xs font-semibold text-slate-500 dark:text-slate-400">
+                            Catatan Rilis: Bug Fixing <span class="text-red-500">*</span>
+                        </label>
+                        <textarea id="release_notes_bug" name="release_notes[bug_fixing]" rows="3"
+                            placeholder="Jelaskan detail perbaikan bug / error..."
+                            class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y @error('release_notes.bug_fixing') border-red-500 @enderror">{{ $notes['bug_fixing'] ?? '' }}</textarea>
+                        @error('release_notes.bug_fixing')
+                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                <div>
+                    <label for="release_impact" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Dampak / Impact</label>
+                    <textarea id="release_impact" name="release_impact" rows="3"
+                              class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5
+                                     focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y">{{ old('release_impact', $deployRequest->release_impact) }}</textarea>
                 </div>
 
                 <div>
