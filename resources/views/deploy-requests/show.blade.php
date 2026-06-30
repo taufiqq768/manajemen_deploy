@@ -125,9 +125,38 @@
                     <span class="w-1.5 h-4 bg-indigo-500 rounded-full"></span>
                     Release Notes
                 </h3>
-                <p class="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-line leading-relaxed">
-                    {{ $deployRequest->release_notes }}
-                </p>
+                <div class="space-y-4">
+                    @if(is_array($deployRequest->release_notes))
+                        @if(!empty($deployRequest->release_notes['perubahan_besar']))
+                            <div class="border-b border-slate-100 dark:border-slate-800 pb-3 last:border-b-0 last:pb-0">
+                                <div class="text-xs font-bold text-indigo-600 dark:text-indigo-400 mb-1 tracking-wider">PERUBAHAN BESAR</div>
+                                <p class="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-line leading-relaxed">
+                                    {{ $deployRequest->release_notes['perubahan_besar'] }}
+                                </p>
+                            </div>
+                        @endif
+                        @if(!empty($deployRequest->release_notes['perubahan_kecil']))
+                            <div class="border-b border-slate-100 dark:border-slate-800 pb-3 last:border-b-0 last:pb-0">
+                                <div class="text-xs font-bold text-indigo-600 dark:text-indigo-400 mb-1 tracking-wider">PERUBAHAN KECIL</div>
+                                <p class="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-line leading-relaxed">
+                                    {{ $deployRequest->release_notes['perubahan_kecil'] }}
+                                </p>
+                            </div>
+                        @endif
+                        @if(!empty($deployRequest->release_notes['bug_fixing']))
+                            <div class="border-b border-slate-100 dark:border-slate-800 pb-3 last:border-b-0 last:pb-0">
+                                <div class="text-xs font-bold text-indigo-600 dark:text-indigo-400 mb-1 tracking-wider">BUG FIXING</div>
+                                <p class="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-line leading-relaxed">
+                                    {{ $deployRequest->release_notes['bug_fixing'] }}
+                                </p>
+                            </div>
+                        @endif
+                    @else
+                        <p class="text-sm text-slate-600 dark:text-slate-300 whitespace-pre-line leading-relaxed">
+                            {{ $deployRequest->release_notes }}
+                        </p>
+                    @endif
+                </div>
             </div>
 
             @if($deployRequest->release_impact)

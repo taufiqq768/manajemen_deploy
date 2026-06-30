@@ -97,7 +97,10 @@ class DeployRequestController extends Controller
             'jenis' => 'required|array|min:1',
             'jenis.*' => 'in:perubahan_besar,perubahan_kecil,bug_fixing',
             'version' => 'required|string|max:50',
-            'release_notes' => 'required|string',
+            'release_notes' => 'required|array',
+            'release_notes.perubahan_besar' => 'required_if:jenis.*,perubahan_besar|nullable|string',
+            'release_notes.perubahan_kecil' => 'required_if:jenis.*,perubahan_kecil|nullable|string',
+            'release_notes.bug_fixing' => 'required_if:jenis.*,bug_fixing|nullable|string',
             'release_impact' => 'nullable|string',
             'document_support' => 'nullable|file|mimes:pdf,doc,docx,jpg,txt,png|max:2048', // max 2MB
             'scheduled_at' => 'nullable|date',
@@ -216,7 +219,10 @@ class DeployRequestController extends Controller
             'jenis' => 'required|array|min:1',
             'jenis.*' => 'in:perubahan_besar,perubahan_kecil,bug_fixing',
             'version' => 'required|string|max:50',
-            'release_notes' => 'required|string',
+            'release_notes' => 'required|array',
+            'release_notes.perubahan_besar' => 'required_if:jenis.*,perubahan_besar|nullable|string',
+            'release_notes.perubahan_kecil' => 'required_if:jenis.*,perubahan_kecil|nullable|string',
+            'release_notes.bug_fixing' => 'required_if:jenis.*,bug_fixing|nullable|string',
             'release_impact' => 'nullable|string',
             'document_support' => 'nullable|file|mimes:pdf,doc,docx,jpg,txt,png|max:2048',
             'scheduled_at' => 'nullable|date',
@@ -267,9 +273,27 @@ class DeployRequestController extends Controller
                 $writeKey = $application->version_api_write_key ?: 'version';
                 $notesKey = $application->version_api_write_notes_key ?: 'release_notes';
                 
+                $releaseNotesRaw = $deployRequest->release_notes;
+                $releaseNotesText = '';
+                if (is_array($releaseNotesRaw)) {
+                    $lines = [];
+                    if (!empty($releaseNotesRaw['perubahan_besar'])) {
+                        $lines[] = "• Perubahan Besar:\n" . $releaseNotesRaw['perubahan_besar'];
+                    }
+                    if (!empty($releaseNotesRaw['perubahan_kecil'])) {
+                        $lines[] = "• Perubahan Kecil:\n" . $releaseNotesRaw['perubahan_kecil'];
+                    }
+                    if (!empty($releaseNotesRaw['bug_fixing'])) {
+                        $lines[] = "• Bug Fixing:\n" . $releaseNotesRaw['bug_fixing'];
+                    }
+                    $releaseNotesText = implode("\n\n", $lines);
+                } else {
+                    $releaseNotesText = (string) $releaseNotesRaw;
+                }
+                
                 $payload = [
                     $writeKey => $deployRequest->version,
-                    $notesKey => $deployRequest->release_notes,
+                    $notesKey => $releaseNotesText,
                 ];
                 
                 $response = \Illuminate\Support\Facades\Http::timeout(5)

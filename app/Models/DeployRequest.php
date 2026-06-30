@@ -50,9 +50,10 @@ class DeployRequest extends Model
     protected function casts(): array
     {
         return [
-            'scheduled_at' => 'datetime',
-            'approved_at'  => 'datetime',
-            'jenis'        => 'array',
+            'scheduled_at'  => 'datetime',
+            'approved_at'   => 'datetime',
+            'jenis'         => 'array',
+            'release_notes' => 'array',
         ];
     }
 

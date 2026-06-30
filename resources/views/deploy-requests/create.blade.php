@@ -58,7 +58,7 @@
                                 Versi / Release <span class="text-red-500">*</span>
                             </label>
                             <input type="text" id="version" name="version" value="{{ old('version') }}" readonly required
-                                placeholder="Pilih aplikasi & jenis request" class="w-full bg-slate-100 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-sm rounded-lg px-3 py-2.5
+                                placeholder="Pilih aplikasi & jenis request" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm rounded-lg px-3 py-2.5
                                               focus:outline-none cursor-not-allowed font-mono
                                               @error('version') border-red-500 @enderror">
                             <p class="text-[11px] text-slate-500 mt-1">Dihitung otomatis (x.x.x) dari versi berjalan & jenis request.</p>
@@ -83,19 +83,49 @@
                     </div>
 
                     {{-- Release Notes --}}
-                    <div>
-                        <label for="release_notes"
-                            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                            Release Notes <span class="text-red-500">*</span>
+                    <div id="release_notes_section" class="space-y-4 hidden">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Catatan Rilis (Release Notes) <span class="text-red-500">*</span>
                         </label>
-                        <textarea id="release_notes" name="release_notes" rows="5" required
-                            placeholder="Jelaskan perubahan yang akan di-deploy"
-                            class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5
-                                             focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y
-                                             @error('release_notes') border-red-500 @enderror">{{ old('release_notes') }}</textarea>
-                        @error('release_notes')
-                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                        @enderror
+                        
+                        {{-- Besar --}}
+                        <div id="notes_besar_container" class="hidden space-y-1.5">
+                            <label for="release_notes_besar" class="block text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                Catatan Rilis: Perubahan Besar <span class="text-red-500">*</span>
+                            </label>
+                            <textarea id="release_notes_besar" name="release_notes[perubahan_besar]" rows="3"
+                                placeholder="Jelaskan detail perubahan besar yang dilakukan..."
+                                class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y @error('release_notes.perubahan_besar') border-red-500 @enderror">{{ old('release_notes.perubahan_besar') }}</textarea>
+                            @error('release_notes.perubahan_besar')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        {{-- Kecil --}}
+                        <div id="notes_kecil_container" class="hidden space-y-1.5">
+                            <label for="release_notes_kecil" class="block text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                Catatan Rilis: Perubahan Kecil <span class="text-red-500">*</span>
+                            </label>
+                            <textarea id="release_notes_kecil" name="release_notes[perubahan_kecil]" rows="3"
+                                placeholder="Jelaskan detail perubahan kecil / fitur minor..."
+                                class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y @error('release_notes.perubahan_kecil') border-red-500 @enderror">{{ old('release_notes.perubahan_kecil') }}</textarea>
+                            @error('release_notes.perubahan_kecil')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        {{-- Bug --}}
+                        <div id="notes_bug_container" class="hidden space-y-1.5">
+                            <label for="release_notes_bug" class="block text-xs font-semibold text-slate-500 dark:text-slate-400">
+                                Catatan Rilis: Bug Fixing <span class="text-red-500">*</span>
+                            </label>
+                            <textarea id="release_notes_bug" name="release_notes[bug_fixing]" rows="3"
+                                placeholder="Jelaskan detail perbaikan bug / error..."
+                                class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y @error('release_notes.bug_fixing') border-red-500 @enderror">{{ old('release_notes.bug_fixing') }}</textarea>
+                            @error('release_notes.bug_fixing')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
 
                     {{-- Release Impact --}}
@@ -232,13 +262,14 @@
 
 @push('scripts')
 <script>
-    function calculateNewVersion() {
+    function updateFormStates() {
         const appSelect = document.getElementById('application_id');
         const selectedOpt = appSelect.options[appSelect.selectedIndex];
         
         if (!selectedOpt || !selectedOpt.value) {
             document.getElementById('version').value = '';
             document.getElementById('version').placeholder = 'Pilih aplikasi & jenis request';
+            document.getElementById('release_notes_section').classList.add('hidden');
             return;
         }
         
@@ -272,12 +303,51 @@
         if (isBug) patch += 1;
         
         document.getElementById('version').value = `${major}.${minor}.${patch}`;
+        
+        // Dynamic Release Notes section visibility
+        if (isBesar || isKecil || isBug) {
+            document.getElementById('release_notes_section').classList.remove('hidden');
+        } else {
+            document.getElementById('release_notes_section').classList.add('hidden');
+        }
+        
+        // Perubahan Besar notes
+        if (isBesar) {
+            document.getElementById('notes_besar_container').classList.remove('hidden');
+            document.getElementById('release_notes_besar').required = true;
+        } else {
+            document.getElementById('notes_besar_container').classList.add('hidden');
+            document.getElementById('release_notes_besar').required = false;
+        }
+        
+        // Perubahan Kecil notes
+        if (isKecil) {
+            document.getElementById('notes_kecil_container').classList.remove('hidden');
+            document.getElementById('release_notes_kecil').required = true;
+        } else {
+            document.getElementById('notes_kecil_container').classList.add('hidden');
+            document.getElementById('release_notes_kecil').required = false;
+        }
+        
+        // Bug Fixing notes
+        if (isBug) {
+            document.getElementById('notes_bug_container').classList.remove('hidden');
+            document.getElementById('release_notes_bug').required = true;
+        } else {
+            document.getElementById('notes_bug_container').classList.add('hidden');
+            document.getElementById('release_notes_bug').required = false;
+        }
     }
     
-    document.getElementById('application_id').addEventListener('change', calculateNewVersion);
+    document.getElementById('application_id').addEventListener('change', updateFormStates);
+    
+    // Also trigger on checkbox changes
+    document.getElementById('jenis_besar').addEventListener('change', updateFormStates);
+    document.getElementById('jenis_kecil').addEventListener('change', updateFormStates);
+    document.getElementById('jenis_bug').addEventListener('change', updateFormStates);
     
     document.addEventListener('DOMContentLoaded', function() {
-        calculateNewVersion();
+        updateFormStates();
     });
 </script>
 @endpush
