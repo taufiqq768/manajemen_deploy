@@ -19,6 +19,8 @@ class Application extends Model
         'version_api_get',
         'version_api_write',
         'version_api_key',
+        'version_api_write_key',
+        'version_api_write_notes_key',
         'synced_at',
     ];
 

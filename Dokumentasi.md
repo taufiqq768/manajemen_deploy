@@ -69,10 +69,17 @@ Berikut adalah skenario standar atau alur kerja (*SOP*) di dalam aplikasi:
    - **WhatsApp (WAHA)**: Pesan teks rapi yang langsung terkirim ke nomor WA *user*.
 3. **Sinkronisasi Aplikasi (API)**: PM dapat menekan tombol *Sync dari HCIS* untuk menarik daftar aplikasi secara otomatis dari API pusat, tanpa harus menginput manual.
 4. **Manajemen PIC Multi-Select**: Setiap aplikasi dapat memiliki beberapa PIC (Programmer) yang dipilih menggunakan UI Tom Select (multi-select dropdown). PIC ini akan otomatis terhubung ke alur rilis/deploy request.
-5. **Integrasi Versi API**: Pengambilan versi aplikasi secara otomatis melalui API GET internal masing-masing aplikasi. Mendukung key JSON dinamis (menggunakan dot-notation seperti `data.no_versi`), fitur AJAX refresh ber-spinner pada tabel utama, serta fitur interaktif **"Tes Get Versi"** di dalam modal untuk validasi real-time sebelum disimpan.
-6. **File Upload Secure**: Sistem mengizinkan dan memvalidasi tipe *file* spesifik (PDF, DOC, DOCX, JPG, PNG) untuk keperluan dokumen administratif rilis.
-7. **Dark Mode & Responsive UI**: Dibangun dengan *Tailwind CSS*, mendukung pergantian tema Terang/Gelap dan mulus dibuka di perangkat seluler (*mobile-friendly*).
-8. **Sistem Terisolasi untuk Admin**: Keamanan terjaga karena profil *user* dan *password* dikunci dan dikendalikan sepenuhnya oleh Administrator.
+5. **Integrasi Versi API (GET & WRITE)**:
+   - **API GET**: Pengambilan versi aplikasi secara otomatis melalui API GET internal masing-masing aplikasi. Mendukung key JSON dinamis (menggunakan dot-notation seperti `data.no_versi`), fitur AJAX refresh ber-spinner pada tabel utama, serta fitur interaktif **"Tes Get Versi"** di dalam modal untuk validasi real-time sebelum disimpan.
+   - **API WRITE**: Pengiriman otomatis nomor versi terbaru dan catatan rilis (*release notes*) ke API Write eksternal aplikasi yang bersangkutan saat *Project Manager* menyetujui (*Approve*) pengajuan deploy. Key parameter payload JSON untuk data versi & catatan rilis dapat dikustomisasi secara fleksibel melalui modal konfigurasi API.
+6. **Sistem Kenaikan Versi Otomatis (Semantic Bumping)**: Input nomor versi saat pengajuan atau revisi rilis dikunci (*read-only*) dan dihitung secara otomatis (real-time via JavaScript) berbasis pilihan kategori **Jenis Request**:
+   - **Perubahan Besar**: Menaikkan angka pertama / Major version (`x.*.*`).
+   - **Perubahan Kecil**: Menaikkan angka kedua / Minor version (`*.x.*`).
+   - **Bug Fixing**: Menaikkan angka ketiga / Patch version (`*.*.x`).
+   (Jika ketiganya dicentang sekaligus, maka seluruh bagian nomor rilis akan dinaikkan).
+7. **File Upload Secure**: Sistem mengizinkan dan memvalidasi tipe *file* spesifik (PDF, DOC, DOCX, JPG, PNG) untuk keperluan dokumen administratif rilis.
+8. **Dark Mode & Responsive UI**: Dibangun dengan *Tailwind CSS*, mendukung pergantian tema Terang/Gelap dan mulus dibuka di perangkat seluler (*mobile-friendly*).
+9. **Sistem Terisolasi untuk Admin**: Keamanan terjaga karena profil *user* dan *password* dikunci dan dikendalikan sepenuhnya oleh Administrator.
 
 ---
 

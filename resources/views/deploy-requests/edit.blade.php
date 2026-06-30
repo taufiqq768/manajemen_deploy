@@ -37,7 +37,7 @@
                             class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5
                                    focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         @foreach($applications as $app)
-                        <option value="{{ $app->id }}" {{ $deployRequest->application_id == $app->id ? 'selected' : '' }}>
+                        <option value="{{ $app->id }}" data-version="{{ $app->version }}" {{ $deployRequest->application_id == $app->id ? 'selected' : '' }}>
                             {{ $app->name }}
                         </option>
                         @endforeach
@@ -46,13 +46,14 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                     <div>
-                        <label for="version" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                            Versi <span class="text-red-500">*</span>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                            Versi / Release <span class="text-red-500">*</span>
                         </label>
-                        <input type="text" id="version" name="version"
+                        <input type="text" id="version" name="version" readonly required
                                value="{{ old('version', $deployRequest->version) }}"
-                               class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5
-                                      focus:outline-none focus:ring-2 focus:ring-indigo-500 font-mono">
+                               class="w-full bg-slate-100 dark:bg-slate-800/80 border border-slate-300 dark:border-slate-700 text-slate-500 dark:text-slate-400 text-sm rounded-lg px-3 py-2.5
+                                      focus:outline-none cursor-not-allowed font-mono">
+                        <p class="text-[11px] text-slate-500 mt-1">Dihitung otomatis (x.x.x) dari versi berjalan & jenis request.</p>
                     </div>
                     <div>
                         <label for="scheduled_at" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Jadwal Deploy</label>
@@ -80,16 +81,99 @@
                 </div>
 
                 <div>
-                    <label for="jenis" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                         Jenis Request <span class="text-red-500">*</span>
                     </label>
-                    <select id="jenis" name="jenis" required
-                            class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5
-                                   focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('jenis') border-red-500 @enderror">
-                        <option value="">Pilih Jenis</option>
-                        <option value="CR" {{ old('jenis', $deployRequest->jenis) == 'CR' ? 'selected' : '' }}>Change Request (CR)</option>
-                        <option value="Bug" {{ old('jenis', $deployRequest->jenis) == 'Bug' ? 'selected' : '' }}>Bug Fixing</option>
-                    </select>
+                    @php
+                        $selectedJenis = is_array(old('jenis', $deployRequest->jenis)) 
+                            ? old('jenis', $deployRequest->jenis) 
+                            : (is_string(old('jenis', $deployRequest->jenis)) ? json_decode(old('jenis', $deployRequest->jenis), true) : []);
+                        if (!is_array($selectedJenis)) {
+                            $selectedJenis = explode(',', str_replace(['[', ']', '"'], '', old('jenis', $deployRequest->jenis)));
+                        }
+                        $selectedJenis = array_map('trim', $selectedJenis);
+                        
+                        // Map old string values to new categories
+                        if (in_array('Bug', $selectedJenis)) {
+                            $selectedJenis[] = 'bug_fixing';
+                        }
+                        if (in_array('CR', $selectedJenis)) {
+                            $selectedJenis[] = 'perubahan_kecil';
+                        }
+                    @endphp
+                    <div class="space-y-3 p-4 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-slate-200 dark:border-slate-800">
+                        {{-- Perubahan Besar --}}
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="jenis_besar" name="jenis[]" type="checkbox" value="perubahan_besar"
+                                       {{ in_array('perubahan_besar', $selectedJenis) ? 'checked' : '' }}
+                                       class="w-4 h-4 text-indigo-600 border-slate-300 dark:border-slate-700 rounded focus:ring-indigo-500 bg-white dark:bg-slate-800"
+                                       onchange="calculateNewVersion()">
+                            </div>
+                            <div class="ml-3 text-sm flex items-center gap-1.5">
+                                <label for="jenis_besar" class="font-medium text-slate-700 dark:text-slate-300 cursor-pointer">Perubahan Besar</label>
+                                
+                                <!-- Tooltip container -->
+                                <div class="relative group inline-block">
+                                    <svg class="w-3.5 h-3.5 text-slate-400 cursor-pointer hover:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 bg-slate-950 text-slate-200 text-xs rounded-lg p-2.5 shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-10 border border-slate-800">
+                                        Perubahan besar mencakup perubahan arsitektur utama, proses bisnis inti, fitur mayor baru, atau perubahan skema database major.
+                                        <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-950"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Perubahan Kecil --}}
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="jenis_kecil" name="jenis[]" type="checkbox" value="perubahan_kecil"
+                                       {{ in_array('perubahan_kecil', $selectedJenis) ? 'checked' : '' }}
+                                       class="w-4 h-4 text-indigo-600 border-slate-300 dark:border-slate-700 rounded focus:ring-indigo-500 bg-white dark:bg-slate-800"
+                                       onchange="calculateNewVersion()">
+                            </div>
+                            <div class="ml-3 text-sm flex items-center gap-1.5">
+                                <label for="jenis_kecil" class="font-medium text-slate-700 dark:text-slate-300 cursor-pointer">Perubahan Kecil</label>
+                                
+                                <!-- Tooltip container -->
+                                <div class="relative group inline-block">
+                                    <svg class="w-3.5 h-3.5 text-slate-400 cursor-pointer hover:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 bg-slate-950 text-slate-200 text-xs rounded-lg p-2.5 shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-10 border border-slate-800">
+                                        Perubahan kecil mencakup penambahan fitur minor, perbaikan tampilan antarmuka (UI/UX), penyesuaian alur kerja minor, atau optimasi performa.
+                                        <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-950"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Bug Fixing --}}
+                        <div class="flex items-start">
+                            <div class="flex items-center h-5">
+                                <input id="jenis_bug" name="jenis[]" type="checkbox" value="bug_fixing"
+                                       {{ in_array('bug_fixing', $selectedJenis) ? 'checked' : '' }}
+                                       class="w-4 h-4 text-indigo-600 border-slate-300 dark:border-slate-700 rounded focus:ring-indigo-500 bg-white dark:bg-slate-800"
+                                       onchange="calculateNewVersion()">
+                            </div>
+                            <div class="ml-3 text-sm flex items-center gap-1.5">
+                                <label for="jenis_bug" class="font-medium text-slate-700 dark:text-slate-300 cursor-pointer">Bug Fixing</label>
+                                
+                                <!-- Tooltip container -->
+                                <div class="relative group inline-block">
+                                    <svg class="w-3.5 h-3.5 text-slate-400 cursor-pointer hover:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 bg-slate-950 text-slate-200 text-xs rounded-lg p-2.5 shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-10 border border-slate-800">
+                                        Bug Fixing mencakup perbaikan galat/error, crash sistem, penambalan celah keamanan (security patches), atau pemulihan bug fitur.
+                                        <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-950"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     @error('jenis')
                         <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                     @enderror
@@ -125,3 +209,54 @@
     </div>
 
 </x-layouts.app>
+
+@push('scripts')
+<script>
+    function calculateNewVersion() {
+        const appSelect = document.getElementById('application_id');
+        const selectedOpt = appSelect.options[appSelect.selectedIndex];
+        
+        if (!selectedOpt || !selectedOpt.value) {
+            document.getElementById('version').value = '';
+            return;
+        }
+        
+        let baseVersion = selectedOpt.dataset.version || '0.0.0';
+        baseVersion = baseVersion.trim();
+        
+        if (baseVersion === '' || baseVersion === '—') {
+            baseVersion = '0.0.0';
+        }
+        
+        // Hapus prefiks 'v' jika ada
+        if (baseVersion.toLowerCase().startsWith('v')) {
+            baseVersion = baseVersion.substring(1);
+        }
+        
+        let parts = baseVersion.split('.');
+        while (parts.length < 3) {
+            parts.push('0');
+        }
+        
+        let major = parseInt(parts[0]) || 0;
+        let minor = parseInt(parts[1]) || 0;
+        let patch = parseInt(parts[2]) || 0;
+        
+        const isBesar = document.getElementById('jenis_besar').checked;
+        const isKecil = document.getElementById('jenis_kecil').checked;
+        const isBug = document.getElementById('jenis_bug').checked;
+        
+        if (isBesar) major += 1;
+        if (isKecil) minor += 1;
+        if (isBug) patch += 1;
+        
+        document.getElementById('version').value = `${major}.${minor}.${patch}`;
+    }
+    
+    document.getElementById('application_id').addEventListener('change', calculateNewVersion);
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        calculateNewVersion();
+    });
+</script>
+@endpush

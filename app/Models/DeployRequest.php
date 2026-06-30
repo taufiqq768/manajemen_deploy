@@ -52,6 +52,7 @@ class DeployRequest extends Model
         return [
             'scheduled_at' => 'datetime',
             'approved_at'  => 'datetime',
+            'jenis'        => 'array',
         ];
     }
 

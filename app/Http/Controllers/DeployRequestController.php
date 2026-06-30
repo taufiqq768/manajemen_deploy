@@ -36,7 +36,7 @@ class DeployRequestController extends Controller
         }
 
         if ($request->filled('jenis')) {
-            $query->where('jenis', $request->jenis);
+            $query->whereJsonContains('jenis', $request->jenis);
         }
 
         if ($request->filled('start_date')) {
@@ -94,7 +94,8 @@ class DeployRequestController extends Controller
                     }
                 }
             ],
-            'jenis' => 'required|in:Bug,CR',
+            'jenis' => 'required|array|min:1',
+            'jenis.*' => 'in:perubahan_besar,perubahan_kecil,bug_fixing',
             'version' => 'required|string|max:50',
             'release_notes' => 'required|string',
             'release_impact' => 'nullable|string',
@@ -212,7 +213,8 @@ class DeployRequestController extends Controller
                     }
                 }
             ],
-            'jenis' => 'required|in:Bug,CR',
+            'jenis' => 'required|array|min:1',
+            'jenis.*' => 'in:perubahan_besar,perubahan_kecil,bug_fixing',
             'version' => 'required|string|max:50',
             'release_notes' => 'required|string',
             'release_impact' => 'nullable|string',
@@ -251,9 +253,41 @@ class DeployRequestController extends Controller
             'approved_at' => now(),
         ]);
 
+        // Update versi aplikasi di database internal
+        $application = $deployRequest->application;
+        $application->update([
+            'version' => $deployRequest->version,
+            'synced_at' => now(),
+        ]);
+
+        // Panggil API Write jika dikonfigurasi
+        $apiError = null;
+        if ($application->version_api_write) {
+            try {
+                $writeKey = $application->version_api_write_key ?: 'version';
+                $notesKey = $application->version_api_write_notes_key ?: 'release_notes';
+                
+                $payload = [
+                    $writeKey => $deployRequest->version,
+                    $notesKey => $deployRequest->release_notes,
+                ];
+                
+                $response = \Illuminate\Support\Facades\Http::timeout(5)
+                    ->post($application->version_api_write, $payload);
+                    
+                if (!$response->successful()) {
+                    $apiError = "Respon HTTP " . $response->status();
+                    \Illuminate\Support\Facades\Log::warning("Gagal push versi ke API Write {$application->name}: " . $apiError);
+                }
+            } catch (\Throwable $e) {
+                $apiError = "Koneksi gagal";
+                \Illuminate\Support\Facades\Log::warning("Gagal push versi ke API Write {$application->name}: " . $e->getMessage());
+            }
+        }
+
         // Beritahu requester (programmer) via in-app + WA + email
         $requester = $deployRequest->requester;
-        $appName = $deployRequest->application->name;
+        $appName = $application->name;
 
         $this->notif->send(
             user: $requester,
@@ -264,7 +298,12 @@ class DeployRequestController extends Controller
             type: 'approved',
         );
 
-        return back()->with('success', 'Request deploy telah disetujui.');
+        $successMsg = 'Request deploy telah disetujui.';
+        if ($apiError) {
+            $successMsg .= " (Peringatan: Gagal memperbarui versi via API Write: {$apiError})";
+        }
+
+        return back()->with('success', $successMsg);
     }
 
     /** Reject (Project Manager) */

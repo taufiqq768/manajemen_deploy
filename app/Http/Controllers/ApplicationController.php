@@ -46,6 +46,8 @@ class ApplicationController extends Controller
             'version_api_get'   => 'nullable|url|max:255',
             'version_api_write' => 'nullable|url|max:255',
             'version_api_key'   => 'nullable|string|max:100',
+            'version_api_write_key' => 'nullable|string|max:100',
+            'version_api_write_notes_key' => 'nullable|string|max:100',
             'pic_ids'           => 'nullable|array',
             'pic_ids.*'         => 'exists:users,id',
         ]);
@@ -74,6 +76,8 @@ class ApplicationController extends Controller
             'version_api_get'   => 'nullable|url|max:255',
             'version_api_write' => 'nullable|url|max:255',
             'version_api_key'   => 'nullable|string|max:100',
+            'version_api_write_key' => 'nullable|string|max:100',
+            'version_api_write_notes_key' => 'nullable|string|max:100',
             'pic_ids'           => 'nullable|array',
             'pic_ids.*'         => 'exists:users,id',
         ]);
@@ -91,6 +95,8 @@ class ApplicationController extends Controller
             'version_api_get'   => 'nullable|url|max:255',
             'version_api_write' => 'nullable|url|max:255',
             'version_api_key'   => 'nullable|string|max:100',
+            'version_api_write_key' => 'nullable|string|max:100',
+            'version_api_write_notes_key' => 'nullable|string|max:100',
         ]);
 
         $application->update($validated);

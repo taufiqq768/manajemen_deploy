@@ -58,9 +58,26 @@
                 </div>
                 <div>
                     <p class="text-xs text-slate-400 dark:text-slate-500 mb-1">Jenis Request</p>
-                    <p class="text-sm text-slate-900 dark:text-white font-medium">
-                        {{ $deployRequest->jenis === 'CR' ? 'Change Request (CR)' : 'Bug Fixing' }}
-                    </p>
+                    <div class="flex flex-wrap gap-1 mt-1">
+                        @if(is_array($deployRequest->jenis))
+                            @foreach($deployRequest->jenis as $j)
+                                <span class="bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 px-2 py-0.5 rounded text-xs border border-indigo-500/20 font-medium">
+                                    {{ match($j) {
+                                        'perubahan_besar' => 'Perubahan Besar',
+                                        'perubahan_kecil' => 'Perubahan Kecil',
+                                        'bug_fixing' => 'Bug Fixing',
+                                        default => $j
+                                    } }}
+                                </span>
+                            @endforeach
+                        @elseif($deployRequest->jenis)
+                            <span class="bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 px-2 py-0.5 rounded text-xs border border-indigo-500/20 font-medium">
+                                {{ $deployRequest->jenis === 'CR' ? 'Change Request (CR)' : ($deployRequest->jenis === 'Bug' ? 'Bug Fixing' : $deployRequest->jenis) }}
+                            </span>
+                        @else
+                            <span class="text-slate-500">—</span>
+                        @endif
+                    </div>
                 </div>
                 <div>
                     <p class="text-xs text-slate-400 dark:text-slate-500 mb-1">Tanggal Pengajuan</p>

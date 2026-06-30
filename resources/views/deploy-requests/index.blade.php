@@ -49,8 +49,9 @@
         <select name="jenis"
                 class="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             <option value="">Semua Jenis</option>
-            <option value="CR" {{ request('jenis') === 'CR' ? 'selected' : '' }}>CR (Change Request)</option>
-            <option value="Bug" {{ request('jenis') === 'Bug' ? 'selected' : '' }}>Bug</option>
+            <option value="perubahan_besar" {{ request('jenis') === 'perubahan_besar' ? 'selected' : '' }}>Perubahan Besar</option>
+            <option value="perubahan_kecil" {{ request('jenis') === 'perubahan_kecil' ? 'selected' : '' }}>Perubahan Kecil</option>
+            <option value="bug_fixing" {{ request('jenis') === 'bug_fixing' ? 'selected' : '' }}>Bug Fixing</option>
         </select>
 
         <div class="flex items-center gap-2">
@@ -109,7 +110,33 @@
                             <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ $req->ticket_number }}</div>
                         </td>
                         <td class="px-5 py-4 text-slate-500 dark:text-slate-300 font-mono text-xs">{{ $req->version }}</td>
-                        <td class="px-5 py-4 text-slate-500 dark:text-slate-400 text-xs">{{ $req->jenis }}</td>
+                        <td class="px-5 py-4">
+                            <div class="flex flex-wrap gap-1 max-w-[150px]">
+                                @if(is_array($req->jenis))
+                                    @foreach($req->jenis as $j)
+                                        <span class="bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 px-1.5 py-0.5 rounded text-[10px] font-medium border border-indigo-500/20" title="{{ match($j) {
+                                            'perubahan_besar' => 'Perubahan Besar',
+                                            'perubahan_kecil' => 'Perubahan Kecil',
+                                            'bug_fixing' => 'Bug Fixing',
+                                            default => $j
+                                        } }}">
+                                            {{ match($j) {
+                                                'perubahan_besar' => 'Besar',
+                                                'perubahan_kecil' => 'Kecil',
+                                                'bug_fixing' => 'Bug',
+                                                default => $j
+                                            } }}
+                                        </span>
+                                    @endforeach
+                                @elseif($req->jenis)
+                                    <span class="bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 px-1.5 py-0.5 rounded text-[10px] font-medium border border-indigo-500/20">
+                                        {{ $req->jenis === 'CR' ? 'CR' : ($req->jenis === 'Bug' ? 'Bug' : $req->jenis) }}
+                                    </span>
+                                @else
+                                    <span class="text-slate-400">—</span>
+                                @endif
+                            </div>
+                        </td>
                         @if(auth()->user()->isProjectManager() || auth()->user()->isAdmin())
                         <td class="px-5 py-4 text-slate-600 dark:text-slate-400">{{ $req->requester->name }}</td>
                         @endif

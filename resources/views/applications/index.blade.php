@@ -89,6 +89,8 @@
                                data-api-get="{{ $app->version_api_get }}"
                                data-api-write="{{ $app->version_api_write }}"
                                data-api-key="{{ $app->version_api_key }}"
+                               data-api-write-key="{{ $app->version_api_write_key }}"
+                               data-api-write-notes-key="{{ $app->version_api_write_notes_key }}"
                                data-version="{{ $app->version }}"
                                class="text-indigo-400 hover:text-indigo-300 underline font-medium focus:outline-none"
                                title="Klik untuk atur API Versi">
@@ -249,6 +251,18 @@
                                    class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                             <p class="text-xs text-slate-500 mt-1.5">Endpoint API untuk menulis / memperbarui status versi aplikasi.</p>
                         </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-1.5">Key Parameter Versi (API Write)</label>
+                            <input type="text" id="version_api_write_key" name="version_api_write_key" placeholder="contoh: version, atau no_versi"
+                                   class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <p class="text-xs text-slate-500 mt-1.5">Key payload JSON untuk data nomor versi (default: <code>version</code>).</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-1.5">Key Parameter Catatan Rilis (API Write)</label>
+                            <input type="text" id="version_api_write_notes_key" name="version_api_write_notes_key" placeholder="contoh: release_notes, atau keterangan"
+                                   class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <p class="text-xs text-slate-500 mt-1.5">Key payload JSON untuk data catatan rilis/release notes (default: <code>release_notes</code>).</p>
+                        </div>
                     </div>
                     <div class="flex items-center justify-between pt-6 mt-6 border-t border-slate-800">
                         <div>
@@ -277,6 +291,8 @@
         let initialApiGet = '';
         let initialApiWrite = '';
         let initialApiKey = '';
+        let initialApiWriteKey = '';
+        let initialApiWriteNotesKey = '';
         function openEditModal(btn) {
             const modal = document.getElementById('editModal');
             const content = document.getElementById('editModalContent');
@@ -373,10 +389,14 @@
             initialApiGet = btn.dataset.apiGet || '';
             initialApiWrite = btn.dataset.apiWrite || '';
             initialApiKey = btn.dataset.apiKey || '';
+            initialApiWriteKey = btn.dataset.apiWriteKey || 'version';
+            initialApiWriteNotesKey = btn.dataset.apiWriteNotesKey || 'release_notes';
 
             document.getElementById('version_api_get').value = initialApiGet;
             document.getElementById('version_api_write').value = initialApiWrite;
             document.getElementById('version_api_key').value = initialApiKey;
+            document.getElementById('version_api_write_key').value = initialApiWriteKey;
+            document.getElementById('version_api_write_notes_key').value = initialApiWriteNotesKey;
             
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -390,8 +410,10 @@
             const currentGet = document.getElementById('version_api_get').value.trim();
             const currentWrite = document.getElementById('version_api_write').value.trim();
             const currentKey = document.getElementById('version_api_key').value.trim();
+            const currentWriteKey = document.getElementById('version_api_write_key').value.trim();
+            const currentWriteNotesKey = document.getElementById('version_api_write_notes_key').value.trim();
             
-            if (!force && (currentGet !== initialApiGet || currentWrite !== initialApiWrite || currentKey !== initialApiKey)) {
+            if (!force && (currentGet !== initialApiGet || currentWrite !== initialApiWrite || currentKey !== initialApiKey || currentWriteKey !== initialApiWriteKey || currentWriteNotesKey !== initialApiWriteNotesKey)) {
                 if (!confirm('Ada perubahan konfigurasi API yang belum disimpan. Yakin ingin membatalkan?')) {
                     return;
                 }
