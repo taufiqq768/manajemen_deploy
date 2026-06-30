@@ -253,16 +253,21 @@ class DeployRequestController extends Controller
     {
         $this->authorize('decide', $deployRequest);
 
+        $application = $deployRequest->application;
+        
+        // Hitung kenaikan versi semantic pada saat disetujui (PM approval)
+        $newVersion = DeployRequest::calculateBumpedVersion($application->version ?? '0.0.0', $deployRequest->jenis);
+
         $deployRequest->update([
             'status' => 'approved',
             'approver_id' => auth()->id(),
             'approved_at' => now(),
+            'version' => $newVersion, // simpan versi baru hasil bumping ke record request
         ]);
 
-        // Update versi aplikasi di database internal
-        $application = $deployRequest->application;
+        // Update versi aplikasi di database internal ke versi baru
         $application->update([
-            'version' => $deployRequest->version,
+            'version' => $newVersion,
             'synced_at' => now(),
         ]);
 
@@ -292,7 +297,7 @@ class DeployRequestController extends Controller
                 }
                 
                 $payload = [
-                    $writeKey => $deployRequest->version,
+                    $writeKey => $newVersion,
                     $notesKey => $releaseNotesText,
                 ];
                 

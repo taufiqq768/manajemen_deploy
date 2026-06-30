@@ -57,6 +57,39 @@ class DeployRequest extends Model
         ];
     }
 
+    public static function calculateBumpedVersion(string $currentVersion, array $jenis): string
+    {
+        $currentVersion = trim($currentVersion);
+        if (empty($currentVersion) || $currentVersion === '—') {
+            $currentVersion = '0.0.0';
+        }
+        
+        if (str_starts_with(strtolower($currentVersion), 'v')) {
+            $currentVersion = substr($currentVersion, 1);
+        }
+        
+        $parts = explode('.', $currentVersion);
+        while (count($parts) < 3) {
+            $parts[] = '0';
+        }
+        
+        $major = (int) $parts[0];
+        $minor = (int) $parts[1];
+        $patch = (int) $parts[2];
+        
+        if (in_array('perubahan_besar', $jenis)) {
+            $major += 1;
+        }
+        if (in_array('perubahan_kecil', $jenis)) {
+            $minor += 1;
+        }
+        if (in_array('bug_fixing', $jenis)) {
+            $patch += 1;
+        }
+        
+        return "{$major}.{$minor}.{$patch}";
+    }
+
     /* ── Helpers ─────────────────────────────────────────── */
 
     public function isPending(): bool

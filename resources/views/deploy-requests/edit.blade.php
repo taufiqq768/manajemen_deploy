@@ -53,7 +53,7 @@
                                value="{{ old('version', $deployRequest->version) }}"
                                class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm rounded-lg px-3 py-2.5
                                       focus:outline-none cursor-not-allowed font-mono">
-                        <p class="text-[11px] text-slate-500 mt-1">Dihitung otomatis (x.x.x) dari versi berjalan & jenis request.</p>
+                        <p class="text-[11px] text-slate-500 mt-1">Versi saat ini. Versi rilis akan otomatis naik setelah pengajuan disetujui Project Manager.</p>
                     </div>
                     <div>
                         <label for="scheduled_at" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Jadwal Deploy</label>
@@ -284,29 +284,12 @@
             baseVersion = '0.0.0';
         }
         
-        // Hapus prefiks 'v' jika ada
-        if (baseVersion.toLowerCase().startsWith('v')) {
-            baseVersion = baseVersion.substring(1);
-        }
-        
-        let parts = baseVersion.split('.');
-        while (parts.length < 3) {
-            parts.push('0');
-        }
-        
-        let major = parseInt(parts[0]) || 0;
-        let minor = parseInt(parts[1]) || 0;
-        let patch = parseInt(parts[2]) || 0;
+        // Display base version as-is (read-only), bumping will happen on approval
+        document.getElementById('version').value = baseVersion;
         
         const isBesar = document.getElementById('jenis_besar').checked;
         const isKecil = document.getElementById('jenis_kecil').checked;
         const isBug = document.getElementById('jenis_bug').checked;
-        
-        if (isBesar) major += 1;
-        if (isKecil) minor += 1;
-        if (isBug) patch += 1;
-        
-        document.getElementById('version').value = `${major}.${minor}.${patch}`;
         
         // Dynamic Release Notes section visibility
         if (isBesar || isKecil || isBug) {
