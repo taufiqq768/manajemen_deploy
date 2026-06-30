@@ -51,6 +51,83 @@
                         @enderror
                     </div>
 
+                    {{-- Jenis Request --}}
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                            Jenis Request <span class="text-red-500">*</span>
+                        </label>
+                        <div class="space-y-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
+                            {{-- Perubahan Besar --}}
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="jenis_besar" name="jenis[]" type="checkbox" value="perubahan_besar"
+                                           {{ is_array(old('jenis')) && in_array('perubahan_besar', old('jenis')) ? 'checked' : '' }}
+                                           class="w-4 h-4 text-indigo-600 border-slate-300 dark:border-slate-700 rounded focus:ring-indigo-500 bg-white dark:bg-slate-800"
+                                           onchange="updateFormStates()">
+                                </div>
+                                <div class="ml-3 text-sm flex items-center gap-1.5">
+                                    <label for="jenis_besar" class="font-medium text-slate-700 dark:text-slate-200 cursor-pointer">Perubahan Besar</label>
+                                    <div class="relative group inline-block">
+                                        <svg class="w-3.5 h-3.5 text-slate-400 cursor-pointer hover:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 bg-slate-950 text-slate-200 text-xs rounded-lg p-2.5 shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-10 border border-slate-800">
+                                            Perubahan besar mencakup perubahan arsitektur utama, proses bisnis inti, fitur mayor baru, atau perubahan skema database major.
+                                            <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-950"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Perubahan Kecil --}}
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="jenis_kecil" name="jenis[]" type="checkbox" value="perubahan_kecil"
+                                           {{ is_array(old('jenis')) && in_array('perubahan_kecil', old('jenis')) ? 'checked' : '' }}
+                                           class="w-4 h-4 text-indigo-600 border-slate-300 dark:border-slate-700 rounded focus:ring-indigo-500 bg-white dark:bg-slate-800"
+                                           onchange="updateFormStates()">
+                                </div>
+                                <div class="ml-3 text-sm flex items-center gap-1.5">
+                                    <label for="jenis_kecil" class="font-medium text-slate-700 dark:text-slate-200 cursor-pointer">Perubahan Kecil</label>
+                                    <div class="relative group inline-block">
+                                        <svg class="w-3.5 h-3.5 text-slate-400 cursor-pointer hover:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 bg-slate-950 text-slate-200 text-xs rounded-lg p-2.5 shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-10 border border-slate-800">
+                                            Perubahan kecil mencakup penambahan fitur minor, perbaikan tampilan antarmuka (UI/UX), penyesuaian alur kerja minor, atau optimasi performa.
+                                            <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-950"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Bug Fixing --}}
+                            <div class="flex items-start">
+                                <div class="flex items-center h-5">
+                                    <input id="jenis_bug" name="jenis[]" type="checkbox" value="bug_fixing"
+                                           {{ is_array(old('jenis')) && in_array('bug_fixing', old('jenis')) ? 'checked' : '' }}
+                                           class="w-4 h-4 text-indigo-600 border-slate-300 dark:border-slate-700 rounded focus:ring-indigo-500 bg-white dark:bg-slate-800"
+                                           onchange="updateFormStates()">
+                                </div>
+                                <div class="ml-3 text-sm flex items-center gap-1.5">
+                                    <label for="jenis_bug" class="font-medium text-slate-700 dark:text-slate-200 cursor-pointer">Bug Fixing</label>
+                                    <div class="relative group inline-block">
+                                        <svg class="w-3.5 h-3.5 text-slate-400 cursor-pointer hover:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 bg-slate-950 text-slate-200 text-xs rounded-lg p-2.5 shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-10 border border-slate-800">
+                                            Bug Fixing mencakup perbaikan galat/error, crash sistem, penambalan celah keamanan (security patches), atau pemulihan bug fitur.
+                                            <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-950"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @error('jenis')
+                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     {{-- Versi & Jadwal --}}
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
@@ -58,10 +135,10 @@
                                 Versi / Release <span class="text-red-500">*</span>
                             </label>
                             <input type="text" id="version" name="version" value="{{ old('version') }}" readonly required
-                                placeholder="Pilih aplikasi & jenis request" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm rounded-lg px-3 py-2.5
+                                placeholder="Pilih aplikasi" class="w-full bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm rounded-lg px-3 py-2.5
                                               focus:outline-none cursor-not-allowed font-mono
                                               @error('version') border-red-500 @enderror">
-                            <p class="text-[11px] text-slate-500 mt-1">Versi saat ini. Versi rilis akan otomatis naik setelah pengajuan disetujui Project Manager.</p>
+                            <p class="text-[11px] text-slate-500 mt-1">Versi saat ini. Naik otomatis setelah disetujui PM.</p>
                             @error('version')
                                 <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                             @enderror
@@ -82,13 +159,12 @@
                         </div>
                     </div>
 
-                    {{-- Release Notes --}}
+                    {{-- Release Notes (dynamic per jenis) --}}
                     <div id="release_notes_section" class="space-y-4 hidden">
                         <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
                             Catatan Rilis (Release Notes) <span class="text-red-500">*</span>
                         </label>
                         
-                        {{-- Besar --}}
                         <div id="notes_besar_container" class="hidden space-y-1.5">
                             <label for="release_notes_besar" class="block text-xs font-semibold text-slate-500 dark:text-slate-400">
                                 Catatan Rilis: Perubahan Besar <span class="text-red-500">*</span>
@@ -101,7 +177,6 @@
                             @enderror
                         </div>
 
-                        {{-- Kecil --}}
                         <div id="notes_kecil_container" class="hidden space-y-1.5">
                             <label for="release_notes_kecil" class="block text-xs font-semibold text-slate-500 dark:text-slate-400">
                                 Catatan Rilis: Perubahan Kecil <span class="text-red-500">*</span>
@@ -114,7 +189,6 @@
                             @enderror
                         </div>
 
-                        {{-- Bug --}}
                         <div id="notes_bug_container" class="hidden space-y-1.5">
                             <label for="release_notes_bug" class="block text-xs font-semibold text-slate-500 dark:text-slate-400">
                                 Catatan Rilis: Bug Fixing <span class="text-red-500">*</span>
@@ -138,89 +212,6 @@
                             placeholder="Sebutkan dampak yang mungkin terjadi (downtime, perubahan schema, dll)"
                             class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5
                                              focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y">{{ old('release_impact') }}</textarea>
-                    </div>
-
-                    {{-- Jenis --}}
-                    <div>
-                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                            Jenis Request <span class="text-red-500">*</span>
-                        </label>
-                        <div class="space-y-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
-                            {{-- Perubahan Besar --}}
-                            <div class="flex items-start">
-                                <div class="flex items-center h-5">
-                                    <input id="jenis_besar" name="jenis[]" type="checkbox" value="perubahan_besar"
-                                           {{ is_array(old('jenis')) && in_array('perubahan_besar', old('jenis')) ? 'checked' : '' }}
-                                           class="w-4 h-4 text-indigo-600 border-slate-300 dark:border-slate-700 rounded focus:ring-indigo-500 bg-white dark:bg-slate-800"
-                                           onchange="updateFormStates()">
-                                </div>
-                                <div class="ml-3 text-sm flex items-center gap-1.5">
-                                    <label for="jenis_besar" class="font-medium text-slate-700 dark:text-slate-200 cursor-pointer">Perubahan Besar</label>
-                                    
-                                    <!-- Tooltip container -->
-                                    <div class="relative group inline-block">
-                                        <svg class="w-3.5 h-3.5 text-slate-400 cursor-pointer hover:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 bg-slate-950 text-slate-200 text-xs rounded-lg p-2.5 shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-10 border border-slate-800">
-                                            Perubahan besar mencakup perubahan arsitektur utama, proses bisnis inti, fitur mayor baru, atau perubahan skema database major.
-                                            <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-950"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Perubahan Kecil --}}
-                            <div class="flex items-start">
-                                <div class="flex items-center h-5">
-                                    <input id="jenis_kecil" name="jenis[]" type="checkbox" value="perubahan_kecil"
-                                           {{ is_array(old('jenis')) && in_array('perubahan_kecil', old('jenis')) ? 'checked' : '' }}
-                                           class="w-4 h-4 text-indigo-600 border-slate-300 dark:border-slate-700 rounded focus:ring-indigo-500 bg-white dark:bg-slate-800"
-                                           onchange="updateFormStates()">
-                                </div>
-                                <div class="ml-3 text-sm flex items-center gap-1.5">
-                                    <label for="jenis_kecil" class="font-medium text-slate-700 dark:text-slate-200 cursor-pointer">Perubahan Kecil</label>
-                                    
-                                    <!-- Tooltip container -->
-                                    <div class="relative group inline-block">
-                                        <svg class="w-3.5 h-3.5 text-slate-400 cursor-pointer hover:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 bg-slate-950 text-slate-200 text-xs rounded-lg p-2.5 shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-10 border border-slate-800">
-                                            Perubahan kecil mencakup penambahan fitur minor, perbaikan tampilan antarmuka (UI/UX), penyesuaian alur kerja minor, atau optimasi performa.
-                                            <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-950"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            {{-- Bug Fixing --}}
-                            <div class="flex items-start">
-                                <div class="flex items-center h-5">
-                                    <input id="jenis_bug" name="jenis[]" type="checkbox" value="bug_fixing"
-                                           {{ is_array(old('jenis')) && in_array('bug_fixing', old('jenis')) ? 'checked' : '' }}
-                                           class="w-4 h-4 text-indigo-600 border-slate-300 dark:border-slate-700 rounded focus:ring-indigo-500 bg-white dark:bg-slate-800"
-                                           onchange="updateFormStates()">
-                                </div>
-                                <div class="ml-3 text-sm flex items-center gap-1.5">
-                                    <label for="jenis_bug" class="font-medium text-slate-700 dark:text-slate-200 cursor-pointer">Bug Fixing</label>
-                                    
-                                    <!-- Tooltip container -->
-                                    <div class="relative group inline-block">
-                                        <svg class="w-3.5 h-3.5 text-slate-400 cursor-pointer hover:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-64 bg-slate-950 text-slate-200 text-xs rounded-lg p-2.5 shadow-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 z-10 border border-slate-800">
-                                            Bug Fixing mencakup perbaikan galat/error, crash sistem, penambalan celah keamanan (security patches), atau pemulihan bug fitur.
-                                            <div class="absolute top-full left-1/2 transform -translate-x-1/2 -mt-1 border-4 border-transparent border-t-slate-950"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        @error('jenis')
-                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                        @enderror
                     </div>
 
                     {{-- Document Support --}}
@@ -258,79 +249,78 @@
         </div>
     </div>
 
-</x-layouts.app>
-
-@push('scripts')
-<script>
-    function updateFormStates() {
-        const appSelect = document.getElementById('application_id');
-        const selectedOpt = appSelect.options[appSelect.selectedIndex];
-        
-        if (!selectedOpt || !selectedOpt.value) {
-            document.getElementById('version').value = '';
-            document.getElementById('version').placeholder = 'Pilih aplikasi & jenis request';
-            document.getElementById('release_notes_section').classList.add('hidden');
-            return;
+    @push('scripts')
+    <script>
+        function updateFormStates() {
+            const appSelect = document.getElementById('application_id');
+            const selectedOpt = appSelect.options[appSelect.selectedIndex];
+            
+            if (!selectedOpt || !selectedOpt.value) {
+                document.getElementById('version').value = '';
+                document.getElementById('version').placeholder = 'Pilih aplikasi';
+                document.getElementById('release_notes_section').classList.add('hidden');
+                return;
+            }
+            
+            let baseVersion = selectedOpt.dataset.version || '0.0.0';
+            baseVersion = baseVersion.trim();
+            
+            if (baseVersion === '' || baseVersion === '—') {
+                baseVersion = '0.0.0';
+            }
+            
+            // Display base version as-is (read-only), bumping will happen on approval
+            document.getElementById('version').value = baseVersion;
+            
+            const isBesar = document.getElementById('jenis_besar').checked;
+            const isKecil = document.getElementById('jenis_kecil').checked;
+            const isBug = document.getElementById('jenis_bug').checked;
+            
+            // Dynamic Release Notes section visibility
+            if (isBesar || isKecil || isBug) {
+                document.getElementById('release_notes_section').classList.remove('hidden');
+            } else {
+                document.getElementById('release_notes_section').classList.add('hidden');
+            }
+            
+            // Perubahan Besar notes
+            if (isBesar) {
+                document.getElementById('notes_besar_container').classList.remove('hidden');
+                document.getElementById('release_notes_besar').required = true;
+            } else {
+                document.getElementById('notes_besar_container').classList.add('hidden');
+                document.getElementById('release_notes_besar').required = false;
+            }
+            
+            // Perubahan Kecil notes
+            if (isKecil) {
+                document.getElementById('notes_kecil_container').classList.remove('hidden');
+                document.getElementById('release_notes_kecil').required = true;
+            } else {
+                document.getElementById('notes_kecil_container').classList.add('hidden');
+                document.getElementById('release_notes_kecil').required = false;
+            }
+            
+            // Bug Fixing notes
+            if (isBug) {
+                document.getElementById('notes_bug_container').classList.remove('hidden');
+                document.getElementById('release_notes_bug').required = true;
+            } else {
+                document.getElementById('notes_bug_container').classList.add('hidden');
+                document.getElementById('release_notes_bug').required = false;
+            }
         }
         
-        let baseVersion = selectedOpt.dataset.version || '0.0.0';
-        baseVersion = baseVersion.trim();
+        document.getElementById('application_id').addEventListener('change', updateFormStates);
         
-        if (baseVersion === '' || baseVersion === '—') {
-            baseVersion = '0.0.0';
-        }
+        // Also trigger on checkbox changes
+        document.getElementById('jenis_besar').addEventListener('change', updateFormStates);
+        document.getElementById('jenis_kecil').addEventListener('change', updateFormStates);
+        document.getElementById('jenis_bug').addEventListener('change', updateFormStates);
         
-        // Display base version as-is (read-only), bumping will happen on approval
-        document.getElementById('version').value = baseVersion;
-        
-        const isBesar = document.getElementById('jenis_besar').checked;
-        const isKecil = document.getElementById('jenis_kecil').checked;
-        const isBug = document.getElementById('jenis_bug').checked;
-        
-        // Dynamic Release Notes section visibility
-        if (isBesar || isKecil || isBug) {
-            document.getElementById('release_notes_section').classList.remove('hidden');
-        } else {
-            document.getElementById('release_notes_section').classList.add('hidden');
-        }
-        
-        // Perubahan Besar notes
-        if (isBesar) {
-            document.getElementById('notes_besar_container').classList.remove('hidden');
-            document.getElementById('release_notes_besar').required = true;
-        } else {
-            document.getElementById('notes_besar_container').classList.add('hidden');
-            document.getElementById('release_notes_besar').required = false;
-        }
-        
-        // Perubahan Kecil notes
-        if (isKecil) {
-            document.getElementById('notes_kecil_container').classList.remove('hidden');
-            document.getElementById('release_notes_kecil').required = true;
-        } else {
-            document.getElementById('notes_kecil_container').classList.add('hidden');
-            document.getElementById('release_notes_kecil').required = false;
-        }
-        
-        // Bug Fixing notes
-        if (isBug) {
-            document.getElementById('notes_bug_container').classList.remove('hidden');
-            document.getElementById('release_notes_bug').required = true;
-        } else {
-            document.getElementById('notes_bug_container').classList.add('hidden');
-            document.getElementById('release_notes_bug').required = false;
-        }
-    }
-    
-    document.getElementById('application_id').addEventListener('change', updateFormStates);
-    
-    // Also trigger on checkbox changes
-    document.getElementById('jenis_besar').addEventListener('change', updateFormStates);
-    document.getElementById('jenis_kecil').addEventListener('change', updateFormStates);
-    document.getElementById('jenis_bug').addEventListener('change', updateFormStates);
-    
-    document.addEventListener('DOMContentLoaded', function() {
+        // Run on page load — DOM is already ready since script is at end of body
         updateFormStates();
-    });
-</script>
-@endpush
+    </script>
+    @endpush
+
+</x-layouts.app>

@@ -262,79 +262,78 @@
         </div>
     </div>
 
-</x-layouts.app>
-
-@push('scripts')
-<script>
-    function updateFormStates() {
-        const appSelect = document.getElementById('application_id');
-        const selectedOpt = appSelect.options[appSelect.selectedIndex];
-        
-        if (!selectedOpt || !selectedOpt.value) {
-            document.getElementById('version').value = '';
-            document.getElementById('version').placeholder = 'Pilih aplikasi & jenis request';
-            document.getElementById('release_notes_section').classList.add('hidden');
-            return;
+    @push('scripts')
+    <script>
+        function updateFormStates() {
+            const appSelect = document.getElementById('application_id');
+            const selectedOpt = appSelect.options[appSelect.selectedIndex];
+            
+            if (!selectedOpt || !selectedOpt.value) {
+                document.getElementById('version').value = '';
+                document.getElementById('version').placeholder = 'Pilih aplikasi & jenis request';
+                document.getElementById('release_notes_section').classList.add('hidden');
+                return;
+            }
+            
+            let baseVersion = selectedOpt.dataset.version || '0.0.0';
+            baseVersion = baseVersion.trim();
+            
+            if (baseVersion === '' || baseVersion === '—') {
+                baseVersion = '0.0.0';
+            }
+            
+            // Display base version as-is (read-only), bumping will happen on approval
+            document.getElementById('version').value = baseVersion;
+            
+            const isBesar = document.getElementById('jenis_besar').checked;
+            const isKecil = document.getElementById('jenis_kecil').checked;
+            const isBug = document.getElementById('jenis_bug').checked;
+            
+            // Dynamic Release Notes section visibility
+            if (isBesar || isKecil || isBug) {
+                document.getElementById('release_notes_section').classList.remove('hidden');
+            } else {
+                document.getElementById('release_notes_section').classList.add('hidden');
+            }
+            
+            // Perubahan Besar notes
+            if (isBesar) {
+                document.getElementById('notes_besar_container').classList.remove('hidden');
+                document.getElementById('release_notes_besar').required = true;
+            } else {
+                document.getElementById('notes_besar_container').classList.add('hidden');
+                document.getElementById('release_notes_besar').required = false;
+            }
+            
+            // Perubahan Kecil notes
+            if (isKecil) {
+                document.getElementById('notes_kecil_container').classList.remove('hidden');
+                document.getElementById('release_notes_kecil').required = true;
+            } else {
+                document.getElementById('notes_kecil_container').classList.add('hidden');
+                document.getElementById('release_notes_kecil').required = false;
+            }
+            
+            // Bug Fixing notes
+            if (isBug) {
+                document.getElementById('notes_bug_container').classList.remove('hidden');
+                document.getElementById('release_notes_bug').required = true;
+            } else {
+                document.getElementById('notes_bug_container').classList.add('hidden');
+                document.getElementById('release_notes_bug').required = false;
+            }
         }
         
-        let baseVersion = selectedOpt.dataset.version || '0.0.0';
-        baseVersion = baseVersion.trim();
+        document.getElementById('application_id').addEventListener('change', updateFormStates);
         
-        if (baseVersion === '' || baseVersion === '—') {
-            baseVersion = '0.0.0';
-        }
+        // Also trigger on checkbox changes
+        document.getElementById('jenis_besar').addEventListener('change', updateFormStates);
+        document.getElementById('jenis_kecil').addEventListener('change', updateFormStates);
+        document.getElementById('jenis_bug').addEventListener('change', updateFormStates);
         
-        // Display base version as-is (read-only), bumping will happen on approval
-        document.getElementById('version').value = baseVersion;
-        
-        const isBesar = document.getElementById('jenis_besar').checked;
-        const isKecil = document.getElementById('jenis_kecil').checked;
-        const isBug = document.getElementById('jenis_bug').checked;
-        
-        // Dynamic Release Notes section visibility
-        if (isBesar || isKecil || isBug) {
-            document.getElementById('release_notes_section').classList.remove('hidden');
-        } else {
-            document.getElementById('release_notes_section').classList.add('hidden');
-        }
-        
-        // Perubahan Besar notes
-        if (isBesar) {
-            document.getElementById('notes_besar_container').classList.remove('hidden');
-            document.getElementById('release_notes_besar').required = true;
-        } else {
-            document.getElementById('notes_besar_container').classList.add('hidden');
-            document.getElementById('release_notes_besar').required = false;
-        }
-        
-        // Perubahan Kecil notes
-        if (isKecil) {
-            document.getElementById('notes_kecil_container').classList.remove('hidden');
-            document.getElementById('release_notes_kecil').required = true;
-        } else {
-            document.getElementById('notes_kecil_container').classList.add('hidden');
-            document.getElementById('release_notes_kecil').required = false;
-        }
-        
-        // Bug Fixing notes
-        if (isBug) {
-            document.getElementById('notes_bug_container').classList.remove('hidden');
-            document.getElementById('release_notes_bug').required = true;
-        } else {
-            document.getElementById('notes_bug_container').classList.add('hidden');
-            document.getElementById('release_notes_bug').required = false;
-        }
-    }
-    
-    document.getElementById('application_id').addEventListener('change', updateFormStates);
-    
-    // Also trigger on checkbox changes
-    document.getElementById('jenis_besar').addEventListener('change', updateFormStates);
-    document.getElementById('jenis_kecil').addEventListener('change', updateFormStates);
-    document.getElementById('jenis_bug').addEventListener('change', updateFormStates);
-    
-    document.addEventListener('DOMContentLoaded', function() {
+        // Run on page load — DOM is already ready since script is at end of body
         updateFormStates();
-    });
-</script>
-@endpush
+    </script>
+    @endpush
+
+</x-layouts.app>
