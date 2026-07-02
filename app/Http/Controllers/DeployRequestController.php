@@ -402,4 +402,36 @@ class DeployRequestController extends Controller
 
         return back()->with('error', 'Request deploy telah ditolak.');
     }
+
+    /** Retry pushing version to remote server */
+    public function retryPush(DeployRequest $deployRequest)
+    {
+        $application = $deployRequest->application;
+        
+        $releaseNotesRaw = $deployRequest->release_notes;
+        $releaseNotesText = '';
+        if (is_array($releaseNotesRaw)) {
+            $lines = [];
+            if (!empty($releaseNotesRaw['perubahan_besar'])) {
+                $lines[] = "• Perubahan Besar:\n" . $releaseNotesRaw['perubahan_besar'];
+            }
+            if (!empty($releaseNotesRaw['perubahan_kecil'])) {
+                $lines[] = "• Perubahan Kecil:\n" . $releaseNotesRaw['perubahan_kecil'];
+            }
+            if (!empty($releaseNotesRaw['bug_fixing'])) {
+                $lines[] = "• Bug Fixing:\n" . $releaseNotesRaw['bug_fixing'];
+            }
+            $releaseNotesText = implode("\n\n", $lines);
+        } else {
+            $releaseNotesText = (string) $releaseNotesRaw;
+        }
+
+        $result = $application->pushVersionToRemote($deployRequest->version, $releaseNotesText);
+
+        if ($result['success']) {
+            return back()->with('success', "Sukses push versi: {$result['message']}");
+        } else {
+            return back()->with('error', "Gagal push versi: {$result['message']}");
+        }
+    }
 }

@@ -37,6 +37,8 @@ Route::middleware('auth')->group(function () {
         ->name('deploy-requests.approve');
     Route::post('/deploy-requests/{deployRequest}/reject', [DeployRequestController::class, 'reject'])
         ->name('deploy-requests.reject');
+    Route::post('/deploy-requests/{deployRequest}/retry-push', [DeployRequestController::class, 'retryPush'])
+        ->name('deploy-requests.retry-push');
 
     // Manajemen Aplikasi (khusus Admin)
     Route::middleware('role:admin')->group(function () {
