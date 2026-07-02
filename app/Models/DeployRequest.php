@@ -19,6 +19,7 @@ class DeployRequest extends Model
         'release_notes',
         'release_impact',
         'document_support',
+        'document_link',
         'environment',
         'status',
         'scheduled_at',
@@ -182,5 +183,21 @@ class DeployRequest extends Model
             return false;
         }
         return $this->application->version === $this->version;
+    }
+
+    /** Cek apakah ini request deploy yang disetujui paling terbaru untuk aplikasinya */
+    public function isLatestApprovedRequest(): bool
+    {
+        if ($this->status !== 'approved') {
+            return false;
+        }
+
+        // Cek jika ada request lain yang disetujui setelah request ini untuk aplikasi yang sama
+        $hasNewer = self::where('application_id', $this->application_id)
+            ->where('status', 'approved')
+            ->where('id', '>', $this->id)
+            ->exists();
+
+        return !$hasNewer;
     }
 }

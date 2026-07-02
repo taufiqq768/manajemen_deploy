@@ -214,20 +214,38 @@
                                              focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-y">{{ old('release_impact') }}</textarea>
                     </div>
 
-                    {{-- Document Support --}}
-                    <div>
-                        <label for="document_support"
-                            class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                            Dokumen Pendukung <span class="text-xs text-slate-500">(opsional, max 2MB, format: pdf, doc,
-                                jpg, png, txt)</span>
-                        </label>
-                        <input type="file" id="document_support" name="document_support"
-                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
-                            class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5
-                                             focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('document_support') border-red-500 @enderror">
-                        @error('document_support')
-                            <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                        @enderror
+                    {{-- Documents --}}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                        {{-- Document Support --}}
+                        <div>
+                            <label for="document_support"
+                                class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                Unggah Dokumen Pendukung <span class="text-xs text-slate-500">(opsional, max 2MB)</span>
+                            </label>
+                            <input type="file" id="document_support" name="document_support"
+                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
+                                class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5
+                                                 focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('document_support') border-red-500 @enderror">
+                            @error('document_support')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        {{-- Document Link --}}
+                        <div>
+                            <label for="document_link"
+                                class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                Link Dokumen Terkait <span class="text-xs text-slate-500">(opsional, url / link)</span>
+                            </label>
+                            <input type="url" id="document_link" name="document_link"
+                                value="{{ old('document_link') }}"
+                                placeholder="https://drive.google.com/... atau tautan dokumen lainnya"
+                                class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5
+                                                 focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('document_link') border-red-500 @enderror">
+                            @error('document_link')
+                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                            @enderror
+                        </div>
                     </div>
 
                     {{-- Submit --}}
