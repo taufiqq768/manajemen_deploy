@@ -77,7 +77,7 @@ Berikut adalah skenario standar atau alur kerja (*SOP*) di dalam aplikasi:
    - **Perubahan Kecil**: Menaikkan angka kedua / Minor version (`*.x.*`).
    - **Bug Fixing**: Menaikkan angka ketiga / Patch version (`*.*.x`).
    (Jika ketiganya dicentang sekaligus, maka seluruh bagian nomor rilis akan dinaikkan).
-7. **File Upload Secure**: Sistem mengizinkan dan memvalidasi tipe *file* spesifik (PDF, DOC, DOCX, JPG, PNG) untuk keperluan dokumen administratif rilis.
+7. **Multi-Upload Dokumen Terkait & Pendukung Dinamis**: Sistem mendukung pengunggahan banyak dokumen secara dinamis dalam tata letak vertikal. Programmer dapat memasukkan Nomor Dokumen (opsional) beserta berkas fisik terkait (PDF, DOC, DOCX, JPG, PNG, TXT) secara berulang. Fitur dilengkapi tombol tambah/hapus dinamis, penomoran urut otomatis, serta pembersihan file yang dihapus di server secara otomatis.
 8. **Dark Mode & Responsive UI**: Dibangun dengan *Tailwind CSS*, mendukung pergantian tema Terang/Gelap dan mulus dibuka di perangkat seluler (*mobile-friendly*).
 9. **Sistem Terisolasi untuk Admin**: Keamanan terjaga karena profil *user* dan *password* dikunci dan dikendalikan sepenuhnya oleh Administrator.
 

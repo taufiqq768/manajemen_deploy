@@ -3,6 +3,12 @@
 ## [Unreleased]
 
 ### Added
+- **Multi-Upload Dokumen Terkait & Pendukung Dinamis**:
+  - Tabel baru `deploy_request_documents` (one-to-many) untuk mendukung pengaitan beberapa berkas dokumen dengan nomor dokumen (opsional) sekaligus.
+  - Migrasi data otomatis untuk menjaga kompatibilitas dokumen dari versi database terdahulu.
+  - Tampilan dinamis di form buat baru dan revisi request deploy (tata letak atas-bawah/vertikal) dengan fitur tambah/hapus baris dokumen secara dinamis.
+  - Penomoran otomatis baris dokumen dan pembersihan file lama di penyimpanan server saat dokumen dihapus/direvisi.
+  - Penampilan list dokumen terunggah pada halaman detail request.
 - **Multi-Select PIC (Programmer)**:
   - Relasi pivot `application_user` (many-to-many) antara tabel `applications` dan `users`.
   - Tampilan modal Edit menggunakan Tom Select untuk pemilih PIC multipel secara dinamis.
