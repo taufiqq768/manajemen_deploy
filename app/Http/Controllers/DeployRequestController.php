@@ -103,7 +103,7 @@ class DeployRequestController extends Controller
             'release_notes.bug_fixing' => 'required_if:jenis.*,bug_fixing|nullable|string',
             'release_impact' => 'nullable|string',
             'document_support' => 'nullable|file|mimes:pdf,doc,docx,jpg,txt,png|max:2048', // max 2MB
-            'document_link' => 'nullable|url|max:1000',
+            'document_number' => 'nullable|string|max:100',
             'scheduled_at' => 'nullable|date',
         ]);
 
@@ -226,7 +226,7 @@ class DeployRequestController extends Controller
             'release_notes.bug_fixing' => 'required_if:jenis.*,bug_fixing|nullable|string',
             'release_impact' => 'nullable|string',
             'document_support' => 'nullable|file|mimes:pdf,doc,docx,jpg,txt,png|max:2048',
-            'document_link' => 'nullable|url|max:1000',
+            'document_number' => 'nullable|string|max:100',
             'scheduled_at' => 'nullable|date',
         ]);
 

@@ -245,17 +245,17 @@
                         @enderror
                     </div>
 
-                    {{-- Document Link --}}
+                    {{-- Document Number --}}
                     <div>
-                        <label for="document_link" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                            Link Dokumen Terkait <span class="text-xs text-slate-500">(opsional, url / link)</span>
+                        <label for="document_number" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                            Nomor Dokumen Terkait <span class="text-xs text-slate-500">(opsional, teks / nomor)</span>
                         </label>
-                        <input type="url" id="document_link" name="document_link"
-                               value="{{ old('document_link', $deployRequest->document_link) }}"
-                               placeholder="https://drive.google.com/... atau tautan dokumen lainnya"
+                        <input type="text" id="document_number" name="document_number"
+                               value="{{ old('document_number', $deployRequest->document_number) }}"
+                               placeholder="Contoh: DM-2026-X-001"
                                class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5
-                                      focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('document_link') border-red-500 @enderror">
-                        @error('document_link')
+                                      focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('document_number') border-red-500 @enderror">
+                        @error('document_number')
                             <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
                         @enderror
                     </div>

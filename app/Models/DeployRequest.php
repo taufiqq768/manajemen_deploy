@@ -19,7 +19,7 @@ class DeployRequest extends Model
         'release_notes',
         'release_impact',
         'document_support',
-        'document_link',
+        'document_number',
         'environment',
         'status',
         'scheduled_at',

@@ -190,31 +190,29 @@
                 </div>
             @endif
 
-            @if($deployRequest->document_support || $deployRequest->document_link)
+            @if($deployRequest->document_support || $deployRequest->document_number)
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
                     <h3 class="text-sm font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
                         <span class="w-1.5 h-4 bg-sky-500 rounded-full"></span>
-                        Dokumen Terkait / Pendukung
+                        Dokumen Terkait
                     </h3>
-                    <div class="flex flex-wrap gap-3 mt-2">
-                        @if($deployRequest->document_support)
-                            <a href="{{ Storage::url($deployRequest->document_support) }}" target="_blank"
-                               class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg transition-colors border border-slate-200 dark:border-slate-700">
-                                <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                </svg>
-                                Lihat File Dokumen
-                            </a>
+                    <div class="space-y-3">
+                        @if($deployRequest->document_number)
+                            <div class="text-sm text-slate-600 dark:text-slate-400">
+                                Nomor Dokumen: <span class="font-semibold text-slate-900 dark:text-white">{{ $deployRequest->document_number }}</span>
+                            </div>
                         @endif
 
-                        @if($deployRequest->document_link)
-                            <a href="{{ $deployRequest->document_link }}" target="_blank"
-                               class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg transition-colors border border-slate-200 dark:border-slate-700">
-                                <svg class="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
-                                </svg>
-                                Buka Tautan Dokumen
-                            </a>
+                        @if($deployRequest->document_support)
+                            <div class="pt-1">
+                                <a href="{{ Storage::url($deployRequest->document_support) }}" target="_blank"
+                                   class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg transition-colors border border-slate-200 dark:border-slate-700">
+                                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                    </svg>
+                                    Lihat File Dokumen
+                                </a>
+                            </div>
                         @endif
                     </div>
                 </div>
