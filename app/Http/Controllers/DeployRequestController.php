@@ -255,8 +255,10 @@ class DeployRequestController extends Controller
 
         $application = $deployRequest->application;
         
+        $oldVersion = $application->version;
+
         // Hitung kenaikan versi semantic pada saat disetujui (PM approval)
-        $newVersion = DeployRequest::calculateBumpedVersion($application->version ?? '0.0.0', $deployRequest->jenis);
+        $newVersion = DeployRequest::calculateBumpedVersion($oldVersion ?? '0.0.0', $deployRequest->jenis);
 
         $deployRequest->update([
             'status' => 'approved',
@@ -307,10 +309,40 @@ class DeployRequestController extends Controller
                 if (!$response->successful()) {
                     $apiError = "Respon HTTP " . $response->status();
                     \Illuminate\Support\Facades\Log::warning("Gagal push versi ke API Write {$application->name}: " . $apiError);
+                    
+                    \App\Models\VersionLog::create([
+                        'application_id' => $application->id,
+                        'type' => 'write',
+                        'old_version' => $oldVersion,
+                        'new_version' => $newVersion,
+                        'status' => 'failed',
+                        'message' => "Gagal push versi ke API Write: Respon HTTP " . $response->status(),
+                        'created_at' => now(),
+                    ]);
+                } else {
+                    \App\Models\VersionLog::create([
+                        'application_id' => $application->id,
+                        'type' => 'write',
+                        'old_version' => $oldVersion,
+                        'new_version' => $newVersion,
+                        'status' => 'success',
+                        'message' => 'Berhasil memperbarui versi di remote server via API Write.',
+                        'created_at' => now(),
+                    ]);
                 }
             } catch (\Throwable $e) {
                 $apiError = "Koneksi gagal";
                 \Illuminate\Support\Facades\Log::warning("Gagal push versi ke API Write {$application->name}: " . $e->getMessage());
+                
+                \App\Models\VersionLog::create([
+                    'application_id' => $application->id,
+                    'type' => 'write',
+                    'old_version' => $oldVersion,
+                    'new_version' => $newVersion,
+                    'status' => 'failed',
+                    'message' => "Error koneksi ke API Write: " . $e->getMessage(),
+                    'created_at' => now(),
+                ]);
             }
         }
 

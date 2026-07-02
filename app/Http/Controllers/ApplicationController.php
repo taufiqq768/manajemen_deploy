@@ -157,6 +157,7 @@ class ApplicationController extends Controller
         $details = [];
 
         foreach ($applications as $app) {
+            $oldVersion = $app->version;
             try {
                 $response = \Illuminate\Support\Facades\Http::timeout(3)->get($app->version_api_get);
                 
@@ -179,6 +180,16 @@ class ApplicationController extends Controller
                         if ($version === null) {
                             $failCount++;
                             $details[] = "{$app->name}: Key JSON tidak cocok/ditemukan";
+                            
+                            \App\Models\VersionLog::create([
+                                'application_id' => $app->id,
+                                'type' => 'sync',
+                                'old_version' => $oldVersion,
+                                'new_version' => null,
+                                'status' => 'failed',
+                                'message' => "Gagal refresh versi: Key JSON tidak cocok/ditemukan",
+                                'created_at' => now(),
+                            ]);
                             continue;
                         }
                     } else {
@@ -197,18 +208,58 @@ class ApplicationController extends Controller
                     if ($version !== '') {
                         $app->update(['version' => $version]);
                         $successCount++;
+                        
+                        \App\Models\VersionLog::create([
+                            'application_id' => $app->id,
+                            'type' => 'sync',
+                            'old_version' => $oldVersion,
+                            'new_version' => $version,
+                            'status' => 'success',
+                            'message' => 'Berhasil mensinkronisasi versi dari API Get.',
+                            'created_at' => now(),
+                        ]);
                     } else {
                         $failCount++;
                         $details[] = "{$app->name}: Respon kosong";
+                        
+                        \App\Models\VersionLog::create([
+                            'application_id' => $app->id,
+                            'type' => 'sync',
+                            'old_version' => $oldVersion,
+                            'new_version' => null,
+                            'status' => 'failed',
+                            'message' => "Gagal refresh versi: Respon kosong",
+                            'created_at' => now(),
+                        ]);
                     }
                 } else {
                     $failCount++;
                     $details[] = "{$app->name}: HTTP {$response->status()}";
+                    
+                    \App\Models\VersionLog::create([
+                        'application_id' => $app->id,
+                        'type' => 'sync',
+                        'old_version' => $oldVersion,
+                        'new_version' => null,
+                        'status' => 'failed',
+                        'message' => "Gagal refresh versi: Respon HTTP {$response->status()}",
+                        'created_at' => now(),
+                    ]);
                 }
             } catch (\Throwable $e) {
                 $failCount++;
                 $details[] = "{$app->name}: Koneksi gagal";
                 \Illuminate\Support\Facades\Log::warning("Gagal fetch versi untuk {$app->name}: " . $e->getMessage());
+                
+                \App\Models\VersionLog::create([
+                    'application_id' => $app->id,
+                    'type' => 'sync',
+                    'old_version' => $oldVersion,
+                    'new_version' => null,
+                    'status' => 'failed',
+                    'message' => "Gagal refresh versi (Error Koneksi): " . $e->getMessage(),
+                    'created_at' => now(),
+                ]);
             }
         }
 

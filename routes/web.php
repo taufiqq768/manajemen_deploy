@@ -25,6 +25,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    // Log Update Versi
+    Route::get('/version-logs', [\App\Http\Controllers\VersionLogController::class, 'index'])->name('version-logs.index');
+
     // Deploy Requests — CRUD
     Route::resource('deploy-requests', DeployRequestController::class)
         ->except(['destroy']);
