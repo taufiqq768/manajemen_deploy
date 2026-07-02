@@ -89,7 +89,19 @@
                             <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ $req->ticket_number }}</div>
                         </td>
                         <td class="px-5 py-4 text-slate-500 dark:text-slate-300 font-mono text-xs">{{ $req->version }}</td>
-                        <td class="px-5 py-4 text-slate-500 dark:text-slate-400 text-xs">{{ $req->jenis }}</td>
+                        <td class="px-5 py-4 text-slate-500 dark:text-slate-400 text-xs">
+                            @if(is_array($req->jenis))
+                                @foreach($req->jenis as $j)
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 mr-1 mb-1">
+                                        {{ $j === 'perubahan_besar' ? 'Besar' : ($j === 'perubahan_kecil' ? 'Kecil' : ($j === 'bug_fixing' ? 'Bug' : $j)) }}
+                                    </span>
+                                @endforeach
+                            @elseif($req->jenis)
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200">
+                                    {{ $req->jenis === 'CR' ? 'CR' : ($req->jenis === 'Bug' ? 'Bug' : $req->jenis) }}
+                                </span>
+                            @endif
+                        </td>
                         @if(auth()->user()->isProjectManager() || auth()->user()->isAdmin())
                         <td class="px-5 py-4 text-slate-600 dark:text-slate-400">{{ $req->requester->name }}</td>
                         @endif
