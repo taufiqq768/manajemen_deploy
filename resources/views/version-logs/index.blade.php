@@ -118,7 +118,7 @@
                                 </span>
                             @endif
                         </td>
-                        <td class="px-5 py-4 max-w-xs truncate text-xs text-slate-600 dark:text-slate-400" title="{{ $log->message }}">
+                        <td class="px-5 py-4 text-xs text-slate-600 dark:text-slate-400 whitespace-pre-line" title="{{ $log->message }}">
                             {{ $log->message ?: 'Tidak ada pesan detail.' }}
                         </td>
                         <td class="px-5 py-4 text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">

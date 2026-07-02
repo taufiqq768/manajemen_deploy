@@ -303,9 +303,13 @@ class DeployRequestController extends Controller
                     $notesKey => $releaseNotesText,
                 ];
                 
+                $payloadJson = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+                
                 $response = \Illuminate\Support\Facades\Http::timeout(5)
                     ->post($application->version_api_write, $payload);
                     
+                $responseBody = $response->body();
+                
                 if (!$response->successful()) {
                     $apiError = "Respon HTTP " . $response->status();
                     \Illuminate\Support\Facades\Log::warning("Gagal push versi ke API Write {$application->name}: " . $apiError);
@@ -316,7 +320,7 @@ class DeployRequestController extends Controller
                         'old_version' => $oldVersion,
                         'new_version' => $newVersion,
                         'status' => 'failed',
-                        'message' => "Gagal push versi ke API Write: Respon HTTP " . $response->status(),
+                        'message' => "Gagal push versi: Respon HTTP {$response->status()}.\n\n[PAYLOAD REQUEST]:\n{$payloadJson}\n\n[RESPON SERVER]:\n{$responseBody}",
                         'created_at' => now(),
                     ]);
                 } else {
@@ -326,7 +330,7 @@ class DeployRequestController extends Controller
                         'old_version' => $oldVersion,
                         'new_version' => $newVersion,
                         'status' => 'success',
-                        'message' => 'Berhasil memperbarui versi di remote server via API Write.',
+                        'message' => "Berhasil push versi.\n\n[PAYLOAD REQUEST]:\n{$payloadJson}\n\n[RESPON SERVER]:\n{$responseBody}",
                         'created_at' => now(),
                     ]);
                 }
@@ -334,13 +338,14 @@ class DeployRequestController extends Controller
                 $apiError = "Koneksi gagal";
                 \Illuminate\Support\Facades\Log::warning("Gagal push versi ke API Write {$application->name}: " . $e->getMessage());
                 
+                $payloadJson = isset($payload) ? json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) : '{}';
                 \App\Models\VersionLog::create([
                     'application_id' => $application->id,
                     'type' => 'write',
                     'old_version' => $oldVersion,
                     'new_version' => $newVersion,
                     'status' => 'failed',
-                    'message' => "Error koneksi ke API Write: " . $e->getMessage(),
+                    'message' => "Error koneksi ke API Write: {$e->getMessage()}.\n\n[PAYLOAD REQUEST]:\n{$payloadJson}",
                     'created_at' => now(),
                 ]);
             }

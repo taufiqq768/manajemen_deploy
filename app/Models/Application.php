@@ -65,9 +65,13 @@ class Application extends Model
                 $notesKey => $releaseNotes ?: "Pembaruan versi sinkronisasi ke {$version}.",
             ];
             
+            $payloadJson = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+            
             $response = \Illuminate\Support\Facades\Http::timeout(5)
                 ->post($this->version_api_write, $payload);
                 
+            $responseBody = $response->body();
+            
             if ($response->successful()) {
                 VersionLog::create([
                     'application_id' => $this->id,
@@ -75,7 +79,7 @@ class Application extends Model
                     'old_version' => null,
                     'new_version' => $version,
                     'status' => 'success',
-                    'message' => 'Berhasil memperbarui versi di remote server via API Write.',
+                    'message' => "Berhasil push versi.\n\n[PAYLOAD REQUEST]:\n{$payloadJson}\n\n[RESPON SERVER]:\n{$responseBody}",
                     'created_at' => now(),
                 ]);
                 return [
@@ -90,7 +94,7 @@ class Application extends Model
                     'old_version' => null,
                     'new_version' => $version,
                     'status' => 'failed',
-                    'message' => "Gagal push versi via API Write: Respon HTTP " . $response->status(),
+                    'message' => "Gagal push versi: Respon HTTP {$response->status()}.\n\n[PAYLOAD REQUEST]:\n{$payloadJson}\n\n[RESPON SERVER]:\n{$responseBody}",
                     'created_at' => now(),
                 ]);
                 return [
@@ -99,13 +103,14 @@ class Application extends Model
                 ];
             }
         } catch (\Throwable $e) {
+            $payloadJson = isset($payload) ? json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) : '{}';
             VersionLog::create([
                 'application_id' => $this->id,
                 'type' => 'write',
                 'old_version' => null,
                 'new_version' => $version,
                 'status' => 'failed',
-                'message' => "Gagal push versi via API Write (Error Koneksi): " . $e->getMessage(),
+                'message' => "Gagal push versi (Error Koneksi): {$e->getMessage()}.\n\n[PAYLOAD REQUEST]:\n{$payloadJson}",
                 'created_at' => now(),
             ]);
             return [
