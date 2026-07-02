@@ -190,30 +190,32 @@
                 </div>
             @endif
 
-            @if($deployRequest->document_support || $deployRequest->document_number)
+            @if($deployRequest->documents->isNotEmpty())
                 <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6">
                     <h3 class="text-sm font-semibold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
                         <span class="w-1.5 h-4 bg-sky-500 rounded-full"></span>
                         Dokumen Terkait
                     </h3>
                     <div class="space-y-3">
-                        @if($deployRequest->document_number)
-                            <div class="text-sm text-slate-600 dark:text-slate-400">
-                                Nomor Dokumen: <span class="font-semibold text-slate-900 dark:text-white">{{ $deployRequest->document_number }}</span>
+                        @foreach($deployRequest->documents as $doc)
+                            <div class="p-3.5 bg-slate-50 dark:bg-slate-800/40 rounded-lg border border-slate-200/60 dark:border-slate-800/80 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                                <div>
+                                    <div class="text-[10px] uppercase font-bold tracking-wider text-slate-400 dark:text-slate-500 mb-0.5">Nomor Dokumen</div>
+                                    <div class="text-sm font-medium text-slate-850 dark:text-slate-200">{{ $doc->document_number ?: '—' }}</div>
+                                </div>
+                                @if($doc->file_path)
+                                    <div class="flex-shrink-0">
+                                        <a href="{{ Storage::url($doc->file_path) }}" target="_blank"
+                                           class="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-medium rounded-lg transition-colors border border-slate-200 dark:border-slate-800">
+                                            <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            </svg>
+                                            Lihat File Dokumen
+                                        </a>
+                                    </div>
+                                @endif
                             </div>
-                        @endif
-
-                        @if($deployRequest->document_support)
-                            <div class="pt-1">
-                                <a href="{{ Storage::url($deployRequest->document_support) }}" target="_blank"
-                                   class="inline-flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg transition-colors border border-slate-200 dark:border-slate-700">
-                                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                                    </svg>
-                                    Lihat File Dokumen
-                                </a>
-                            </div>
-                        @endif
+                        @endforeach
                     </div>
                 </div>
             @endif

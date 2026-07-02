@@ -102,15 +102,11 @@ class DeployRequestController extends Controller
             'release_notes.perubahan_kecil' => 'required_if:jenis.*,perubahan_kecil|nullable|string',
             'release_notes.bug_fixing' => 'required_if:jenis.*,bug_fixing|nullable|string',
             'release_impact' => 'nullable|string',
-            'document_support' => 'nullable|file|mimes:pdf,doc,docx,jpg,txt,png|max:2048', // max 2MB
-            'document_number' => 'nullable|string|max:100',
             'scheduled_at' => 'nullable|date',
+            'documents' => 'nullable|array',
+            'documents.*.number' => 'nullable|string|max:150',
+            'documents.*.file' => 'nullable|file|mimes:pdf,doc,docx,jpg,txt,png|max:2048',
         ]);
-
-        $docPath = null;
-        if ($request->hasFile('document_support')) {
-            $docPath = $request->file('document_support')->store('documents', 'public');
-        }
 
         $now = now();
         $year = $now->format('Y');
@@ -134,7 +130,6 @@ class DeployRequestController extends Controller
             if (count($parts) == 4) {
                 $urut = (int) $parts[3] + 1;
             } else {
-                // fallback if ticket_number format is broken, just count
                 $urut = DeployRequest::whereYear('created_at', $year)->whereMonth('created_at', $month)->count() + 1;
             }
         }
@@ -142,14 +137,35 @@ class DeployRequestController extends Controller
         $nomorUrut = str_pad($urut, 4, '0', STR_PAD_LEFT);
         $ticketNumber = "DM/{$year}/{$romanMonth}/{$nomorUrut}";
 
+        // Filter out documents before save to avoid mass assignment issues on DeployRequest
+        $createData = collect($validated)->except(['documents'])->toArray();
+
         $deploy = DeployRequest::create([
-            ...$validated,
+            ...$createData,
             'ticket_number' => $ticketNumber,
-            'document_support' => $docPath,
             'requester_id' => auth()->id(),
             'status' => 'pending',
             'environment' => 'production',
         ]);
+
+        // Simpan dokumen-dokumen terkait
+        if ($request->has('documents')) {
+            foreach ($request->input('documents') as $key => $docData) {
+                $docNumber = $docData['number'] ?? null;
+                $docPath = null;
+                
+                if ($request->hasFile("documents.{$key}.file")) {
+                    $docPath = $request->file("documents.{$key}.file")->store('documents', 'public');
+                }
+                
+                if ($docNumber || $docPath) {
+                    $deploy->documents()->create([
+                        'document_number' => $docNumber,
+                        'file_path' => $docPath,
+                    ]);
+                }
+            }
+        }
 
         // Kirim notifikasi ke semua Project Manager (in-app + WA + email)
         $appName = $deploy->application->name;
@@ -225,26 +241,63 @@ class DeployRequestController extends Controller
             'release_notes.perubahan_kecil' => 'required_if:jenis.*,perubahan_kecil|nullable|string',
             'release_notes.bug_fixing' => 'required_if:jenis.*,bug_fixing|nullable|string',
             'release_impact' => 'nullable|string',
-            'document_support' => 'nullable|file|mimes:pdf,doc,docx,jpg,txt,png|max:2048',
-            'document_number' => 'nullable|string|max:100',
             'scheduled_at' => 'nullable|date',
+            'documents' => 'nullable|array',
+            'documents.*.id' => 'nullable|integer|exists:deploy_request_documents,id',
+            'documents.*.number' => 'nullable|string|max:150',
+            'documents.*.file' => 'nullable|file|mimes:pdf,doc,docx,jpg,txt,png|max:2048',
         ]);
 
-        $data = $validated;
-        if ($request->hasFile('document_support')) {
-            if ($deployRequest->document_support) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($deployRequest->document_support);
-            }
-            $data['document_support'] = $request->file('document_support')->store('documents', 'public');
-        } else {
-            // Biarkan dokumen lama jika tidak ada file baru di-upload
-            unset($data['document_support']);
-        }
+        $updateData = collect($validated)->except(['documents'])->toArray();
 
         $deployRequest->update([
-            ...$data,
+            ...$updateData,
             'status' => 'pending', // reset ke pending setelah revisi
         ]);
+
+        // Simpan / update dokumen-dokumen terkait
+        $submittedIds = [];
+        if ($request->has('documents')) {
+            foreach ($request->input('documents') as $key => $docData) {
+                $docId = $docData['id'] ?? null;
+                $docNumber = $docData['number'] ?? null;
+                
+                $existingDoc = $docId ? $deployRequest->documents()->find($docId) : null;
+                $docPath = $existingDoc ? $existingDoc->file_path : null;
+                
+                if ($request->hasFile("documents.{$key}.file")) {
+                    if ($existingDoc && $existingDoc->file_path) {
+                        \Illuminate\Support\Facades\Storage::disk('public')->delete($existingDoc->file_path);
+                    }
+                    $docPath = $request->file("documents.{$key}.file")->store('documents', 'public');
+                }
+                
+                if ($docNumber || $docPath) {
+                    if ($existingDoc) {
+                        $existingDoc->update([
+                            'document_number' => $docNumber,
+                            'file_path' => $docPath,
+                        ]);
+                        $submittedIds[] = $existingDoc->id;
+                    } else {
+                        $newDoc = $deployRequest->documents()->create([
+                            'document_number' => $docNumber,
+                            'file_path' => $docPath,
+                        ]);
+                        $submittedIds[] = $newDoc->id;
+                    }
+                }
+            }
+        }
+
+        // Hapus dokumen yang dibuang oleh user di UI
+        $docsToDelete = $deployRequest->documents()->whereNotIn('id', $submittedIds)->get();
+        foreach ($docsToDelete as $delDoc) {
+            if ($delDoc->file_path) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($delDoc->file_path);
+            }
+            $delDoc->delete();
+        }
 
         return redirect()->route('deploy-requests.show', $deployRequest)
             ->with('success', 'Request deploy berhasil diperbarui.');

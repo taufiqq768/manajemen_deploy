@@ -215,36 +215,34 @@
                     </div>
 
                     {{-- Documents --}}
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                        {{-- Document Support --}}
-                        <div>
-                            <label for="document_support"
-                                class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                                Unggah Dokumen Pendukung <span class="text-xs text-slate-500">(opsional, max 2MB)</span>
-                            </label>
-                            <input type="file" id="document_support" name="document_support"
-                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
-                                class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5
-                                                 focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('document_support') border-red-500 @enderror">
-                            @error('document_support')
-                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                            @enderror
+                    <div class="space-y-3">
+                        <label class="block text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Dokumen Pendukung & Terkait
+                        </label>
+                        <div id="documents-container" class="space-y-4">
+                            <div class="document-item p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-lg relative space-y-3">
+                                <button type="button" onclick="removeDocumentRow(this)" class="absolute top-2 right-2 text-slate-400 hover:text-red-500 transition-colors p-1" title="Hapus dokumen ini">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                    </svg>
+                                </button>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Nomor Dokumen Terkait</label>
+                                    <input type="text" name="documents[0][number]" placeholder="Contoh: DM-2026-X-001" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Unggah Dokumen Pendukung <span class="text-slate-400 font-normal">(opsional, max 2MB)</span></label>
+                                    <input type="file" name="documents[0][file]" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                </div>
+                            </div>
                         </div>
-
-                        {{-- Document Number --}}
-                        <div>
-                            <label for="document_number"
-                                class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                                Nomor Dokumen Terkait <span class="text-xs text-slate-500">(opsional, teks / nomor)</span>
-                            </label>
-                            <input type="text" id="document_number" name="document_number"
-                                value="{{ old('document_number') }}"
-                                placeholder="Contoh: DM-2026-X-001"
-                                class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5
-                                                 focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('document_number') border-red-500 @enderror">
-                            @error('document_number')
-                                <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
-                            @enderror
+                        <div class="pt-1">
+                            <button type="button" onclick="addDocumentRow()" class="inline-flex items-center gap-1.5 px-3 py-2 bg-slate-800 hover:bg-slate-700 text-white text-xs font-medium rounded-lg transition-colors border border-slate-700">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                                </svg>
+                                Tambah Dokumen Lainnya
+                            </button>
                         </div>
                     </div>
 
@@ -347,6 +345,39 @@
                     this.showPicker();
                 } catch (e) {}
             });
+        }
+
+        // Dynamic Document Rows
+        let docIndex = 1;
+        function addDocumentRow() {
+            const container = document.getElementById('documents-container');
+            const div = document.createElement('div');
+            div.className = "document-item p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-lg relative space-y-3";
+            div.innerHTML = `
+                <button type="button" onclick="removeDocumentRow(this)" class="absolute top-2 right-2 text-slate-400 hover:text-red-500 transition-colors p-1" title="Hapus dokumen ini">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                </button>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Nomor Dokumen Terkait</label>
+                    <input type="text" name="documents[${docIndex}][number]" placeholder="Contoh: DM-2026-X-001" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Unggah Dokumen Pendukung <span class="text-slate-400 font-normal">(opsional, max 2MB)</span></label>
+                    <input type="file" name="documents[${docIndex}][file]" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+            `;
+            container.appendChild(div);
+            docIndex++;
+        }
+        function removeDocumentRow(btn) {
+            const items = document.querySelectorAll('.document-item');
+            if (items.length <= 1) {
+                alert('Minimal harus ada 1 entri dokumen pendukung.');
+                return;
+            }
+            btn.closest('.document-item').remove();
         }
     </script>
     @endpush

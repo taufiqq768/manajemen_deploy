@@ -149,6 +149,11 @@ class DeployRequest extends Model
         return $this->hasMany(Notification::class);
     }
 
+    public function documents()
+    {
+        return $this->hasMany(DeployRequestDocument::class);
+    }
+
     /** Cek jika proses update versi ke remote server gagal */
     public function hasFailedVersionUpdate(): bool
     {
