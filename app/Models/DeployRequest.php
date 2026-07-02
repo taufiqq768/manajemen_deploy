@@ -147,4 +147,40 @@ class DeployRequest extends Model
     {
         return $this->hasMany(Notification::class);
     }
+
+    /** Cek jika proses update versi ke remote server gagal */
+    public function hasFailedVersionUpdate(): bool
+    {
+        if ($this->status !== 'approved') {
+            return false;
+        }
+
+        $failed = \App\Models\VersionLog::where('application_id', $this->application_id)
+            ->where('type', 'write')
+            ->where('new_version', $this->version)
+            ->where('status', 'failed')
+            ->exists();
+
+        if (!$failed) {
+            return false;
+        }
+
+        // Jika setelah gagal ada log sukses untuk versi yang sama, anggap sudah berhasil
+        $success = \App\Models\VersionLog::where('application_id', $this->application_id)
+            ->where('type', 'write')
+            ->where('new_version', $this->version)
+            ->where('status', 'success')
+            ->exists();
+
+        return !$success;
+    }
+
+    /** Cek jika versi remote server sudah sinkron / sama dengan versi request ini */
+    public function isVersionSynced(): bool
+    {
+        if ($this->status !== 'approved') {
+            return false;
+        }
+        return $this->application->version === $this->version;
+    }
 }

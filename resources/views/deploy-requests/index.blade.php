@@ -109,7 +109,18 @@
                             <div class="font-medium text-slate-900 dark:text-white">{{ $req->application->name }}</div>
                             <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ $req->ticket_number }}</div>
                         </td>
-                        <td class="px-5 py-4 text-slate-500 dark:text-slate-300 font-mono text-xs">{{ $req->version }}</td>
+                        <td class="px-5 py-4 text-slate-500 dark:text-slate-300 font-mono text-xs">
+                            <div class="flex items-center gap-1">
+                                <span>{{ $req->version }}</span>
+                                @if($req->hasFailedVersionUpdate())
+                                    <span class="text-red-500 flex-shrink-0" title="Gagal update versi ke remote server (Lihat Log Update Versi)">
+                                        <svg class="w-3.5 h-3.5 inline" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                        </svg>
+                                    </span>
+                                @endif
+                            </div>
+                        </td>
                         <td class="px-5 py-4">
                             <div class="flex flex-wrap gap-1 max-w-[150px]">
                                 @if(is_array($req->jenis))

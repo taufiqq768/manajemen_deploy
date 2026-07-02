@@ -46,7 +46,7 @@
                         </a>
                     @endif
 
-                    @if($deployRequest->isApproved() && $deployRequest->application->version_api_write)
+                    @if($deployRequest->isApproved() && $deployRequest->application->version_api_write && !$deployRequest->isVersionSynced())
                         <form method="POST" action="{{ route('deploy-requests.retry-push', $deployRequest) }}" onsubmit="return confirm('Kirim ulang pembaruan versi ke remote server?')">
                             @csrf
                             <button type="submit"
