@@ -232,15 +232,20 @@
                     </label>
                     <div id="documents-container" class="space-y-4">
                         @forelse($deployRequest->documents as $idx => $doc)
-                            <div class="document-item p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-lg relative space-y-3">
+                            <div class="document-item p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-lg space-y-3">
                                 <input type="hidden" name="documents[{{ $idx }}][id]" value="{{ $doc->id }}">
-                                <button type="button" onclick="removeDocumentRow(this)" class="absolute top-2 right-2 text-slate-400 hover:text-red-500 transition-colors p-1" title="Hapus dokumen ini">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                    </svg>
-                                </button>
+                                <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
+                                    <span class="document-header-title text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wider">Dokumen Pendukung #{{ $idx + 1 }}</span>
+                                    @if($idx > 0)
+                                        <button type="button" onclick="removeDocumentRow(this)" class="text-slate-400 hover:text-red-500 transition-colors p-1" title="Hapus dokumen ini">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                            </svg>
+                                        </button>
+                                    @endif
+                                </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Nomor Dokumen Terkait</label>
+                                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Nomor Dokumen Terkait <span class="text-slate-400 font-normal">(opsional)</span></label>
                                     <input type="text" name="documents[{{ $idx }}][number]" value="{{ old("documents.{$idx}.number", $doc->document_number) }}" placeholder="Contoh: DM-2026-X-001" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
                                 <div>
@@ -254,14 +259,12 @@
                                 </div>
                             </div>
                         @empty
-                            <div class="document-item p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-lg relative space-y-3">
-                                <button type="button" onclick="removeDocumentRow(this)" class="absolute top-2 right-2 text-slate-400 hover:text-red-500 transition-colors p-1" title="Hapus dokumen ini">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                    </svg>
-                                </button>
+                            <div class="document-item p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-lg space-y-3">
+                                <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
+                                    <span class="document-header-title text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wider">Dokumen Pendukung #1</span>
+                                </div>
                                 <div>
-                                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Nomor Dokumen Terkait</label>
+                                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Nomor Dokumen Terkait <span class="text-slate-400 font-normal">(opsional)</span></label>
                                     <input type="text" name="documents[0][number]" placeholder="Contoh: DM-2026-X-001" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                                 </div>
                                 <div>
@@ -379,17 +382,23 @@
         let docIndex = {{ count($deployRequest->documents) ?: 1 }};
         function addDocumentRow() {
             const container = document.getElementById('documents-container');
+            const items = container.querySelectorAll('.document-item');
+            const nextNum = items.length + 1;
+            
             const div = document.createElement('div');
-            div.className = "document-item p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-lg relative space-y-3";
+            div.className = "document-item p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-800 rounded-lg space-y-3";
             div.innerHTML = `
-                <button type="button" onclick="removeDocumentRow(this)" class="absolute top-2 right-2 text-slate-400 hover:text-red-500 transition-colors p-1" title="Hapus dokumen ini">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                    </svg>
-                </button>
+                <div class="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-2">
+                    <span class="document-header-title text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wider">Dokumen Pendukung #${nextNum}</span>
+                    <button type="button" onclick="removeDocumentRow(this)" class="text-slate-400 hover:text-red-500 transition-colors p-1" title="Hapus dokumen ini">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                        </svg>
+                    </button>
+                </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Nomor Dokumen Terkait</label>
-                    <input type="text" name="documents[${docIndex}][number]" placeholder="Contoh: DM-2026-X-001" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Nomor Dokumen Terkait <span class="text-slate-400 font-normal">(opsional)</span></label>
+                    <input type="text" name="documents[${docIndex}][number]" placeholder="Contoh: DM-2026-X-001" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1">Unggah Dokumen Pendukung <span class="text-slate-400 font-normal">(opsional, max 2MB)</span></label>
@@ -400,12 +409,17 @@
             docIndex++;
         }
         function removeDocumentRow(btn) {
-            const items = document.querySelectorAll('.document-item');
-            if (items.length <= 1) {
-                alert('Minimal harus ada 1 entri dokumen pendukung.');
-                return;
-            }
             btn.closest('.document-item').remove();
+            
+            // Recalculate document headers sequentially
+            const container = document.getElementById('documents-container');
+            const items = container.querySelectorAll('.document-item');
+            items.forEach((item, idx) => {
+                const header = item.querySelector('.document-header-title');
+                if (header) {
+                    header.textContent = `Dokumen Pendukung #${idx + 1}`;
+                }
+            });
         }
     </script>
     @endpush
