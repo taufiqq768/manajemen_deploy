@@ -132,6 +132,15 @@
                         </td>
                         <td class="px-5 py-4 text-right">
                             <div class="flex items-center justify-end gap-3">
+                                @if($app->version_api_write)
+                                <form method="POST" action="{{ route('applications.push-version', $app) }}"
+                                      onsubmit="return confirm('Kirim/push pembaruan versi {{ $app->version }} ke remote server?')">
+                                    @csrf
+                                    <button type="submit" class="text-emerald-400 hover:text-emerald-300 text-xs transition-colors" title="Kirim paksa versi lokal ke remote server">
+                                        Push
+                                    </button>
+                                </form>
+                                @endif
                                 <button type="button" 
                                    onclick="openEditModal(this)"
                                    data-id="{{ $app->id }}"

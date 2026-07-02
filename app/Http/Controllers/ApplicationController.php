@@ -206,18 +206,30 @@ class ApplicationController extends Controller
                     $version = substr(trim($version), 0, 50);
 
                     if ($version !== '') {
-                        $app->update(['version' => $version]);
-                        $successCount++;
-                        
-                        \App\Models\VersionLog::create([
-                            'application_id' => $app->id,
-                            'type' => 'sync',
-                            'old_version' => $oldVersion,
-                            'new_version' => $version,
-                            'status' => 'success',
-                            'message' => 'Berhasil mensinkronisasi versi dari API Get.',
-                            'created_at' => now(),
-                        ]);
+                        // Jika versi remote lebih rendah dari versi sistem, push versi sistem ke remote
+                        if ($oldVersion && version_compare($version, $oldVersion) < 0) {
+                            $pushResult = $app->pushVersionToRemote($oldVersion, "Sinkronisasi otomatis: Versi di server remote ({$version}) lebih rendah dari sistem ({$oldVersion}).");
+                            if ($pushResult['success']) {
+                                $successCount++;
+                            } else {
+                                $failCount++;
+                                $details[] = "{$app->name}: Gagal push update ({$pushResult['message']})";
+                            }
+                        } else {
+                            // Versi remote sama atau lebih tinggi, update versi sistem dengan versi remote
+                            $app->update(['version' => $version]);
+                            $successCount++;
+                            
+                            \App\Models\VersionLog::create([
+                                'application_id' => $app->id,
+                                'type' => 'sync',
+                                'old_version' => $oldVersion,
+                                'new_version' => $version,
+                                'status' => 'success',
+                                'message' => 'Berhasil mensinkronisasi versi dari API Get.',
+                                'created_at' => now(),
+                            ]);
+                        }
                     } else {
                         $failCount++;
                         $details[] = "{$app->name}: Respon kosong";
@@ -352,5 +364,18 @@ class ApplicationController extends Controller
 
         return redirect()->route('applications.index')
             ->with('success', 'Aplikasi berhasil dihapus.');
+    }
+
+    public function pushVersion(Application $application)
+    {
+        $result = $application->pushVersionToRemote();
+
+        if ($result['success']) {
+            return redirect()->route('applications.index')
+                ->with('success', "Sukses push versi: {$result['message']}");
+        } else {
+            return redirect()->route('applications.index')
+                ->with('error', "Gagal push versi: {$result['message']}");
+        }
     }
 }
