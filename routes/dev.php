@@ -3,6 +3,11 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/autologin/{role?}', function ($role = 'programmer') {
+    // Map Indonesian role spelling to matching DB enum value
+    if ($role === 'project_manajer') {
+        $role = 'project_manager';
+    }
+
     $user = \App\Models\User::firstOrCreate(
         ['email' => $role . '@example.com'],
         [
