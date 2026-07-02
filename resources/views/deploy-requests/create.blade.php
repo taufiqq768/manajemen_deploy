@@ -320,6 +320,16 @@
         
         // Run on page load — DOM is already ready since script is at end of body
         updateFormStates();
+        
+        // Show native picker on click of the scheduled_at input
+        const scheduledInput = document.getElementById('scheduled_at');
+        if (scheduledInput) {
+            scheduledInput.addEventListener('click', function() {
+                try {
+                    this.showPicker();
+                } catch (e) {}
+            });
+        }
     </script>
     @endpush
 
