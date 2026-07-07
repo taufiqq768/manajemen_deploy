@@ -1,6 +1,58 @@
 <x-layouts.app>
     <x-slot name="title">Detail Aktivitas - IT Work Hub</x-slot>
 
+    @push('scripts')
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+    <style>
+        .ts-control {
+            border: none;
+            background: transparent;
+            padding: 4px 6px;
+            font-size: 10px;
+            border-radius: 4px;
+            box-shadow: none;
+        }
+        .ts-control:hover {
+            background-color: transparent;
+            border-color: #cbd5e1;
+        }
+        .ts-control.focus {
+            box-shadow: 0 0 0 1px #639922;
+            background-color: white;
+            border-color: #639922;
+        }
+        .dark .ts-control.focus {
+            background-color: #1e293b;
+        }
+        .ts-wrapper.multi .ts-control > div {
+            background: #e2e8f0;
+            color: #475569;
+            border-radius: 4px;
+            padding: 1px 5px;
+            font-weight: 500;
+        }
+        .dark .ts-wrapper.multi .ts-control > div {
+            background: #334155;
+            color: #cbd5e1;
+            border: 1px solid #475569;
+        }
+        .ts-dropdown {
+            font-size: 11px;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+        .dark .ts-dropdown {
+            background: #1e293b;
+            color: #f8fafc;
+            border-color: #334155;
+        }
+        .dark .ts-dropdown .option:hover, .dark .ts-dropdown .option.active {
+            background-color: #334155;
+            color: white;
+        }
+    </style>
+    @endpush
+
     <div class="w-full px-4 2xl:px-8 mx-auto space-y-6">
         <div class="flex items-center gap-4">
             <a href="{{ route('it-work-hub.longlist') }}" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors bg-white dark:bg-slate-900 rounded-lg shadow-sm border border-slate-200 dark:border-slate-800">
@@ -66,13 +118,13 @@
                             <tr data-id="{{ $activity->id }}" class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
                                 <td class="px-2 py-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-move text-center"><i class="ti ti-grip-vertical text-lg"></i></td>
                                 <td class="px-2 py-1 text-center font-medium text-slate-500 row-number"><span class="number-text">{{ $loop->iteration }}</span></td>
-                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm font-medium text-slate-800 dark:text-slate-200 px-2 py-1.5 rounded" value="{{ $activity->name }}"></td>
-                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="{{ $activity->start_date ? \Carbon\Carbon::parse($activity->start_date)->format('Y-m-d') : '' }}"></td>
-                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="{{ $activity->end_date ? \Carbon\Carbon::parse($activity->end_date)->format('Y-m-d') : '' }}"></td>
-                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-red-500 px-1 py-1.5 rounded" value="{{ $activity->adjusted_date ? \Carbon\Carbon::parse($activity->adjusted_date)->format('Y-m-d') : '' }}"></td>
-                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded" value="{{ $activity->description }}"></td>
-                                <td class="px-1 py-1">
-                                    <select multiple class="input-pics w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] px-1 py-1 rounded h-14">
+                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm font-medium text-slate-800 dark:text-slate-200 px-2 py-1.5 rounded input-name" value="{{ $activity->name }}"></td>
+                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded input-start-date" value="{{ $activity->start_date ? \Carbon\Carbon::parse($activity->start_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded input-end-date" value="{{ $activity->end_date ? \Carbon\Carbon::parse($activity->end_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-red-500 px-1 py-1.5 rounded input-adjusted-date" value="{{ $activity->adjusted_date ? \Carbon\Carbon::parse($activity->adjusted_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded input-desc" value="{{ $activity->description }}"></td>
+                                <td class="px-1 py-1" style="min-width: 200px;">
+                                    <select multiple class="input-pics w-full" placeholder="Pilih PIC...">
                                         @foreach($users as $user)
                                             <option value="{{ $user->id }}" {{ $activity->pics->contains('id', $user->id) ? 'selected' : '' }}>{{ $user->name }}</option>
                                         @endforeach
@@ -80,7 +132,7 @@
                                 </td>
                                 <td class="px-1 py-1 text-center"><input type="url" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-indigo-600 px-2 py-1.5 rounded text-center" value="{{ $activity->document_link }}"></td>
                                 <td class="px-1 py-1">
-                                    <select class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold text-blue-700 px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
+                                    <select onchange="updateStatusColor(this)" class="status-dropdown w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
                                         <option value="Not Started" {{ $activity->status == 'Not Started' ? 'selected' : '' }}>NOT STARTED</option>
                                         <option value="Ureq Analysis" {{ $activity->status == 'Ureq Analysis' ? 'selected' : '' }}>UREQ ANALYSIS</option>
                                         <option value="Programming" {{ $activity->status == 'Programming' ? 'selected' : '' }}>PROGRAMMING</option>
@@ -134,13 +186,13 @@
                             <tr data-id="{{ $activity->id }}" class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
                                 <td class="px-2 py-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-move text-center"><i class="ti ti-grip-vertical text-lg"></i></td>
                                 <td class="px-2 py-1 text-center font-medium text-slate-500 row-number"><span class="number-text">{{ $loop->iteration }}</span></td>
-                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm font-medium text-slate-800 dark:text-slate-200 px-2 py-1.5 rounded" value="{{ $activity->name }}"></td>
-                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="{{ $activity->start_date ? \Carbon\Carbon::parse($activity->start_date)->format('Y-m-d') : '' }}"></td>
-                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="{{ $activity->end_date ? \Carbon\Carbon::parse($activity->end_date)->format('Y-m-d') : '' }}"></td>
-                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-red-500 px-1 py-1.5 rounded" value="{{ $activity->adjusted_date ? \Carbon\Carbon::parse($activity->adjusted_date)->format('Y-m-d') : '' }}"></td>
-                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded" value="{{ $activity->description }}"></td>
-                                <td class="px-1 py-1">
-                                    <select multiple class="input-pics w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] px-1 py-1 rounded h-14">
+                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm font-medium text-slate-800 dark:text-slate-200 px-2 py-1.5 rounded input-name" value="{{ $activity->name }}"></td>
+                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded input-start-date" value="{{ $activity->start_date ? \Carbon\Carbon::parse($activity->start_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded input-end-date" value="{{ $activity->end_date ? \Carbon\Carbon::parse($activity->end_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-red-500 px-1 py-1.5 rounded input-adjusted-date" value="{{ $activity->adjusted_date ? \Carbon\Carbon::parse($activity->adjusted_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded input-desc" value="{{ $activity->description }}"></td>
+                                <td class="px-1 py-1" style="min-width: 200px;">
+                                    <select multiple class="input-pics w-full" placeholder="Pilih PIC...">
                                         @foreach($users as $user)
                                             <option value="{{ $user->id }}" {{ $activity->pics->contains('id', $user->id) ? 'selected' : '' }}>{{ $user->name }}</option>
                                         @endforeach
@@ -148,7 +200,7 @@
                                 </td>
                                 <td class="px-1 py-1 text-center"><input type="url" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-indigo-600 px-2 py-1.5 rounded text-center" value="{{ $activity->document_link }}"></td>
                                 <td class="px-1 py-1">
-                                    <select class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold text-blue-700 px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
+                                    <select onchange="updateStatusColor(this)" class="status-dropdown w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
                                         <option value="Not Started" {{ $activity->status == 'Not Started' ? 'selected' : '' }}>NOT STARTED</option>
                                         <option value="Ureq Analysis" {{ $activity->status == 'Ureq Analysis' ? 'selected' : '' }}>UREQ ANALYSIS</option>
                                         <option value="Programming" {{ $activity->status == 'Programming' ? 'selected' : '' }}>PROGRAMMING</option>
@@ -202,13 +254,13 @@
                             <tr data-id="{{ $activity->id }}" class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
                                 <td class="px-2 py-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-move text-center"><i class="ti ti-grip-vertical text-lg"></i></td>
                                 <td class="px-2 py-1 text-center font-medium text-slate-500 row-number"><span class="number-text">{{ $loop->iteration }}</span></td>
-                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm font-medium text-slate-800 dark:text-slate-200 px-2 py-1.5 rounded" value="{{ $activity->name }}"></td>
-                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="{{ $activity->start_date ? \Carbon\Carbon::parse($activity->start_date)->format('Y-m-d') : '' }}"></td>
-                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="{{ $activity->end_date ? \Carbon\Carbon::parse($activity->end_date)->format('Y-m-d') : '' }}"></td>
-                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-red-500 px-1 py-1.5 rounded" value="{{ $activity->adjusted_date ? \Carbon\Carbon::parse($activity->adjusted_date)->format('Y-m-d') : '' }}"></td>
-                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded" value="{{ $activity->description }}"></td>
-                                <td class="px-1 py-1">
-                                    <select multiple class="input-pics w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] px-1 py-1 rounded h-14">
+                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm font-medium text-slate-800 dark:text-slate-200 px-2 py-1.5 rounded input-name" value="{{ $activity->name }}"></td>
+                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded input-start-date" value="{{ $activity->start_date ? \Carbon\Carbon::parse($activity->start_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded input-end-date" value="{{ $activity->end_date ? \Carbon\Carbon::parse($activity->end_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-red-500 px-1 py-1.5 rounded input-adjusted-date" value="{{ $activity->adjusted_date ? \Carbon\Carbon::parse($activity->adjusted_date)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded input-desc" value="{{ $activity->description }}"></td>
+                                <td class="px-1 py-1" style="min-width: 200px;">
+                                    <select multiple class="input-pics w-full" placeholder="Pilih PIC...">
                                         @foreach($users as $user)
                                             <option value="{{ $user->id }}" {{ $activity->pics->contains('id', $user->id) ? 'selected' : '' }}>{{ $user->name }}</option>
                                         @endforeach
@@ -216,7 +268,7 @@
                                 </td>
                                 <td class="px-1 py-1 text-center"><input type="url" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-indigo-600 px-2 py-1.5 rounded text-center" value="{{ $activity->document_link }}"></td>
                                 <td class="px-1 py-1">
-                                    <select class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold text-blue-700 px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
+                                    <select onchange="updateStatusColor(this)" class="status-dropdown w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
                                         <option value="Not Started" {{ $activity->status == 'Not Started' ? 'selected' : '' }}>NOT STARTED</option>
                                         <option value="Ureq Analysis" {{ $activity->status == 'Ureq Analysis' ? 'selected' : '' }}>UREQ ANALYSIS</option>
                                         <option value="Programming" {{ $activity->status == 'Programming' ? 'selected' : '' }}>PROGRAMMING</option>
@@ -246,13 +298,13 @@
         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
             <td class="px-2 py-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-move text-center"><i class="ti ti-grip-vertical text-lg"></i></td>
             <td class="px-2 py-1 text-center font-medium text-slate-500 row-number"><span class="number-text"></span></td>
-            <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm font-medium text-slate-800 dark:text-slate-200 px-2 py-1.5 rounded" placeholder="Nama item..."></td>
-            <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded"></td>
-            <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded"></td>
-            <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-red-500 px-1 py-1.5 rounded"></td>
-            <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded" placeholder="Keterangan..."></td>
-            <td class="px-1 py-1">
-                <select multiple class="input-pics w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] px-1 py-1 rounded h-14">
+            <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm font-medium text-slate-800 dark:text-slate-200 px-2 py-1.5 rounded input-name" placeholder="Nama item..."></td>
+            <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded input-start-date"></td>
+            <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded input-end-date"></td>
+            <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-red-500 px-1 py-1.5 rounded input-adjusted-date"></td>
+            <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded input-desc" placeholder="Keterangan..."></td>
+            <td class="px-1 py-1" style="min-width: 200px;">
+                <select multiple class="input-pics w-full" placeholder="Pilih PIC...">
                     @foreach($users as $user)
                         <option value="{{ $user->id }}">{{ $user->name }}</option>
                     @endforeach
@@ -260,14 +312,14 @@
             </td>
             <td class="px-1 py-1 text-center"><input type="url" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs text-indigo-600 px-2 py-1.5 rounded text-center" placeholder="https://..."></td>
             <td class="px-1 py-1">
-                <select class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold text-slate-500 px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
-                    <option value="Not Started" selected>NOT STARTED</option>
-                    <option value="Ureq Analysis">UREQ ANALYSIS</option>
-                    <option value="Programming">PROGRAMMING</option>
-                    <option value="Tech Testing">TECH TESTING</option>
-                    <option value="SIT">SIT</option>
-                    <option value="UAT">UAT</option>
-                    <option value="Done">DONE</option>
+                <select onchange="updateStatusColor(this)" class="status-dropdown text-red-600 w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
+                    <option value="Not Started" class="text-red-600" selected>NOT STARTED</option>
+                    <option value="Ureq Analysis" class="text-orange-500">UREQ ANALYSIS</option>
+                    <option value="Programming" class="text-amber-500">PROGRAMMING</option>
+                    <option value="Tech Testing" class="text-blue-500">TECH TESTING</option>
+                    <option value="SIT" class="text-indigo-500">SIT</option>
+                    <option value="UAT" class="text-teal-500">UAT</option>
+                    <option value="Done" class="text-[#639922]">DONE</option>
                 </select>
             </td>
             <td class="px-2 py-1 text-center opacity-0 group-hover:opacity-100 transition-opacity"><button type="button" class="text-slate-400 hover:text-red-500 transition-colors" title="Hapus Baris" onclick="removeRow(this)"><i class="ti ti-trash"></i></button></td>
@@ -276,8 +328,26 @@
 
     @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
+        function updateStatusColor(select) {
+            select.classList.remove('text-red-600', 'text-orange-500', 'text-amber-500', 'text-blue-500', 'text-indigo-500', 'text-teal-500', 'text-[#639922]', 'text-slate-500');
+            
+            switch (select.value) {
+                case 'Not Started': select.classList.add('text-red-600'); break;
+                case 'Ureq Analysis': select.classList.add('text-orange-500'); break;
+                case 'Programming': select.classList.add('text-amber-500'); break;
+                case 'Tech Testing': select.classList.add('text-blue-500'); break;
+                case 'SIT': select.classList.add('text-indigo-500'); break;
+                case 'UAT': select.classList.add('text-teal-500'); break;
+                case 'Done': select.classList.add('text-[#639922]'); break;
+                default: select.classList.add('text-slate-500'); break;
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.status-dropdown').forEach(updateStatusColor);
+
             ['tbody-fitur', 'tbody-cr', 'tbody-bug'].forEach(id => {
                 const el = document.getElementById(id);
                 if(el) {
@@ -292,6 +362,15 @@
                         }
                     });
                 }
+            });
+
+            // Init Tom Select for existing rows
+            document.querySelectorAll('.input-pics').forEach(el => {
+                new TomSelect(el, {
+                    plugins: ['remove_button'],
+                    hideSelected: true,
+                    placeholder: "Pilih PIC..."
+                });
             });
         });
 
@@ -309,19 +388,18 @@
                 const rows = tbody.querySelectorAll('tr:not(.empty-state)');
                 
                 rows.forEach((row, index) => {
-                    const inputs = row.querySelectorAll('input, select');
                     const activity = {
                         id: row.dataset.id || null,
                         type: type === 'fitur' ? 'Fitur' : (type === 'cr' ? 'CR' : 'Bug'),
                         sort_order: index + 1,
-                        name: inputs[0].value,
-                        start_date: inputs[1].value,
-                        end_date: inputs[2].value,
-                        adjusted_date: inputs[3].value,
-                        description: inputs[4].value,
-                        pics: Array.from(inputs[5].selectedOptions).map(opt => opt.value),
-                        document_link: inputs[6].value,
-                        status: inputs[7].value
+                        name: row.querySelector('.input-name').value,
+                        start_date: row.querySelector('.input-start-date').value,
+                        end_date: row.querySelector('.input-end-date').value,
+                        adjusted_date: row.querySelector('.input-adjusted-date').value,
+                        description: row.querySelector('.input-desc').value,
+                        pics: Array.from(row.querySelector('.input-pics').selectedOptions).map(opt => opt.value),
+                        document_link: row.querySelector('input[type="url"]').value,
+                        status: row.querySelector('.status-dropdown').value
                     };
                     if (activity.name.trim() !== '') {
                         activities.push(activity);
@@ -392,7 +470,22 @@
             
             const trs = tbody.querySelectorAll('tr:not(.empty-state)');
             newRow.querySelector('.number-text').textContent = trs.length + 1;
-            tbody.appendChild(newRow);
+            
+            const trElement = document.createElement('tr');
+            trElement.className = newRow.children[0].className;
+            trElement.innerHTML = newRow.children[0].innerHTML;
+            
+            tbody.appendChild(trElement);
+            
+            // Init TomSelect on the newly appended row
+            const newSelect = trElement.querySelector('.input-pics');
+            if(newSelect) {
+                new TomSelect(newSelect, {
+                    plugins: ['remove_button'],
+                    hideSelected: true,
+                    placeholder: "Pilih PIC..."
+                });
+            }
         }
 
         function removeRow(btn) {

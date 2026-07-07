@@ -32,4 +32,9 @@ class ItWhProject extends Model
     {
         return $this->hasMany(ItWhProjectDocument::class, 'it_wh_project_id');
     }
+
+    public function groups()
+    {
+        return $this->belongsToMany(ItWhProjectGroup::class, 'it_wh_project_group_project', 'it_wh_project_id', 'it_wh_project_group_id');
+    }
 }

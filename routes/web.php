@@ -62,6 +62,12 @@ Route::middleware('auth')->group(function () {
         Route::delete('/documents/{id}', [\App\Http\Controllers\ItWorkHubController::class, 'destroyDocument'])->name('documents.destroy');
 
         Route::get('/repository', [\App\Http\Controllers\ItWorkHubController::class, 'repository'])->name('repository');
+        Route::get('/project-groups', [\App\Http\Controllers\ItWorkHubController::class, 'projectGroups'])->name('project-groups');
+        Route::post('/project-groups/save', [\App\Http\Controllers\ItWorkHubController::class, 'updateProjectGroups'])->name('project-groups.save');
+        
+        // To-Do List
+        Route::get('/todo', [\App\Http\Controllers\ItWorkHubController::class, 'todo'])->name('todo');
+        Route::post('/todo/save', [\App\Http\Controllers\ItWorkHubController::class, 'updateTodos'])->name('todo.save');
     });
 
     // Notifikasi
