@@ -99,24 +99,27 @@
                             <th class="px-2 py-3 w-10 text-center"></th>
                         </tr>
                     </thead>
+
                     <tbody id="tbody-todos" class="divide-y divide-slate-200 dark:divide-slate-800">
                         @forelse($todos as $index => $todo)
                             <tr data-id="{{ $todo->id }}"
                                 class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
                                 <td
                                     class="px-2 py-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-move text-center">
-                                    <i class="ti ti-grip-vertical text-lg"></i></td>
+                                    <i class="ti ti-grip-vertical text-lg"></i>
+                                </td>
                                 <td class="px-2 py-1 text-center font-medium text-slate-500 row-number"><span
                                         class="number-text">{{ $loop->iteration }}</span></td>
                                 <!-- <td class="px-2 py-2 text-center text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
-                                    {{ \Carbon\Carbon::parse($todo->date ?? now())->format('d/m/Y') }}
-                                    <input type="hidden" class="input-date" value="{{ \Carbon\Carbon::parse($todo->date ?? now())->format('Y-m-d') }}">
-                                </td> -->
+                                        {{ \Carbon\Carbon::parse($todo->date ?? now())->format('d/m/Y') }}
+                                        <input type="hidden" class="input-date" value="{{ \Carbon\Carbon::parse($todo->date ?? now())->format('Y-m-d') }}">
+                                    </td> -->
                                 <td class="px-1 py-1">
                                     <select class="input-user w-full" placeholder="Pilih PIC..." {{ !$isAdminOrPM ? 'disabled' : '' }}>
                                         @foreach($users as $u)
                                             <option value="{{ $u->id }}" {{ $todo->user_id == $u->id ? 'selected' : '' }}>
-                                                {{ $u->name }}</option>
+                                                {{ $u->name }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </td>
@@ -158,7 +161,8 @@
     <template id="row-template">
         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
             <td class="px-2 py-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-move text-center">
-                <i class="ti ti-grip-vertical text-lg"></i></td>
+                <i class="ti ti-grip-vertical text-lg"></i>
+            </td>
             <td class="px-2 py-1 text-center font-medium text-slate-500 row-number"><span class="number-text"></span>
             </td>
             <td class="px-2 py-2 text-center text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
