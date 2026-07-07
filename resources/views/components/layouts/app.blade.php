@@ -149,7 +149,7 @@
                         <p class="px-3 text-xs font-bold tracking-wider text-slate-400 uppercase">IT Work Hub</p>
                     </div>
 
-                    @if(auth()->user()->isAdmin())
+                    @if(auth()->user()->isAdmin() || auth()->user()->isProjectManager())
                         <a href="{{ route('it-work-hub.dashboard') }}"
                             class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
                                                   {{ request()->routeIs('it-work-hub.dashboard') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
