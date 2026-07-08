@@ -149,28 +149,10 @@ class ItWorkHubNonAppController extends Controller
         // Delete activities that are no longer in the payload
         $project->activities()->whereNotIn('id', $incomingIds)->delete();
 
-        // Recalculate Project Progress
-        $allActivities = $project->activities()->get();
-        if ($allActivities->count() > 0) {
-            $totalWeight = 0;
-            foreach ($allActivities as $act) {
-                $weight = match($act->status) {
-                    'Ureq Analysis' => 15,
-                    'Programming' => 50,
-                    'Tech Testing' => 70,
-                    'SIT' => 85,
-                    'UAT' => 95,
-                    'Done' => 100,
-                    default => 0,
-                };
-                $totalWeight += $weight;
-            }
-            $averageProgress = round($totalWeight / $allActivities->count());
-            $project->progress = $averageProgress;
-        } else {
-            $project->progress = 0;
-        }
-        $project->save();
+        // Project progress is automatically recalculated via Model Events (booted in ItWhNonappActivity)
+
+        // Refetch project to get the newly calculated progress
+        $project->refresh();
 
         return response()->json(['success' => true, 'message' => 'Aktivitas berhasil disimpan.', 'progress' => $project->progress]);
         } catch (\Throwable $e) {

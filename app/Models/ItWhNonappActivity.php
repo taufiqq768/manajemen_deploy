@@ -32,4 +32,15 @@ class ItWhNonappActivity extends Model
     {
         return $this->belongsToMany(User::class, 'it_wh_nonapp_activity_user', 'it_wh_nonapp_activity_id', 'user_id');
     }
+
+    protected static function booted()
+    {
+        static::saved(function ($activity) {
+            $activity->project->recalculateProgress();
+        });
+
+        static::deleted(function ($activity) {
+            $activity->project->recalculateProgress();
+        });
+    }
 }
