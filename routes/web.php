@@ -61,6 +61,20 @@ Route::middleware('auth')->group(function () {
         Route::post('/documents/{id}/save', [\App\Http\Controllers\ItWorkHubController::class, 'storeDocument'])->name('documents.save');
         Route::delete('/documents/{id}', [\App\Http\Controllers\ItWorkHubController::class, 'destroyDocument'])->name('documents.destroy');
 
+        // Non App
+        Route::prefix('non-app')->name('non-app.')->group(function () {
+            Route::get('/longlist', [\App\Http\Controllers\ItWorkHubNonAppController::class, 'longlist'])->name('longlist');
+            Route::get('/create', [\App\Http\Controllers\ItWorkHubNonAppController::class, 'create'])->name('create');
+            Route::post('/store', [\App\Http\Controllers\ItWorkHubNonAppController::class, 'store'])->name('store');
+            Route::get('/show/{id}', [\App\Http\Controllers\ItWorkHubNonAppController::class, 'show'])->name('show');
+            
+            Route::get('/activities/{id}', [\App\Http\Controllers\ItWorkHubNonAppController::class, 'activities'])->name('activities');
+            Route::post('/activities/{id}/save', [\App\Http\Controllers\ItWorkHubNonAppController::class, 'updateActivities'])->name('activities.save');
+            
+            Route::post('/documents/{id}/save', [\App\Http\Controllers\ItWorkHubNonAppController::class, 'storeDocument'])->name('documents.save');
+            Route::delete('/documents/{id}', [\App\Http\Controllers\ItWorkHubNonAppController::class, 'destroyDocument'])->name('documents.destroy');
+        });
+
         Route::get('/repository', [\App\Http\Controllers\ItWorkHubController::class, 'repository'])->name('repository');
         Route::get('/project-groups', [\App\Http\Controllers\ItWorkHubController::class, 'projectGroups'])->name('project-groups');
         Route::post('/project-groups/save', [\App\Http\Controllers\ItWorkHubController::class, 'updateProjectGroups'])->name('project-groups.save');

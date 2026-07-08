@@ -85,6 +85,18 @@ class User extends Authenticatable
         return $this->belongsToMany(ItWhActivity::class, 'it_wh_activity_user', 'user_id', 'it_wh_activity_id');
     }
 
+    /** IT Work Hub Non App: Project dimana user ini sebagai Squad */
+    public function itWhNonappProjects()
+    {
+        return $this->belongsToMany(ItWhNonappProject::class, 'it_wh_nonapp_project_user', 'user_id', 'it_wh_nonapp_project_id');
+    }
+
+    /** IT Work Hub Non App: Aktivitas dimana user ini sebagai PIC */
+    public function itWhNonappActivities()
+    {
+        return $this->belongsToMany(ItWhNonappActivity::class, 'it_wh_nonapp_activity_user', 'user_id', 'it_wh_nonapp_activity_id');
+    }
+
     /** Jumlah notifikasi yang belum dibaca */
     public function unreadNotificationsCount(): int
     {

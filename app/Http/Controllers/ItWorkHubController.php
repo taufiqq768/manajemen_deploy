@@ -33,7 +33,7 @@ class ItWorkHubController extends Controller
             'hold' => \App\Models\ItWhProject::whereIn('status', ['Hold', 'Retired'])->count(),
         ];
 
-        return view('it-work-hub.longlist', compact('projects', 'stats'));
+        return view('it-work-hub.app-dev.longlist', compact('projects', 'stats'));
     }
 
     public function create()
@@ -41,7 +41,7 @@ class ItWorkHubController extends Controller
         // Ambil data user selain admin dan project_manager untuk Squad
         $users = \App\Models\User::whereNotIn('role', ['admin', 'project_manager'])->get();
 
-        return view('it-work-hub.create', compact('users'));
+        return view('it-work-hub.app-dev.create', compact('users'));
     }
 
     public function store(Request $request)
@@ -79,14 +79,14 @@ class ItWorkHubController extends Controller
     public function show($id)
     {
         $project = \App\Models\ItWhProject::with(['squads', 'documents'])->findOrFail($id);
-        return view('it-work-hub.show', compact('project'));
+        return view('it-work-hub.app-dev.show', compact('project'));
     }
 
     public function activities($id)
     {
         $project = \App\Models\ItWhProject::with(['squads', 'activities.pics'])->findOrFail($id);
         $users = \App\Models\User::whereNotIn('role', ['admin', 'project_manager'])->get();
-        return view('it-work-hub.activities', compact('project', 'users'));
+        return view('it-work-hub.app-dev.activities', compact('project', 'users'));
     }
 
     public function updateActivities(Request $request, $id)

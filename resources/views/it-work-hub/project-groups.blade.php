@@ -131,7 +131,7 @@
                             <tr data-id="{{ $group->id }}" class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
                                 <td class="px-2 py-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-move text-center"><i class="ti ti-grip-vertical text-lg"></i></td>
                                 <td class="px-2 py-1 text-center font-medium text-slate-500 row-number"><span class="number-text">{{ $loop->iteration }}</span></td>
-                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm font-medium text-slate-800 dark:text-slate-200 px-2 py-1.5 rounded" value="{{ $group->name }}"></td>
+                                <td class="px-1 py-1"><input type="text" class="input-name w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm font-medium text-slate-800 dark:text-slate-200 px-2 py-1.5 rounded" value="{{ $group->name }}"></td>
                                 <td class="px-1 py-1">
                                     <select onchange="updateGroupStatusColor(this)" class="status-dropdown w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
                                         <option value="Not Started" class="text-slate-500" {{ $group->status == 'Not Started' ? 'selected' : '' }}>NOT STARTED</option>
@@ -158,8 +158,8 @@
                                         <span>{{ $group->progress }}%</span>
                                     </div>
                                 </td>
-                                <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="{{ $group->deadline ? \Carbon\Carbon::parse($group->deadline)->format('Y-m-d') : '' }}"></td>
-                                <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded" value="{{ $group->description }}"></td>
+                                <td class="px-1 py-1 text-center"><input type="date" class="input-deadline w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded" value="{{ $group->deadline ? \Carbon\Carbon::parse($group->deadline)->format('Y-m-d') : '' }}"></td>
+                                <td class="px-1 py-1"><input type="text" class="input-desc w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded" value="{{ $group->description }}"></td>
                                 <td class="px-2 py-1 text-center opacity-0 group-hover:opacity-100 transition-opacity"><button type="button" class="text-slate-400 hover:text-red-500 transition-colors" title="Hapus Baris" onclick="removeRow(this)"><i class="ti ti-trash"></i></button></td>
                             </tr>
                             @empty
@@ -180,7 +180,7 @@
         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors group">
             <td class="px-2 py-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-move text-center"><i class="ti ti-grip-vertical text-lg"></i></td>
             <td class="px-2 py-1 text-center font-medium text-slate-500 row-number"><span class="number-text"></span></td>
-            <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm font-medium text-slate-800 dark:text-slate-200 px-2 py-1.5 rounded" placeholder="Nama Group..."></td>
+            <td class="px-1 py-1"><input type="text" class="input-name w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm font-medium text-slate-800 dark:text-slate-200 px-2 py-1.5 rounded" placeholder="Nama Group..."></td>
             <td class="px-1 py-1">
                 <select onchange="updateGroupStatusColor(this)" class="status-dropdown text-slate-500 w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
                     <option value="Not Started" class="text-slate-500" selected>NOT STARTED</option>
@@ -202,8 +202,8 @@
             <td class="px-1 py-1 text-center text-xs font-semibold text-slate-400 italic">
                 (Auto)
             </td>
-            <td class="px-1 py-1 text-center"><input type="date" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded"></td>
-            <td class="px-1 py-1"><input type="text" class="w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded" placeholder="Keterangan..."></td>
+            <td class="px-1 py-1 text-center"><input type="date" class="input-deadline w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded"></td>
+            <td class="px-1 py-1"><input type="text" class="input-desc w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-2 py-1.5 rounded" placeholder="Keterangan..."></td>
             <td class="px-2 py-1 text-center opacity-0 group-hover:opacity-100 transition-opacity"><button type="button" class="text-slate-400 hover:text-red-500 transition-colors" title="Hapus Baris" onclick="removeRow(this)"><i class="ti ti-trash"></i></button></td>
         </tr>
     </template>
@@ -265,15 +265,14 @@
             const rows = tbody.querySelectorAll('tr:not(.empty-state)');
             
             rows.forEach((row, index) => {
-                const inputs = row.querySelectorAll('input, select');
                 const group = {
                     id: row.dataset.id || null,
                     sort_order: index + 1,
-                    name: inputs[0].value,
-                    status: inputs[1].value,
-                    projects: Array.from(inputs[2].selectedOptions).map(opt => opt.value),
-                    deadline: inputs[3].value,
-                    description: inputs[4].value
+                    name: row.querySelector('.input-name').value,
+                    status: row.querySelector('.status-dropdown').value,
+                    projects: Array.from(row.querySelector('.input-projects').selectedOptions).map(opt => opt.value),
+                    deadline: row.querySelector('.input-deadline').value,
+                    description: row.querySelector('.input-desc').value
                 };
                 if (group.name.trim() !== '') {
                     groups.push(group);
