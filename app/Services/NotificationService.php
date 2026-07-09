@@ -116,7 +116,7 @@ class NotificationService
         $lines[] = "🔗 *Lihat detail:*";
         $lines[] = $detailUrl;
         $lines[] = '';
-        $lines[] = "_— Deploy Manager | " . now()->format('d/m/Y H:i') . " WIB_";
+        $lines[] = "_🕰 Deploy Manager | " . now()->timezone('Asia/Jakarta')->format('d/m/Y H:i') . " WIB_";
 
         $text = implode("\n", $lines);
         // ─────────────────────────────────────────────────────────

@@ -12,14 +12,14 @@
 
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-            <h2 class="text-xl font-bold text-white">Manajemen Aplikasi</h2>
-            <p class="text-sm text-slate-400 mt-0.5">Daftar aplikasi yang dapat di-deploy</p>
+            <h2 class="text-xl font-bold text-slate-800 dark:text-white">Manajemen Aplikasi</h2>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Daftar aplikasi yang dapat di-deploy</p>
         </div>
         <div class="flex items-center gap-3">
             <form method="POST" action="{{ route('applications.sync') }}">
                 @csrf
                 <button type="submit" 
-                   class="inline-flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium rounded-lg transition-colors border border-slate-700">
+                   class="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-white text-sm font-medium rounded-lg transition-colors border border-slate-200 dark:border-slate-700">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
@@ -36,9 +36,9 @@
         </div>
     </div>
 
-    <div class="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
         @if($applications->isEmpty())
-        <div class="flex flex-col items-center justify-center py-20 text-slate-500">
+        <div class="flex flex-col items-center justify-center py-20 text-slate-500 dark:text-slate-500">
             <svg class="w-12 h-12 mb-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                       d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
@@ -48,13 +48,13 @@
         @else
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-slate-800/60 text-slate-400 text-xs uppercase tracking-wider">
+                <thead class="bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 text-xs uppercase tracking-wider">
                     <tr>
                         <th class="px-5 py-3 text-left">Nama Aplikasi</th>
                         <th class="px-5 py-3 text-left">
                             <div class="flex items-center gap-1.5">
                                 <span>Versi</span>
-                                <button type="button" id="btnRefreshVersions" onclick="ajaxRefreshVersions()" title="Refresh semua versi aplikasi" class="text-slate-400 hover:text-white transition-colors focus:outline-none p-0.5 rounded hover:bg-slate-800">
+                                <button type="button" id="btnRefreshVersions" onclick="ajaxRefreshVersions()" title="Refresh semua versi aplikasi" class="text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors focus:outline-none p-0.5 rounded hover:bg-slate-200 dark:hover:bg-slate-800">
                                     <svg id="iconRefreshVersions" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                                     </svg>
@@ -67,14 +67,14 @@
                         <th class="px-5 py-3 text-right">Aksi</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-slate-800">
+                <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
                     @foreach($applications as $app)
-                    <tr class="hover:bg-slate-800/40 transition-colors">
+                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
                         <td class="px-5 py-4">
                             <div class="flex items-center gap-2">
-                                <p class="font-medium text-white">{{ $app->name }}</p>
+                                <p class="font-medium text-slate-800 dark:text-white">{{ $app->name }}</p>
                                 @if($app->api_id)
-                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" title="Tersinkronisasi dengan GUP API">GUP</span>
+                                    <span class="px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20" title="Tersinkronisasi dengan GUP API">GUP</span>
                                 @endif
                             </div>
                             @if($app->description)
@@ -100,34 +100,34 @@
                         <td class="px-5 py-4">
                             @if($app->app_url)
                             <a href="{{ $app->app_url }}" target="_blank"
-                               class="text-emerald-400 hover:text-emerald-300 text-xs transition-colors truncate max-w-xs block">
+                               class="text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-300 text-xs transition-colors truncate max-w-xs block">
                                 {{ parse_url($app->app_url, PHP_URL_HOST) ?? $app->app_url }}
                             </a>
                             @else
-                            <span class="text-slate-600">—</span>
+                            <span class="text-slate-400 dark:text-slate-600">—</span>
                             @endif
                         </td>
                         <td class="px-5 py-4">
                             @if($app->repo_url)
                             <a href="{{ $app->repo_url }}" target="_blank"
-                               class="text-indigo-400 hover:text-indigo-300 text-xs transition-colors truncate max-w-xs block">
+                               class="text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 text-xs transition-colors truncate max-w-xs block">
                                 {{ parse_url($app->repo_url, PHP_URL_HOST) ?? $app->repo_url }}…
                             </a>
                             @else
-                            <span class="text-slate-600">—</span>
+                            <span class="text-slate-400 dark:text-slate-600">—</span>
                             @endif
                         </td>
                         <td class="px-5 py-4">
                             @if($app->pics->isNotEmpty())
                                 <div class="flex flex-wrap gap-1">
                                     @foreach($app->pics as $pic)
-                                        <span class="px-2 py-0.5 bg-indigo-500/10 text-indigo-400 text-xs rounded border border-indigo-500/20">
+                                        <span class="px-2 py-0.5 bg-indigo-100 text-indigo-700 border border-indigo-200 dark:bg-indigo-500/10 dark:text-indigo-400 text-xs rounded dark:border-indigo-500/20">
                                             {{ $pic->name }}
                                         </span>
                                     @endforeach
                                 </div>
                             @else
-                                <span class="text-slate-600">—</span>
+                                <span class="text-slate-400 dark:text-slate-600">—</span>
                             @endif
                         </td>
                         <td class="px-5 py-4 text-right">
@@ -151,7 +151,7 @@
                                    data-desc="{{ $app->description }}"
                                    data-api="{{ $app->api_id ? '1' : '0' }}"
                                    data-pics="{{ $app->pics->pluck('id')->toJson() }}"
-                                   class="text-slate-400 hover:text-white text-xs transition-colors">Edit</button>
+                                   class="text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white text-xs transition-colors">Edit</button>
                                 <form method="POST" action="{{ route('applications.destroy', $app) }}"
                                       onsubmit="return confirm('Hapus aplikasi ini? Semua request terkait akan ikut terhapus.')">
                                     @csrf @method('DELETE')
@@ -167,7 +167,7 @@
             </table>
         </div>
         @if($applications->hasPages())
-        <div class="px-5 py-4 border-t border-slate-800">{{ $applications->links() }}</div>
+        <div class="px-5 py-4 border-t border-slate-200 dark:border-slate-800">{{ $applications->links() }}</div>
         @endif
         @endif
     </div>
