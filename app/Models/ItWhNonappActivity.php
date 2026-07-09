@@ -4,17 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ItWhActivity extends Model
+class ItWhNonappActivity extends Model
 {
     protected $fillable = [
-        'it_wh_project_id',
-        'type',
+        'it_wh_nonapp_project_id',
         'name',
         'start_date',
         'deadline',
         'adjustment_date',
         'notes',
-        'document_link',
         'status',
         'sort_order',
     ];
@@ -27,12 +25,12 @@ class ItWhActivity extends Model
 
     public function project()
     {
-        return $this->belongsTo(ItWhProject::class, 'it_wh_project_id');
+        return $this->belongsTo(ItWhNonappProject::class, 'it_wh_nonapp_project_id');
     }
 
     public function pics()
     {
-        return $this->belongsToMany(User::class, 'it_wh_activity_user', 'it_wh_activity_id', 'user_id');
+        return $this->belongsToMany(User::class, 'it_wh_nonapp_activity_user', 'it_wh_nonapp_activity_id', 'user_id');
     }
 
     protected static function booted()

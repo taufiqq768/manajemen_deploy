@@ -33,7 +33,7 @@ class ItWorkHubController extends Controller
             'hold' => \App\Models\ItWhProject::whereIn('status', ['Hold', 'Retired'])->count(),
         ];
 
-        return view('it-work-hub.longlist', compact('projects', 'stats'));
+        return view('it-work-hub.app-dev.longlist', compact('projects', 'stats'));
     }
 
     public function create()
@@ -41,7 +41,7 @@ class ItWorkHubController extends Controller
         // Ambil data user selain admin dan project_manager untuk Squad
         $users = \App\Models\User::whereNotIn('role', ['admin', 'project_manager'])->get();
 
-        return view('it-work-hub.create', compact('users'));
+        return view('it-work-hub.app-dev.create', compact('users'));
     }
 
     public function store(Request $request)
@@ -79,14 +79,14 @@ class ItWorkHubController extends Controller
     public function show($id)
     {
         $project = \App\Models\ItWhProject::with(['squads', 'documents'])->findOrFail($id);
-        return view('it-work-hub.show', compact('project'));
+        return view('it-work-hub.app-dev.show', compact('project'));
     }
 
     public function activities($id)
     {
         $project = \App\Models\ItWhProject::with(['squads', 'activities.pics'])->findOrFail($id);
         $users = \App\Models\User::whereNotIn('role', ['admin', 'project_manager'])->get();
-        return view('it-work-hub.activities', compact('project', 'users'));
+        return view('it-work-hub.app-dev.activities', compact('project', 'users'));
     }
 
     public function updateActivities(Request $request, $id)
@@ -99,9 +99,9 @@ class ItWorkHubController extends Controller
             'activities.*.type' => 'required|in:Fitur,CR,Bug',
             'activities.*.name' => 'required|string',
             'activities.*.start_date' => 'nullable|date',
-            'activities.*.end_date' => 'nullable|date',
-            'activities.*.adjusted_date' => 'nullable|date',
-            'activities.*.description' => 'nullable|string',
+            'activities.*.deadline' => 'nullable|date',
+            'activities.*.adjustment_date' => 'nullable|date',
+            'activities.*.notes' => 'nullable|string',
             'activities.*.document_link' => 'nullable|url',
             'activities.*.status' => 'required|string',
             'activities.*.sort_order' => 'required|integer',
@@ -119,9 +119,9 @@ class ItWorkHubController extends Controller
                     'type' => $actData['type'],
                     'name' => $actData['name'],
                     'start_date' => $actData['start_date'] ?: null,
-                    'end_date' => $actData['end_date'] ?: null,
-                    'adjusted_date' => $actData['adjusted_date'] ?: null,
-                    'description' => $actData['description'] ?? null,
+                    'deadline' => $actData['deadline'] ?: null,
+                    'adjustment_date' => $actData['adjustment_date'] ?: null,
+                    'notes' => $actData['notes'] ?? null,
                     'document_link' => $actData['document_link'] ?? null,
                     'status' => $actData['status'],
                     'sort_order' => $actData['sort_order'],
@@ -140,28 +140,9 @@ class ItWorkHubController extends Controller
         // Delete activities that are no longer in the payload
         $project->activities()->whereNotIn('id', $incomingIds)->delete();
 
-        // Recalculate Project Progress
-        $allActivities = $project->activities()->get();
-        if ($allActivities->count() > 0) {
-            $totalWeight = 0;
-            foreach ($allActivities as $act) {
-                $weight = match($act->status) {
-                    'Ureq Analysis' => 15,
-                    'Programming' => 50,
-                    'Tech Testing' => 70,
-                    'SIT' => 85,
-                    'UAT' => 95,
-                    'Done' => 100,
-                    default => 0,
-                };
-                $totalWeight += $weight;
-            }
-            $averageProgress = round($totalWeight / $allActivities->count());
-            $project->progress = $averageProgress;
-        } else {
-            $project->progress = 0;
-        }
-        $project->save();
+        // Project progress is automatically recalculated via Model Events (booted in ItWhActivity)
+
+        $project->refresh();
 
         return response()->json(['success' => true, 'message' => 'Aktivitas berhasil disimpan.', 'progress' => $project->progress]);
     }
@@ -237,5 +218,155 @@ class ItWorkHubController extends Controller
     public function repository()
     {
         return view('it-work-hub.repository');
+    }
+
+    public function projectGroups()
+    {
+        $projectGroups = \App\Models\ItWhProjectGroup::with('projects')->orderBy('sort_order')->get();
+        $projects = \App\Models\ItWhProject::orderBy('name')->get();
+        
+        $stats = [
+            'total' => \App\Models\ItWhProjectGroup::count(),
+            'not_started' => \App\Models\ItWhProjectGroup::where('status', 'Not Started')->count(),
+            'progress' => \App\Models\ItWhProjectGroup::where('status', 'Progress')->count(),
+            'live' => \App\Models\ItWhProjectGroup::where('status', 'Live')->count(),
+            'live_cr' => \App\Models\ItWhProjectGroup::where('status', 'Live w/ CR')->count(),
+            'live_bug' => \App\Models\ItWhProjectGroup::where('status', 'Live (Bug Fixing)')->count(),
+            'hold' => \App\Models\ItWhProjectGroup::whereIn('status', ['Hold', 'Retired'])->count(),
+        ];
+
+        return view('it-work-hub.project-groups', compact('projectGroups', 'projects', 'stats'));
+    }
+
+    public function updateProjectGroups(Request $request)
+    {
+        $request->validate([
+            'groups' => 'present|array',
+            'groups.*.id' => 'nullable',
+            'groups.*.name' => 'required|string',
+            'groups.*.status' => 'required|string',
+            'groups.*.deadline' => 'nullable|date',
+            'groups.*.description' => 'nullable|string',
+            'groups.*.sort_order' => 'required|integer',
+            'groups.*.projects' => 'nullable|array',
+            'groups.*.projects.*' => 'exists:it_wh_projects,id',
+        ]);
+
+        $incomingIds = [];
+        $groupsData = $request->input('groups', []);
+
+        foreach ($groupsData as $groupData) {
+            $group = \App\Models\ItWhProjectGroup::updateOrCreate(
+                ['id' => (isset($groupData['id']) && is_numeric($groupData['id'])) ? $groupData['id'] : null],
+                [
+                    'name' => $groupData['name'],
+                    'status' => $groupData['status'],
+                    'deadline' => $groupData['deadline'] ?: null,
+                    'description' => $groupData['description'] ?? null,
+                    'sort_order' => $groupData['sort_order'],
+                ]
+            );
+
+            if (isset($groupData['projects'])) {
+                $group->projects()->sync($groupData['projects']);
+            } else {
+                $group->projects()->detach();
+            }
+
+            // Calculate progress based on attached projects
+            $attachedProjects = $group->projects()->get();
+            if ($attachedProjects->count() > 0) {
+                $group->progress = round($attachedProjects->avg('progress'));
+            } else {
+                $group->progress = 0;
+            }
+            $group->save();
+
+            $incomingIds[] = $group->id;
+        }
+
+        // Delete groups that are no longer in the payload
+        \App\Models\ItWhProjectGroup::whereNotIn('id', $incomingIds)->delete();
+
+        return response()->json(['success' => true, 'message' => 'Project Groups berhasil disimpan.']);
+    }
+    public function todo()
+    {
+        $user = auth()->user();
+        
+        $query = \App\Models\ItWhTodo::with(['user', 'assigner']);
+        
+        // Project Managers and Admins can see all tasks. Ordinary users see their own.
+        if (!in_array($user->role, ['admin', 'project_manager'])) {
+            $query->where('user_id', $user->id);
+        }
+
+        $todos = $query->orderBy('sort_order', 'asc')->get();
+        $users = \App\Models\User::orderBy('name')->get();
+
+        return view('it-work-hub.todo', compact('todos', 'users'));
+    }
+
+    public function updateTodos(Request $request)
+    {
+        $user = auth()->user();
+        $isAdminOrPM = in_array($user->role, ['admin', 'project_manager']);
+
+        $request->validate([
+            'todos' => 'present|array',
+            'todos.*.id' => 'nullable',
+            'todos.*.user_id' => 'required|exists:users,id',
+            'todos.*.date' => 'required|date',
+            'todos.*.task_name' => 'required|string|max:255',
+            'todos.*.deadline' => 'required|date',
+            'todos.*.status' => 'required|in:To Do,In Progress,Done',
+            'todos.*.notes' => 'nullable|string',
+            'todos.*.sort_order' => 'required|integer',
+        ]);
+
+        $incomingIds = [];
+        $todosData = $request->input('todos', []);
+
+        foreach ($todosData as $todoData) {
+            // Ordinary users can only assign to themselves
+            if (!$isAdminOrPM) {
+                $todoData['user_id'] = $user->id;
+            }
+
+            $todoId = (isset($todoData['id']) && is_numeric($todoData['id'])) ? $todoData['id'] : null;
+
+            if ($todoId) {
+                $todo = \App\Models\ItWhTodo::find($todoId);
+                // Security check for non-admins
+                if (!$isAdminOrPM && $todo && $todo->user_id != $user->id) {
+                    continue; // Skip if trying to edit someone else's task
+                }
+            }
+
+            $todo = \App\Models\ItWhTodo::updateOrCreate(
+                ['id' => $todoId],
+                [
+                    'user_id' => $todoData['user_id'],
+                    'assigner_id' => $todoId ? (\App\Models\ItWhTodo::find($todoId)->assigner_id ?? $user->id) : $user->id,
+                    'date' => $todoData['date'],
+                    'task_name' => $todoData['task_name'],
+                    'deadline' => $todoData['deadline'],
+                    'status' => $todoData['status'],
+                    'notes' => $todoData['notes'] ?? null,
+                    'sort_order' => $todoData['sort_order'],
+                ]
+            );
+
+            $incomingIds[] = $todo->id;
+        }
+
+        // Delete todos that are no longer in the payload
+        $deleteQuery = \App\Models\ItWhTodo::whereNotIn('id', $incomingIds);
+        if (!$isAdminOrPM) {
+            $deleteQuery->where('user_id', $user->id); // Ordinary users only delete their own
+        }
+        $deleteQuery->delete();
+
+        return response()->json(['success' => true, 'message' => 'To-Do List berhasil disimpan.']);
     }
 }

@@ -97,7 +97,7 @@
                 @if($user->isAdmin())
                     <a href="{{ route('applications.index') }}"
                         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
-                                  {{ request()->routeIs('applications.*') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                                          {{ request()->routeIs('applications.*') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                         <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
@@ -109,7 +109,7 @@
                 @if($user->isAdmin())
                     <a href="{{ route('users.index') }}"
                         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
-                                  {{ request()->routeIs('users.*') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                                          {{ request()->routeIs('users.*') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                         <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -119,7 +119,7 @@
 
                     <a href="{{ route('waha-connection.index') }}"
                         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
-                                  {{ request()->routeIs('waha-connection.*') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                                          {{ request()->routeIs('waha-connection.*') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
                         <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
@@ -152,31 +152,55 @@
                 </a>
 
                 {{-- IT Work Hub Section --}}
-                @if(auth()->check() && auth()->user()->isAdmin())
+                @if(auth()->check())
                     <div class="pt-4 pb-1">
                         <p class="px-3 text-xs font-bold tracking-wider text-slate-400 uppercase">IT Work Hub</p>
                     </div>
 
-                    <a href="{{ route('it-work-hub.dashboard') }}"
+                    @if(auth()->user()->isAdmin() || auth()->user()->isProjectManager())
+                        <a href="{{ route('it-work-hub.dashboard') }}"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
+                                                  {{ request()->routeIs('it-work-hub.dashboard') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                            <i class="ti ti-chart-bar text-lg flex-shrink-0"></i>
+                            Dashboard
+                        </a>
+
+                        <a href="{{ route('it-work-hub.longlist') }}"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
+                                                  {{ request()->routeIs('it-work-hub.longlist', 'it-work-hub.create', 'it-work-hub.show', 'it-work-hub.activities') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                            <i class="ti ti-code text-lg flex-shrink-0"></i>
+                            App Dev
+                        </a>
+
+                        <a href="{{ route('it-work-hub.non-app.longlist') }}"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
+                                                  {{ request()->routeIs('it-work-hub.non-app.longlist', 'it-work-hub.non-app.create', 'it-work-hub.non-app.show', 'it-work-hub.non-app.activities') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                            <i class="ti ti-briefcase text-lg flex-shrink-0"></i>
+                            Non App
+                        </a>
+
+                        <a href="{{ route('it-work-hub.project-groups') }}"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
+                                                  {{ request()->routeIs('it-work-hub.project-groups') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                            <i class="ti ti-layers-linked text-lg flex-shrink-0"></i>
+                            Project Grouping
+                        </a>
+
+                        <a href="{{ route('it-work-hub.repository') }}"
+                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
+                                                  {{ request()->routeIs('it-work-hub.repository') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                            <i class="ti ti-file-text text-lg flex-shrink-0"></i>
+                            Repository Doc
+                        </a>
+                    @endif
+
+                    <a href="{{ route('it-work-hub.todo') }}"
                         class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
-                              {{ request()->routeIs('it-work-hub.dashboard') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
-                        <i class="ti ti-chart-bar text-lg flex-shrink-0"></i>
-                        Dashboard
+                                      {{ request()->routeIs('it-work-hub.todo') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                        <i class="ti ti-checklist text-lg flex-shrink-0"></i>
+                        To-Do List
                     </a>
 
-                    <a href="{{ route('it-work-hub.longlist') }}"
-                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
-                              {{ request()->routeIs('it-work-hub.longlist', 'it-work-hub.create', 'it-work-hub.show', 'it-work-hub.activities') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
-                        <i class="ti ti-code text-lg flex-shrink-0"></i>
-                        App Dev
-                    </a>
-
-                    <a href="{{ route('it-work-hub.repository') }}"
-                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
-                              {{ request()->routeIs('it-work-hub.repository') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
-                        <i class="ti ti-file-text text-lg flex-shrink-0"></i>
-                        Repository Doc
-                    </a>
                 @endif
 
             </nav>

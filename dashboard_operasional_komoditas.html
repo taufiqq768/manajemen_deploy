@@ -1,0 +1,71 @@
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem">
+  <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem">
+    <p style="font-size:13px;color:var(--color-text-secondary);margin:0 0 4px">Total produksi (ton)</p>
+    <p style="font-size:24px;font-weight:500;margin:0">116.800</p>
+  </div>
+  <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem">
+    <p style="font-size:13px;color:var(--color-text-secondary);margin:0 0 4px">Rata-rata COGS</p>
+    <p style="font-size:24px;font-weight:500;margin:0">28.000</p>
+  </div>
+  <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem">
+    <p style="font-size:13px;color:var(--color-text-secondary);margin:0 0 4px">Rata-rata delta</p>
+    <p style="font-size:24px;font-weight:500;margin:0">10.222</p>
+  </div>
+  <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem">
+    <p style="font-size:13px;color:var(--color-text-secondary);margin:0 0 4px">Rata-rata GPM</p>
+    <p style="font-size:24px;font-weight:500;margin:0">37%</p>
+  </div>
+</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:8px;font-size:12px;color:var(--color-text-secondary)">
+  <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#1D9E75"></span>RSS</span>
+  <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#378ADD"></span>SIR</span>
+  <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#D85A30"></span>TBC</span>
+</div>
+<div style="position:relative;width:100%;height:260px;margin-bottom:2rem">
+  <canvas id="cProd" role="img" aria-label="Bar chart produksi ton per komoditas: RSS 75800, SIR 23000, TBC 18000">Produksi: RSS 75.800, SIR 23.000, TBC 18.000 ton</canvas>
+</div>
+
+<div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:8px;font-size:12px;color:var(--color-text-secondary)">
+  <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#1D9E75"></span>COGS</span>
+  <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#378ADD"></span>Delta thd H. Jual</span>
+</div>
+<div style="position:relative;width:100%;height:260px;margin-bottom:2rem">
+  <canvas id="cCogs" role="img" aria-label="Grouped bar chart COGS dan delta harga jual per komoditas">COGS dan Delta: RSS 32000/7800, SIR 29000/9300, TBC 23000/7700</canvas>
+</div>
+
+<div style="position:relative;width:100%;height:260px;margin-bottom:1rem">
+  <canvas id="cGpm" role="img" aria-label="Line chart persentase GPM per komoditas: RSS 24%, SIR 32%, TBC 33%">GPM: RSS 24%, SIR 32%, TBC 33%</canvas>
+</div>
+
+<div style="position:relative;width:100%;height:260px">
+  <canvas id="cShare" role="img" aria-label="Donut chart kontribusi produksi tiap komoditas terhadap total">Kontribusi produksi: RSS 65%, SIR 20%, TBC 15%</canvas>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const labels = ['RSS','SIR','TBC'];
+new Chart(document.getElementById('cProd'), {
+  type: 'bar',
+  data: { labels, datasets: [{ label: 'Produksi (Ton)', data: [75800,23000,18000], backgroundColor: ['#1D9E75','#378ADD','#D85A30'] }] },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{ticks:{callback:v=>v.toLocaleString('id-ID')}}} }
+});
+new Chart(document.getElementById('cCogs'), {
+  type: 'bar',
+  data: { labels, datasets: [
+    { label: 'COGS (Rp/Kg)', data: [32000,29000,23000], backgroundColor: '#1D9E75' },
+    { label: 'Delta thd H.Jual', data: [7800,9300,7700], backgroundColor: '#378ADD' }
+  ]},
+  options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{ticks:{callback:v=>v.toLocaleString('id-ID')}}} }
+});
+new Chart(document.getElementById('cGpm'), {
+  type: 'line',
+  data: { labels, datasets: [{ label:'% GPM', data:[24,32,33], borderColor:'#7F77DD', backgroundColor:'#7F77DD', tension:0.3, pointRadius:5 }] },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{y:{ticks:{callback:v=>v+'%'}}} }
+});
+new Chart(document.getElementById('cShare'), {
+  type: 'doughnut',
+  data: { labels, datasets: [{ data:[75800,23000,18000], backgroundColor:['#1D9E75','#378ADD','#D85A30'] }] },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} }
+});
+</script>

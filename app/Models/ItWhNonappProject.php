@@ -4,38 +4,42 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ItWhProject extends Model
+class ItWhNonappProject extends Model
 {
     protected $fillable = [
         'name',
         'description',
         'priority',
         'status',
-        'bpo',
         'progress',
+        'bpo',
         'pain_point_uraian',
         'pain_point_impact',
-        'sort_order'
+        'start_date',
+        'deadline',
+        'adjustment_date',
+        'sort_order',
+    ];
+
+    protected $casts = [
+        'start_date' => 'date',
+        'deadline' => 'date',
+        'adjustment_date' => 'date',
     ];
 
     public function squads()
     {
-        return $this->belongsToMany(User::class, 'it_wh_project_user', 'it_wh_project_id', 'user_id');
+        return $this->belongsToMany(User::class, 'it_wh_nonapp_project_user', 'it_wh_nonapp_project_id', 'user_id');
     }
 
     public function activities()
     {
-        return $this->hasMany(ItWhActivity::class, 'it_wh_project_id');
+        return $this->hasMany(ItWhNonappActivity::class, 'it_wh_nonapp_project_id');
     }
 
     public function documents()
     {
-        return $this->hasMany(ItWhProjectDocument::class, 'it_wh_project_id');
-    }
-
-    public function groups()
-    {
-        return $this->belongsToMany(ItWhProjectGroup::class, 'it_wh_project_group_project', 'it_wh_project_id', 'it_wh_project_group_id');
+        return $this->hasMany(ItWhNonappDocument::class, 'it_wh_nonapp_project_id');
     }
 
     public function recalculateProgress()
@@ -60,9 +64,5 @@ class ItWhProject extends Model
             $this->progress = 0;
         }
         $this->save();
-
-        foreach ($this->groups as $group) {
-            $group->recalculateProgress();
-        }
     }
 }
