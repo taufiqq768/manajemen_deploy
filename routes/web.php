@@ -66,6 +66,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/create', [\App\Http\Controllers\ItWorkHubController::class, 'create'])->name('create');
         Route::post('/store', [\App\Http\Controllers\ItWorkHubController::class, 'store'])->name('store');
         Route::get('/show/{id}', [\App\Http\Controllers\ItWorkHubController::class, 'show'])->name('show');
+        Route::post('/update/{id}', [\App\Http\Controllers\ItWorkHubController::class, 'update'])->name('update');
+        Route::delete('/destroy/{id}', [\App\Http\Controllers\ItWorkHubController::class, 'destroy'])->name('destroy');
+        Route::post('/status/{id}', [\App\Http\Controllers\ItWorkHubController::class, 'updateStatus'])->name('status.update');
         
         // Activities
         Route::get('/activities/{id}', [\App\Http\Controllers\ItWorkHubController::class, 'activities'])->name('activities');
@@ -81,6 +84,9 @@ Route::middleware('auth')->group(function () {
             Route::get('/create', [\App\Http\Controllers\ItWorkHubNonAppController::class, 'create'])->name('create');
             Route::post('/store', [\App\Http\Controllers\ItWorkHubNonAppController::class, 'store'])->name('store');
             Route::get('/show/{id}', [\App\Http\Controllers\ItWorkHubNonAppController::class, 'show'])->name('show');
+            Route::post('/update/{id}', [\App\Http\Controllers\ItWorkHubNonAppController::class, 'update'])->name('update');
+            Route::delete('/destroy/{id}', [\App\Http\Controllers\ItWorkHubNonAppController::class, 'destroy'])->name('destroy');
+            Route::post('/status/{id}', [\App\Http\Controllers\ItWorkHubNonAppController::class, 'updateStatus'])->name('status.update');
             
             Route::get('/activities/{id}', [\App\Http\Controllers\ItWorkHubNonAppController::class, 'activities'])->name('activities');
             Route::post('/activities/{id}/save', [\App\Http\Controllers\ItWorkHubNonAppController::class, 'updateActivities'])->name('activities.save');

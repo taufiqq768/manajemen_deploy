@@ -69,7 +69,7 @@
                             <th class="px-2 py-3 w-8 text-center"></th>
                             <th class="px-4 py-3 w-12 text-center">#</th>
                             <th class="px-4 py-3">Nama Project</th>
-                            <th class="px-4 py-3 text-center">Tanggal Inisiasi</th>
+                            <th class="px-4 py-3 text-center">Status</th>
                             <th class="px-4 py-3 text-center">Prioritas</th>
                             <th class="px-4 py-3 text-center">% Progress</th>
                             <th class="px-4 py-3 text-center">Deadline</th>
@@ -84,7 +84,27 @@
                             <td class="px-2 py-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-move text-center"><i class="ti ti-grip-vertical text-lg"></i></td>
                             <td class="px-4 py-3 text-center font-medium">{{ $projects->firstItem() + $index }}</td>
                             <td class="px-4 py-3 font-semibold text-slate-800 dark:text-slate-200">{{ $project->name }}</td>
-                            <td class="px-4 py-3 text-center text-xs">{{ $project->start_date ? \Carbon\Carbon::parse($project->start_date)->format('d M Y') : '-' }}</td>
+                            <td class="px-4 py-3 text-center">
+                                @php
+                                    $statusColors = [
+                                        'Not Started' => 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+                                        'Live' => 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
+                                        'Live w/ CR' => 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
+                                        'Live w/ Bug' => 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
+                                        'Hold' => 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
+                                        'Retired' => 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300',
+                                    ];
+                                    $color = $statusColors[$project->status] ?? 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400';
+                                @endphp
+                                <select data-old-value="{{ $project->status }}" onchange="updateProjectStatus({{ $project->id }}, this)" class="px-2 py-1 rounded text-[10px] font-bold w-full {{ $color }} cursor-pointer outline-none appearance-none text-center">
+                                    <option value="Not Started" class="bg-white text-slate-800" {{ $project->status == 'Not Started' ? 'selected' : '' }}>NOT STARTED</option>
+                                    <option value="Live" class="bg-white text-slate-800" {{ $project->status == 'Live' ? 'selected' : '' }}>LIVE</option>
+                                    <option value="Live w/ CR" class="bg-white text-slate-800" {{ $project->status == 'Live w/ CR' ? 'selected' : '' }}>LIVE W/ CR</option>
+                                    <option value="Live w/ Bug" class="bg-white text-slate-800" {{ $project->status == 'Live w/ Bug' ? 'selected' : '' }}>LIVE W/ BUG</option>
+                                    <option value="Hold" class="bg-white text-slate-800" {{ $project->status == 'Hold' ? 'selected' : '' }}>HOLD</option>
+                                    <option value="Retired" class="bg-white text-slate-800" {{ $project->status == 'Retired' ? 'selected' : '' }}>RETIRED</option>
+                                </select>
+                            </td>
                             <td class="px-4 py-3 text-center">
                                 @if($project->priority === 'High')
                                     <span class="px-2 py-1 rounded text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400">HIGH</span>
@@ -112,9 +132,18 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-center">
-                                <a href="{{ route('it-work-hub.non-app.show', $project->id) }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-medium rounded-md transition-colors">
-                                    Detail <i class="ti ti-arrow-right"></i>
-                                </a>
+                                <div class="flex items-center justify-center gap-1">
+                                    <a href="{{ route('it-work-hub.non-app.show', $project->id) }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-medium rounded-md transition-colors" title="Detail">
+                                        <i class="ti ti-eye"></i>
+                                    </a>
+                                    <form action="{{ route('it-work-hub.non-app.destroy', $project->id) }}" method="POST" class="inline-block" onsubmit="return confirm('Apakah Anda yakin ingin menghapus project ini beserta seluruh aktivitas dan dokumennya?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-red-100 hover:bg-red-200 dark:bg-red-500/20 dark:hover:bg-red-500/30 text-red-700 dark:text-red-400 text-xs font-medium rounded-md transition-colors" title="Hapus">
+                                            <i class="ti ti-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                         @empty
@@ -131,4 +160,55 @@
             </div>
         </div>
     </div>
+
+    @push('scripts')
+    <script>
+        function updateProjectStatus(id, selectElement) {
+            const newStatus = selectElement.value;
+            const oldStatus = selectElement.getAttribute('data-old-value');
+    
+            if (!confirm("Apakah anda akan menyimpan perubahan ini?")) {
+                selectElement.value = oldStatus;
+                return;
+            }
+    
+            const statusColors = {
+                'Not Started': 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+                'Live': 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
+                'Live w/ CR': 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
+                'Live w/ Bug': 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
+                'Hold': 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
+                'Retired': 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300'
+            };
+    
+            // Update color
+            selectElement.className = `px-2 py-1 rounded text-[10px] font-bold w-full ${statusColors[newStatus]} cursor-pointer outline-none appearance-none text-center`;
+    
+            fetch(`/it-work-hub/non-app/status/${id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ status: newStatus })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update old value
+                    selectElement.setAttribute('data-old-value', newStatus);
+                    // Reload halaman untuk update dashboard/stats
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Gagal memperbarui status project');
+                // Revert back on error
+                selectElement.value = oldStatus;
+                selectElement.className = `px-2 py-1 rounded text-[10px] font-bold w-full ${statusColors[oldStatus]} cursor-pointer outline-none appearance-none text-center`;
+            });
+        }
+    </script>
+    @endpush
 </x-layouts.app>

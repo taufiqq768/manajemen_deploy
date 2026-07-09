@@ -44,10 +44,13 @@
                 {{-- Card Info Umum --}}
                 <div
                     class="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-                    <div class="p-4 border-b border-slate-200 dark:border-slate-800 bg-[#F1EFE8] dark:bg-slate-800/50">
+                    <div class="p-4 border-b border-slate-200 dark:border-slate-800 bg-[#F1EFE8] dark:bg-slate-800/50 flex justify-between items-center">
                         <h3 class="text-sm font-semibold text-slate-800 dark:text-white flex items-center gap-2">
                             <i class="ti ti-info-circle"></i> Informasi Project
                         </h3>
+                        <button onclick="document.getElementById('editProjectModal').classList.remove('hidden')" class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300 text-sm font-medium flex items-center gap-1">
+                            <i class="ti ti-edit"></i> Edit
+                        </button>
                     </div>
                     <div class="p-5 grid grid-cols-2 gap-4">
                         <div>
@@ -358,4 +361,64 @@
         }
     </script>
     @endpush
+    {{-- Modal Edit Project --}}
+    <div id="editProjectModal" class="fixed inset-0 z-50 hidden">
+        <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity"></div>
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div class="relative transform overflow-hidden rounded-xl bg-white dark:bg-slate-900 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl border border-slate-200 dark:border-slate-800">
+                    <form action="{{ route('it-work-hub.update', $project->id) }}" method="POST">
+                        @csrf
+                        <div class="px-4 pb-4 pt-5 sm:p-6 sm:pb-4 border-b border-slate-200 dark:border-slate-800 bg-[#F1EFE8] dark:bg-slate-800/50">
+                            <h3 class="text-lg font-semibold leading-6 text-slate-900 dark:text-white flex items-center gap-2">
+                                <i class="ti ti-edit"></i> Edit Informasi Project
+                            </h3>
+                        </div>
+                        <div class="px-4 py-5 sm:p-6 space-y-4">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="col-span-2">
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Squad / Tim <span class="font-normal text-slate-400 text-xs">(Gunakan Ctrl/Cmd untuk pilih lebih dari 1)</span></label>
+                                    <select name="squads[]" multiple class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922] h-32">
+                                        @foreach($users as $user)
+                                            <option value="{{ $user->id }}" {{ $project->squads->contains('id', $user->id) ? 'selected' : '' }}>{{ $user->name }} ({{ ucfirst($user->role) }})</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">BPO</label>
+                                    <input type="text" name="bpo" value="{{ old('bpo', $project->bpo) }}" class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Priority</label>
+                                    <select name="priority" class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]" required>
+                                        <option value="Low" {{ $project->priority == 'Low' ? 'selected' : '' }}>Low</option>
+                                        <option value="Medium" {{ $project->priority == 'Medium' ? 'selected' : '' }}>Medium</option>
+                                        <option value="High" {{ $project->priority == 'High' ? 'selected' : '' }}>High</option>
+                                    </select>
+                                </div>
+                                <div class="col-span-2">
+                                    <h4 class="text-sm font-semibold text-slate-700 dark:text-slate-300 mt-2 mb-3 pb-1 border-b border-slate-200 dark:border-slate-700">Pain Point</h4>
+                                    <div class="space-y-4">
+                                        <div>
+                                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Uraian Masalah</label>
+                                            <textarea name="pain_point_uraian" rows="3" class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]">{{ old('pain_point_uraian', $project->pain_point_uraian) }}</textarea>
+                                        </div>
+                                        <div>
+                                            <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Impact (Dampak)</label>
+                                            <textarea name="pain_point_impact" rows="3" class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]">{{ old('pain_point_impact', $project->pain_point_impact) }}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-slate-50 dark:bg-slate-800/50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 border-t border-slate-200 dark:border-slate-800">
+                            <button type="submit" class="inline-flex w-full justify-center rounded-lg bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:ml-3 sm:w-auto">Simpan</button>
+                            <button type="button" onclick="document.getElementById('editProjectModal').classList.add('hidden')" class="mt-3 inline-flex w-full justify-center rounded-lg bg-white dark:bg-slate-900 px-3 py-2 text-sm font-semibold text-slate-900 dark:text-white shadow-sm ring-1 ring-inset ring-slate-300 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 sm:mt-0 sm:w-auto">Batal</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </x-layouts.app>
