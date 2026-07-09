@@ -79,7 +79,64 @@ class ItWorkHubController extends Controller
     public function show($id)
     {
         $project = \App\Models\ItWhProject::with(['squads', 'documents'])->findOrFail($id);
-        return view('it-work-hub.app-dev.show', compact('project'));
+        $users = \App\Models\User::whereNotIn('role', ['admin', 'project_manager'])->get();
+        return view('it-work-hub.app-dev.show', compact('project', 'users'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'squads' => 'nullable|array',
+            'squads.*' => 'exists:users,id',
+            'bpo' => 'nullable|string|max:255',
+            'pain_point_uraian' => 'nullable|string',
+            'pain_point_impact' => 'nullable|string',
+            'priority' => 'required|in:High,Medium,Low',
+        ]);
+
+        $project = \App\Models\ItWhProject::findOrFail($id);
+        $project->update([
+            'bpo' => $validated['bpo'] ?? null,
+            'pain_point_uraian' => $validated['pain_point_uraian'] ?? null,
+            'pain_point_impact' => $validated['pain_point_impact'] ?? null,
+            'priority' => $validated['priority'],
+        ]);
+
+        if (isset($validated['squads'])) {
+            $project->squads()->sync($validated['squads']);
+        } else {
+            $project->squads()->detach();
+        }
+
+        return redirect()->back()->with('success', 'Informasi project berhasil diperbarui.');
+    }
+
+    public function destroy($id)
+    {
+        $project = \App\Models\ItWhProject::findOrFail($id);
+        
+        // Hapus relasi untuk menghindari foreign key constraint error
+        $project->squads()->detach();
+        $project->groups()->detach();
+        $project->activities()->delete();
+        $project->documents()->delete();
+        
+        $project->delete();
+
+        return redirect()->route('it-work-hub.longlist')->with('success', 'Project berhasil dihapus.');
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|string',
+        ]);
+
+        $project = \App\Models\ItWhProject::findOrFail($id);
+        $project->status = $request->status;
+        $project->save();
+
+        return response()->json(['success' => true, 'message' => 'Status project berhasil diperbarui.']);
     }
 
     public function activities($id)
