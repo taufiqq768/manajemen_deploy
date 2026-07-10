@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('it_wh_project_documents', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('it_wh_project_id')->constrained('it_wh_projects')->onDelete('cascade');
-            $table->enum('type', ['PIR', 'Dokumen']);
-            $table->text('description')->nullable();
-            $table->date('document_date')->nullable();
-            $table->string('file_path')->nullable();
-            $table->string('link')->nullable();
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('it_wh_project_documents')) {
+            Schema::create('it_wh_project_documents', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('it_wh_project_id')->constrained('it_wh_projects')->onDelete('cascade');
+                $table->enum('type', ['PIR', 'Dokumen']);
+                $table->text('description')->nullable();
+                $table->date('document_date')->nullable();
+                $table->string('file_path')->nullable();
+                $table->string('link')->nullable();
+                $table->timestamps();
+            });
+        }
     }
 
     /**
