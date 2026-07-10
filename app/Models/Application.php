@@ -45,6 +45,12 @@ class Application extends Model
         return $this->belongsToMany(User::class, 'application_user', 'application_id', 'user_id');
     }
 
+    /** Semua change request untuk aplikasi ini */
+    public function changeRequests()
+    {
+        return $this->hasMany(ChangeRequest::class);
+    }
+
     /** Push version to remote server via API Write */
     public function pushVersionToRemote($version = null, $releaseNotes = '')
     {

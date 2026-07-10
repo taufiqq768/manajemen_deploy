@@ -29,3 +29,6 @@ r o u t e s / d e v . p h p
 /scratch
 app/Http/Controllers/ProgrammerApplicationController.php
 resources/views/programmer/
+app/Http/Controllers/ChangeRequestController.php
+app/Models/ChangeRequest.php
+database/migrations/2026_07_10_000000_create_change_requests_table.php

@@ -33,6 +33,8 @@ Route::middleware('auth')->group(function () {
         ->name('programmer.applications');
     Route::get('/programmer/applications/{application}', [\App\Http\Controllers\ProgrammerApplicationController::class, 'show'])
         ->name('programmer.applications.show');
+    Route::post('/programmer/applications/{application}/cr', [\App\Http\Controllers\ChangeRequestController::class, 'store'])
+        ->name('programmer.applications.cr.store');
 
     // Deploy Requests — CRUD
     Route::resource('deploy-requests', DeployRequestController::class)
