@@ -27,3 +27,5 @@ Homestead.yaml
 Thumbs.db
 r o u t e s / d e v . p h p  
 /scratch
+app/Http/Controllers/ProgrammerApplicationController.php
+resources/views/programmer/

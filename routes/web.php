@@ -28,6 +28,10 @@ Route::middleware('auth')->group(function () {
     // Log Update Versi
     Route::get('/version-logs', [\App\Http\Controllers\VersionLogController::class, 'index'])->name('version-logs.index');
 
+    // Programmer Applications
+    Route::get('/programmer/applications', [\App\Http\Controllers\ProgrammerApplicationController::class, 'index'])
+        ->name('programmer.applications');
+
     // Deploy Requests — CRUD
     Route::resource('deploy-requests', DeployRequestController::class)
         ->except(['destroy']);
