@@ -31,6 +31,8 @@ Route::middleware('auth')->group(function () {
     // Programmer Applications
     Route::get('/programmer/applications', [\App\Http\Controllers\ProgrammerApplicationController::class, 'index'])
         ->name('programmer.applications');
+    Route::get('/programmer/applications/{application}', [\App\Http\Controllers\ProgrammerApplicationController::class, 'show'])
+        ->name('programmer.applications.show');
 
     // Deploy Requests — CRUD
     Route::resource('deploy-requests', DeployRequestController::class)
