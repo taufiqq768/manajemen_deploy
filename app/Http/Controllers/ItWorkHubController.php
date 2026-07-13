@@ -8,8 +8,94 @@ class ItWorkHubController extends Controller
 {
     public function dashboard()
     {
-        return view('it-work-hub.dashboard');
+        // App Dev Stats
+        $allAppDevStatuses = ['Not Started', 'Live', 'Live w/ CR', 'Live w/ Bug', 'Hold', 'Retired'];
+        $appDevRaw = \App\Models\ItWhProject::selectRaw('status, count(*) as count')->groupBy('status')->pluck('count', 'status');
+        $appDevStats = collect($allAppDevStatuses)->mapWithKeys(fn($s) => [$s => $appDevRaw[$s] ?? 0]);
+        $appDevTotal = (int) $appDevStats->sum();
+        $appDevAvgProgress = round(\App\Models\ItWhProject::avg('progress') ?? 0);
+        $appDevPriorityRaw = \App\Models\ItWhProject::selectRaw('priority, count(*) as count')->groupBy('priority')->pluck('count', 'priority');
+        $appDevPriorityStats = ['High' => $appDevPriorityRaw['High'] ?? 0, 'Medium' => $appDevPriorityRaw['Medium'] ?? 0, 'Low' => $appDevPriorityRaw['Low'] ?? 0];
+
+        // Non App Stats
+        $allNonAppStatuses = ['Not Started', 'On Progress', 'Hold', 'Done'];
+        $nonAppRaw = \App\Models\ItWhNonappProject::selectRaw('status, count(*) as count')->groupBy('status')->pluck('count', 'status');
+        $nonAppStats = collect($allNonAppStatuses)->mapWithKeys(fn($s) => [$s => $nonAppRaw[$s] ?? 0]);
+        $nonAppTotal = (int) $nonAppStats->sum();
+        $nonAppAvgProgress = round(\App\Models\ItWhNonappProject::avg('progress') ?? 0);
+        $nonAppPriorityRaw = \App\Models\ItWhNonappProject::selectRaw('priority, count(*) as count')->groupBy('priority')->pluck('count', 'priority');
+        $nonAppPriorityStats = ['High' => $nonAppPriorityRaw['High'] ?? 0, 'Medium' => $nonAppPriorityRaw['Medium'] ?? 0, 'Low' => $nonAppPriorityRaw['Low'] ?? 0];
+
+        // Governance Stats
+        $governanceAll = \App\Models\ItWhGovernance::selectRaw('progress, priority')->get();
+        $governanceStats = ['Not Started' => 0, 'On Progress' => 0, 'Done' => 0];
+        $governancePriorityStats = ['High' => 0, 'Medium' => 0, 'Low' => 0];
+        foreach ($governanceAll as $gov) {
+            if ($gov->progress == 0) $governanceStats['Not Started']++;
+            elseif ($gov->progress == 100) $governanceStats['Done']++;
+            else $governanceStats['On Progress']++;
+            if (isset($governancePriorityStats[$gov->priority])) $governancePriorityStats[$gov->priority]++;
+        }
+        $governanceTotal = $governanceAll->count();
+        $governanceAvgProgress = round($governanceAll->avg('progress') ?? 0);
+
+        // Project Group Stats
+        $allGroupStatuses = ['Not Started', 'Progress', 'Live', 'Live w/ CR', 'Live (Bug Fixing)', 'Hold', 'Retired'];
+        $groupRaw = \App\Models\ItWhProjectGroup::selectRaw('status, count(*) as count')->groupBy('status')->pluck('count', 'status');
+        $groupStats = collect($allGroupStatuses)->mapWithKeys(fn($s) => [$s => $groupRaw[$s] ?? 0]);
+        $groupTotal = (int) $groupStats->sum();
+        $groupAvgProgress = round(\App\Models\ItWhProjectGroup::avg('progress') ?? 0);
+
+        // PIC Stats: combine activities from all 3 modules per user
+        $appDevActByPic = \Illuminate\Support\Facades\DB::table('it_wh_activity_user')
+            ->join('users', 'users.id', '=', 'it_wh_activity_user.user_id')
+            ->join('it_wh_activities', 'it_wh_activities.id', '=', 'it_wh_activity_user.it_wh_activity_id')
+            ->selectRaw('users.id as user_id, users.name, it_wh_activities.status, count(*) as count')
+            ->groupBy('users.id', 'users.name', 'it_wh_activities.status')
+            ->get();
+
+        $nonAppActByPic = \Illuminate\Support\Facades\DB::table('it_wh_nonapp_activity_user')
+            ->join('users', 'users.id', '=', 'it_wh_nonapp_activity_user.user_id')
+            ->join('it_wh_nonapp_activities', 'it_wh_nonapp_activities.id', '=', 'it_wh_nonapp_activity_user.it_wh_nonapp_activity_id')
+            ->selectRaw('users.id as user_id, users.name, it_wh_nonapp_activities.status, count(*) as count')
+            ->groupBy('users.id', 'users.name', 'it_wh_nonapp_activities.status')
+            ->get();
+
+        $govActByPic = \Illuminate\Support\Facades\DB::table('it_wh_governance_activity_user')
+            ->join('users', 'users.id', '=', 'it_wh_governance_activity_user.user_id')
+            ->join('it_wh_governance_activities', 'it_wh_governance_activities.id', '=', 'it_wh_governance_activity_user.it_wh_governance_activity_id')
+            ->selectRaw('users.id as user_id, users.name, it_wh_governance_activities.status, count(*) as count')
+            ->groupBy('users.id', 'users.name', 'it_wh_governance_activities.status')
+            ->get();
+
+        $picSummary = collect();
+        foreach ([$appDevActByPic, $nonAppActByPic, $govActByPic] as $dataset) {
+            foreach ($dataset as $row) {
+                $key = $row->user_id;
+                if (!$picSummary->has($key)) {
+                    $picSummary->put($key, ['name' => $row->name, 'total' => 0, 'done' => 0]);
+                }
+                $entry = $picSummary->get($key);
+                $entry['total'] += $row->count;
+                if ($row->status === 'Done') $entry['done'] += $row->count;
+                $picSummary->put($key, $entry);
+            }
+        }
+        $picSummary = $picSummary->sortByDesc('total')->values();
+        $picNames = $picSummary->pluck('name')->toArray();
+        $picTotals = $picSummary->pluck('total')->toArray();
+        $picDone = $picSummary->pluck('done')->toArray();
+        $picProgress = $picSummary->map(fn($p) => $p['total'] > 0 ? round(($p['done'] / $p['total']) * 100) : 0)->toArray();
+
+        return view('it-work-hub.dashboard', compact(
+            'appDevStats', 'appDevTotal', 'appDevAvgProgress', 'appDevPriorityStats',
+            'nonAppStats', 'nonAppTotal', 'nonAppAvgProgress', 'nonAppPriorityStats',
+            'governanceStats', 'governancePriorityStats', 'governanceTotal', 'governanceAvgProgress',
+            'groupStats', 'groupTotal', 'groupAvgProgress',
+            'picSummary', 'picNames', 'picTotals', 'picDone', 'picProgress'
+        ));
     }
+
 
     public function longlist(Request $request)
     {
