@@ -11,12 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('it_wh_project_group_project', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('it_wh_project_group_id')->constrained()->onDelete('cascade');
-            $table->foreignId('it_wh_project_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('it_wh_project_group_project')) {
+            Schema::create('it_wh_project_group_project', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('it_wh_project_group_id')->constrained()->onDelete('cascade');
+                $table->foreignId('it_wh_project_id')->constrained()->onDelete('cascade');
+                $table->timestamps();
+            });
+        }
     }
 
     /**
