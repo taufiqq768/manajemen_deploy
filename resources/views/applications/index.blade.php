@@ -286,6 +286,11 @@
                             <input type="text" id="manual_version_input" name="version" required placeholder="contoh: 1.0.0"
                                    class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
                         </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-1.5">Catatan Perubahan / Rilis</label>
+                            <textarea id="manual_notes_input" name="release_notes" rows="3" placeholder="Keterangan perbaikan bug, fitur baru, dll."
+                                      class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                        </div>
                     </div>
                     <div class="flex items-center justify-end gap-3 pt-6 mt-6 border-t border-slate-800">
                         <button type="button" onclick="closeEditVersionModal()" class="px-5 py-2.5 text-sm text-slate-400 hover:text-white transition-colors">Batal</button>
@@ -490,6 +495,7 @@
             
             initialManualVersion = btn.dataset.version || '';
             document.getElementById('manual_version_input').value = initialManualVersion;
+            document.getElementById('manual_notes_input').value = '';
             
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -502,8 +508,9 @@
 
         function closeEditVersionModal() {
             const currentVal = document.getElementById('manual_version_input').value.trim();
-            if (currentVal !== initialManualVersion) {
-                if (!confirm('Ada perubahan versi yang belum disimpan. Yakin ingin membatalkan?')) {
+            const currentNotes = document.getElementById('manual_notes_input').value.trim();
+            if (currentVal !== initialManualVersion || currentNotes !== '') {
+                if (!confirm('Ada perubahan versi atau catatan yang belum disimpan. Yakin ingin membatalkan?')) {
                     return;
                 }
             }

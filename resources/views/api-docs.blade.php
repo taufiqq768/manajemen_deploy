@@ -180,6 +180,10 @@
                               type: "string",
                               example: "1.0.1"
                             },
+                            changelog: {
+                              type: "string",
+                              example: "Perubahan Kecil:\n- Perbaikan bug login\n- Penambahan field API key"
+                            },
                             updated_at: {
                               type: "string",
                               format: "date-time",

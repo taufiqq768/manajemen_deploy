@@ -157,10 +157,38 @@ class ApplicationController extends Controller
             ], 404);
         }
 
+        // Retrieve latest approved deploy request for release notes
+        $latestApproved = \App\Models\DeployRequest::where('application_id', $application->id)
+            ->where('status', 'approved')
+            ->where('version', $application->version)
+            ->latest('approved_at')
+            ->first();
+
+        $changelog = null;
+        if ($latestApproved) {
+            $releaseNotesRaw = $latestApproved->release_notes;
+            if (is_array($releaseNotesRaw)) {
+                $lines = [];
+                if (!empty($releaseNotesRaw['perubahan_besar'])) {
+                    $lines[] = "Perubahan Besar:\n" . $releaseNotesRaw['perubahan_besar'];
+                }
+                if (!empty($releaseNotesRaw['perubahan_kecil'])) {
+                    $lines[] = "Perubahan Kecil:\n" . $releaseNotesRaw['perubahan_kecil'];
+                }
+                if (!empty($releaseNotesRaw['bug_fixing'])) {
+                    $lines[] = "Bug Fixing:\n" . $releaseNotesRaw['bug_fixing'];
+                }
+                $changelog = implode("\n\n", $lines);
+            } else {
+                $changelog = (string) $releaseNotesRaw;
+            }
+        }
+
         return response()->json([
             'success' => true,
             'application' => $application->name,
             'version' => $application->version ?? '0.0.0',
+            'changelog' => $changelog,
             'updated_at' => $application->updated_at ? $application->updated_at->toIso8601String() : null
         ]);
     }
@@ -169,11 +197,21 @@ class ApplicationController extends Controller
     {
         $validated = $request->validate([
             'version' => 'required|string|max:50',
+            'release_notes' => 'nullable|string|max:1000',
         ]);
 
-        $application->update($validated);
+        $application->update(['version' => $validated['version']]);
 
         $message = 'Versi aplikasi ' . $application->name . ' berhasil diperbarui secara manual ke ' . $application->version;
+
+        if ($application->version_api_write) {
+            $pushResult = $application->pushVersionToRemote($validated['version'], $validated['release_notes']);
+            if ($pushResult['success']) {
+                $message .= ' dan sukses dikirim ke remote server.';
+            } else {
+                $message .= ', namun GAGAL mengirim ke remote server: ' . $pushResult['message'];
+            }
+        }
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
