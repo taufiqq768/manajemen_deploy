@@ -43,6 +43,7 @@ Route::middleware('auth')->group(function () {
 
     // Manajemen Aplikasi (khusus Admin)
     Route::middleware('role:admin')->group(function () {
+        Route::get('api-docs', fn() => view('api-docs'))->name('api-docs');
         Route::post('applications/sync', [ApplicationController::class, 'sync'])->name('applications.sync');
         Route::put('applications/{application}/version-api', [ApplicationController::class, 'updateVersionApi'])->name('applications.version-api.update');
         Route::put('applications/{application}/update-version', [ApplicationController::class, 'updateVersionManual'])->name('applications.version.update');
