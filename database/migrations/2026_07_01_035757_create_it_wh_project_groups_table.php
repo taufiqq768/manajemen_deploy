@@ -11,16 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('it_wh_project_groups', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('status')->default('Not Started');
-            $table->integer('progress')->default(0);
-            $table->date('deadline')->nullable();
-            $table->text('description')->nullable();
-            $table->integer('sort_order')->default(0);
-            $table->timestamps();
-        });
+        if (!Schema::hasTable('it_wh_project_groups')) {
+            Schema::create('it_wh_project_groups', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->string('status')->default('Not Started');
+                $table->integer('progress')->default(0);
+                $table->date('deadline')->nullable();
+                $table->text('description')->nullable();
+                $table->integer('sort_order')->default(0);
+                $table->timestamps();
+            });
+        }
     }
 
     /**

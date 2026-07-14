@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        if (!Schema::hasColumn('it_wh_todos', 'sort_order')) {
-            Schema::table('it_wh_todos', function (Blueprint $table) {
-                $table->integer('sort_order')->default(0)->after('notes');
+        if (Schema::hasColumn('it_wh_governances', 'status')) {
+            Schema::table('it_wh_governances', function (Blueprint $table) {
+                $table->dropColumn('status');
             });
         }
     }
@@ -23,8 +23,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('it_wh_todos', function (Blueprint $table) {
-            //
+        Schema::table('it_wh_governances', function (Blueprint $table) {
+            $table->string('status')->default('Not Started')->after('progress_notes');
         });
     }
 };

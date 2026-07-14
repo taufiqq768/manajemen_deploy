@@ -95,6 +95,21 @@ Route::middleware('auth')->group(function () {
             Route::delete('/documents/{id}', [\App\Http\Controllers\ItWorkHubNonAppController::class, 'destroyDocument'])->name('documents.destroy');
         });
 
+        // Governance
+        Route::prefix('governance')->name('governance.')->group(function () {
+            Route::get('/longlist', [\App\Http\Controllers\ItWhGovernanceController::class, 'longlist'])->name('longlist');
+            Route::post('/store', [\App\Http\Controllers\ItWhGovernanceController::class, 'store'])->name('store');
+            Route::get('/show/{id}', [\App\Http\Controllers\ItWhGovernanceController::class, 'show'])->name('show');
+            Route::post('/update/{id}', [\App\Http\Controllers\ItWhGovernanceController::class, 'update'])->name('update');
+            Route::delete('/destroy/{id}', [\App\Http\Controllers\ItWhGovernanceController::class, 'destroy'])->name('destroy');
+            
+            Route::get('/activities/{id}', [\App\Http\Controllers\ItWhGovernanceController::class, 'activities'])->name('activities');
+            Route::post('/activities/{id}/save', [\App\Http\Controllers\ItWhGovernanceController::class, 'updateActivities'])->name('activities.save');
+            
+            Route::post('/documents/{id}/save', [\App\Http\Controllers\ItWhGovernanceController::class, 'storeDocument'])->name('documents.save');
+            Route::delete('/documents/{id}', [\App\Http\Controllers\ItWhGovernanceController::class, 'destroyDocument'])->name('documents.destroy');
+        });
+
         Route::get('/repository', [\App\Http\Controllers\ItWorkHubController::class, 'repository'])->name('repository');
         Route::get('/project-groups', [\App\Http\Controllers\ItWorkHubController::class, 'projectGroups'])->name('project-groups');
         Route::post('/project-groups/save', [\App\Http\Controllers\ItWorkHubController::class, 'updateProjectGroups'])->name('project-groups.save');
