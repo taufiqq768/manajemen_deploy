@@ -36,6 +36,16 @@ Route::middleware('auth')->group(function () {
     Route::post('/programmer/applications/{application}/cr', [\App\Http\Controllers\ChangeRequestController::class, 'store'])
         ->name('programmer.applications.cr.store');
 
+    // Programmer Kanban Notes
+    Route::post('/programmer/applications/{application}/notes', [\App\Http\Controllers\NoteController::class, 'store'])
+        ->name('programmer.applications.notes.store');
+    Route::put('/notes/{note}', [\App\Http\Controllers\NoteController::class, 'update'])
+        ->name('notes.update');
+    Route::post('/notes/{note}/move', [\App\Http\Controllers\NoteController::class, 'move'])
+        ->name('notes.move');
+    Route::delete('/notes/{note}', [\App\Http\Controllers\NoteController::class, 'destroy'])
+        ->name('notes.destroy');
+
     // Deploy Requests — CRUD
     Route::resource('deploy-requests', DeployRequestController::class)
         ->except(['destroy']);

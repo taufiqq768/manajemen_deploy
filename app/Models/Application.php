@@ -51,6 +51,12 @@ class Application extends Model
         return $this->hasMany(ChangeRequest::class);
     }
 
+    /** Semua catatan (Kanban) untuk aplikasi ini */
+    public function notes()
+    {
+        return $this->hasMany(Note::class);
+    }
+
     /** Push version to remote server via API Write */
     public function pushVersionToRemote($version = null, $releaseNotes = '')
     {
