@@ -74,17 +74,12 @@
                         </td>
                         <td class="px-5 py-4">
                             <button type="button" 
-                               onclick="openVersionApiModal(this)"
+                               onclick="openEditVersionModal(this)"
                                data-id="{{ $app->id }}"
                                data-name="{{ $app->name }}"
-                               data-api-get="{{ $app->version_api_get }}"
-                               data-api-write="{{ $app->version_api_write }}"
-                               data-api-key="{{ $app->version_api_key }}"
-                               data-api-write-key="{{ $app->version_api_write_key }}"
-                               data-api-write-notes-key="{{ $app->version_api_write_notes_key }}"
                                data-version="{{ $app->version }}"
                                class="text-indigo-400 hover:text-indigo-300 underline font-medium focus:outline-none"
-                               title="Klik untuk atur API Versi">
+                               title="Klik untuk ubah versi secara manual">
                                 {{ $app->version ?? '—' }}
                             </button>
                         </td>
@@ -132,6 +127,18 @@
                                     </button>
                                 </form>
                                 @endif
+                                <button type="button" 
+                                   onclick="openVersionApiModal(this)"
+                                   data-id="{{ $app->id }}"
+                                   data-name="{{ $app->name }}"
+                                   data-api-write="{{ $app->version_api_write }}"
+                                   data-api-write-key="{{ $app->version_api_write_key }}"
+                                   data-api-write-notes-key="{{ $app->version_api_write_notes_key }}"
+                                   data-version="{{ $app->version }}"
+                                   class="text-indigo-400 hover:text-indigo-300 text-xs transition-colors"
+                                   title="Klik untuk atur API Versi Write">
+                                    API
+                                </button>
                                 <button type="button" 
                                    onclick="openEditModal(this)"
                                    data-id="{{ $app->id }}"
@@ -257,6 +264,32 @@
                             <button type="button" onclick="closeVersionApiModal()" class="px-5 py-2.5 text-sm text-slate-400 hover:text-white transition-colors">Batal</button>
                             <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors">Simpan</button>
                         </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Version Modal -->
+    <div id="editVersionModal" class="fixed inset-0 z-50 hidden bg-black/60 items-center justify-center p-4">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-md shadow-xl transform scale-95 opacity-0 transition-all duration-200" id="editVersionModalContent">
+            <div class="p-6 sm:p-8 flex-shrink-0 border-b border-slate-800 flex justify-between items-center">
+                <h2 class="text-lg font-bold text-white">Ubah Versi Manual</h2>
+                <span id="version_edit_app_name" class="text-indigo-400 font-medium"></span>
+            </div>
+            <div class="p-6 sm:p-8">
+                <form id="editVersionForm" method="POST" action="">
+                    @csrf @method('PUT')
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-300 mb-1.5">Versi Baru Aplikasi</label>
+                            <input type="text" id="manual_version_input" name="version" required placeholder="contoh: 1.0.0"
+                                   class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-end gap-3 pt-6 mt-6 border-t border-slate-800">
+                        <button type="button" onclick="closeEditVersionModal()" class="px-5 py-2.5 text-sm text-slate-400 hover:text-white transition-colors">Batal</button>
+                        <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors">Simpan</button>
                     </div>
                 </form>
             </div>
@@ -429,6 +462,88 @@
                 if (data.success) {
                     alert(data.message);
                     closeVersionApiModal();
+                    window.location.reload();
+                } else {
+                    alert('Gagal menyimpan: ' + (data.message || 'Terjadi kesalahan'));
+                    btn.disabled = false;
+                    btn.classList.remove('cursor-not-allowed', 'opacity-50');
+                    btn.textContent = originalText;
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Terjadi kesalahan koneksi saat menyimpan.');
+                btn.disabled = false;
+                btn.classList.remove('cursor-not-allowed', 'opacity-50');
+                btn.textContent = originalText;
+            });
+        });
+
+        let initialManualVersion = '';
+        function openEditVersionModal(btn) {
+            const modal = document.getElementById('editVersionModal');
+            const content = document.getElementById('editVersionModalContent');
+            const form = document.getElementById('editVersionForm');
+            
+            form.action = `/applications/${btn.dataset.id}/update-version`;
+            document.getElementById('version_edit_app_name').textContent = `(${btn.dataset.name})`;
+            
+            initialManualVersion = btn.dataset.version || '';
+            document.getElementById('manual_version_input').value = initialManualVersion;
+            
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            document.getElementById('manual_version_input').focus();
+        }
+
+        function closeEditVersionModal() {
+            const currentVal = document.getElementById('manual_version_input').value.trim();
+            if (currentVal !== initialManualVersion) {
+                if (!confirm('Ada perubahan versi yang belum disimpan. Yakin ingin membatalkan?')) {
+                    return;
+                }
+            }
+            const modal = document.getElementById('editVersionModal');
+            const content = document.getElementById('editVersionModalContent');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.remove('flex');
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        // Intercept Simpan Versi Manual menggunakan AJAX
+        document.getElementById('editVersionForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const form = this;
+            const btn = form.querySelector('button[type="submit"]');
+            const originalText = btn.textContent;
+            
+            btn.disabled = true;
+            btn.classList.add('cursor-not-allowed', 'opacity-50');
+            btn.textContent = 'Menyimpan...';
+            
+            const formData = new FormData(form);
+            
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    closeEditVersionModal();
                     window.location.reload();
                 } else {
                     alert('Gagal menyimpan: ' + (data.message || 'Terjadi kesalahan'));

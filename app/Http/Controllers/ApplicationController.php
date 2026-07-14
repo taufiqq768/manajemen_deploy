@@ -164,4 +164,25 @@ class ApplicationController extends Controller
             'updated_at' => $application->updated_at ? $application->updated_at->toIso8601String() : null
         ]);
     }
+
+    public function updateVersionManual(Request $request, Application $application)
+    {
+        $validated = $request->validate([
+            'version' => 'required|string|max:50',
+        ]);
+
+        $application->update($validated);
+
+        $message = 'Versi aplikasi ' . $application->name . ' berhasil diperbarui secara manual ke ' . $application->version;
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+                'version' => $application->version
+            ]);
+        }
+
+        return redirect()->route('applications.index')->with('success', $message);
+    }
 }
