@@ -89,48 +89,12 @@ class ApplicationController extends Controller
             ->with('success', 'Aplikasi berhasil diperbarui.');
     }
 
-    public function updateVersionApi(Request $request, Application $application)
-    {
-        $validated = $request->validate([
-            'version_api_write' => 'nullable|url|max:255',
-            'version_api_write_key' => 'nullable|string|max:100',
-            'version_api_write_notes_key' => 'nullable|string|max:100',
-        ]);
-
-        $application->update($validated);
-
-        $message = 'Konfigurasi API Versi Write untuk ' . $application->name . ' berhasil diperbarui.';
-
-        if ($request->ajax() || $request->wantsJson()) {
-            return response()->json([
-                'success' => true,
-                'message' => $message,
-                'version' => $application->version
-            ]);
-        }
-
-        return redirect()->route('applications.index')->with('success', $message);
-    }
-
     public function destroy(Application $application)
     {
         $application->delete();
 
         return redirect()->route('applications.index')
             ->with('success', 'Aplikasi berhasil dihapus.');
-    }
-
-    public function pushVersion(Application $application)
-    {
-        $result = $application->pushVersionToRemote();
-
-        if ($result['success']) {
-            return redirect()->route('applications.index')
-                ->with('success', "Sukses push versi: {$result['message']}");
-        } else {
-            return redirect()->route('applications.index')
-                ->with('error', "Gagal push versi: {$result['message']}");
-        }
     }
 
     public function getVersion(Request $request)
@@ -184,6 +148,17 @@ class ApplicationController extends Controller
             }
         }
 
+        // Fallback to the manual version log notes if no deploy request notes found
+        if (empty($changelog)) {
+            $latestManual = \App\Models\VersionLog::where('application_id', $application->id)
+                ->where('new_version', $application->version)
+                ->latest()
+                ->first();
+            if ($latestManual) {
+                $changelog = $latestManual->message;
+            }
+        }
+
         return response()->json([
             'success' => true,
             'application' => $application->name,
@@ -200,18 +175,23 @@ class ApplicationController extends Controller
             'release_notes' => 'nullable|string|max:1000',
         ]);
 
-        $application->update(['version' => $validated['version']]);
+        $oldVersion = $application->version;
+        $application->update([
+            'version' => $validated['version'],
+            'synced_at' => now()
+        ]);
+
+        \App\Models\VersionLog::create([
+            'application_id' => $application->id,
+            'type' => 'manual',
+            'old_version' => $oldVersion,
+            'new_version' => $validated['version'],
+            'status' => 'success',
+            'message' => $validated['release_notes'] ?: 'Diperbarui secara manual.',
+            'created_at' => now(),
+        ]);
 
         $message = 'Versi aplikasi ' . $application->name . ' berhasil diperbarui secara manual ke ' . $application->version;
-
-        if ($application->version_api_write) {
-            $pushResult = $application->pushVersionToRemote($validated['version'], $validated['release_notes']);
-            if ($pushResult['success']) {
-                $message .= ' dan sukses dikirim ke remote server.';
-            } else {
-                $message .= ', namun GAGAL mengirim ke remote server: ' . $pushResult['message'];
-            }
-        }
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([

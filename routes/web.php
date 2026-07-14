@@ -38,16 +38,12 @@ Route::middleware('auth')->group(function () {
         ->name('deploy-requests.approve');
     Route::post('/deploy-requests/{deployRequest}/reject', [DeployRequestController::class, 'reject'])
         ->name('deploy-requests.reject');
-    Route::post('/deploy-requests/{deployRequest}/retry-push', [DeployRequestController::class, 'retryPush'])
-        ->name('deploy-requests.retry-push');
 
     // Manajemen Aplikasi (khusus Admin)
     Route::middleware('role:admin')->group(function () {
         Route::get('api-docs', fn() => view('api-docs'))->name('api-docs');
         Route::post('applications/sync', [ApplicationController::class, 'sync'])->name('applications.sync');
-        Route::put('applications/{application}/version-api', [ApplicationController::class, 'updateVersionApi'])->name('applications.version-api.update');
         Route::put('applications/{application}/update-version', [ApplicationController::class, 'updateVersionManual'])->name('applications.version.update');
-        Route::post('applications/{application}/push-version', [ApplicationController::class, 'pushVersion'])->name('applications.push-version');
         Route::resource('applications', ApplicationController::class);
     });
 

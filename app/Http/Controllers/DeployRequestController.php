@@ -285,84 +285,6 @@ class DeployRequestController extends Controller
             'synced_at' => now(),
         ]);
 
-        // Panggil API Write jika dikonfigurasi
-        $apiError = null;
-        if ($application->version_api_write) {
-            try {
-                $writeKey = $application->version_api_write_key ?: 'version';
-                $notesKey = $application->version_api_write_notes_key ?: 'release_notes';
-                
-                $releaseNotesRaw = $deployRequest->release_notes;
-                $releaseNotesText = '';
-                if (is_array($releaseNotesRaw)) {
-                    $lines = [];
-                    if (!empty($releaseNotesRaw['perubahan_besar'])) {
-                        $lines[] = "• Perubahan Besar:\n" . $releaseNotesRaw['perubahan_besar'];
-                    }
-                    if (!empty($releaseNotesRaw['perubahan_kecil'])) {
-                        $lines[] = "• Perubahan Kecil:\n" . $releaseNotesRaw['perubahan_kecil'];
-                    }
-                    if (!empty($releaseNotesRaw['bug_fixing'])) {
-                        $lines[] = "• Bug Fixing:\n" . $releaseNotesRaw['bug_fixing'];
-                    }
-                    $releaseNotesText = implode("\n\n", $lines);
-                } else {
-                    $releaseNotesText = (string) $releaseNotesRaw;
-                }
-                
-                $payload = [
-                    $writeKey => $newVersion,
-                    $notesKey => $releaseNotesText,
-                ];
-                
-                $payloadJson = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
-                
-                $response = \Illuminate\Support\Facades\Http::timeout(5)
-                    ->post($application->version_api_write, $payload);
-                    
-                $responseBody = $response->body();
-                
-                if (!$response->successful()) {
-                    $apiError = "Respon HTTP " . $response->status();
-                    \Illuminate\Support\Facades\Log::warning("Gagal push versi ke API Write {$application->name}: " . $apiError);
-                    
-                    \App\Models\VersionLog::create([
-                        'application_id' => $application->id,
-                        'type' => 'write',
-                        'old_version' => $oldVersion,
-                        'new_version' => $newVersion,
-                        'status' => 'failed',
-                        'message' => "Gagal push versi: Respon HTTP {$response->status()}.\n\n[PAYLOAD REQUEST]:\n{$payloadJson}\n\n[RESPON SERVER]:\n{$responseBody}",
-                        'created_at' => now(),
-                    ]);
-                } else {
-                    \App\Models\VersionLog::create([
-                        'application_id' => $application->id,
-                        'type' => 'write',
-                        'old_version' => $oldVersion,
-                        'new_version' => $newVersion,
-                        'status' => 'success',
-                        'message' => "Berhasil push versi.\n\n[PAYLOAD REQUEST]:\n{$payloadJson}\n\n[RESPON SERVER]:\n{$responseBody}",
-                        'created_at' => now(),
-                    ]);
-                }
-            } catch (\Throwable $e) {
-                $apiError = "Koneksi gagal";
-                \Illuminate\Support\Facades\Log::warning("Gagal push versi ke API Write {$application->name}: " . $e->getMessage());
-                
-                $payloadJson = isset($payload) ? json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT) : '{}';
-                \App\Models\VersionLog::create([
-                    'application_id' => $application->id,
-                    'type' => 'write',
-                    'old_version' => $oldVersion,
-                    'new_version' => $newVersion,
-                    'status' => 'failed',
-                    'message' => "Error koneksi ke API Write: {$e->getMessage()}.\n\n[PAYLOAD REQUEST]:\n{$payloadJson}",
-                    'created_at' => now(),
-                ]);
-            }
-        }
-
         // Beritahu requester (programmer) via in-app + WA + email
         $requester = $deployRequest->requester;
         $appName = $application->name;
@@ -376,12 +298,7 @@ class DeployRequestController extends Controller
             type: 'approved',
         );
 
-        $successMsg = 'Request deploy telah disetujui.';
-        if ($apiError) {
-            $successMsg .= " (Peringatan: Gagal memperbarui versi via API Write: {$apiError})";
-        }
-
-        return back()->with('success', $successMsg);
+        return back()->with('success', 'Request deploy telah disetujui.');
     }
 
     /** Reject (Project Manager) */
@@ -413,37 +330,5 @@ class DeployRequestController extends Controller
         );
 
         return back()->with('error', 'Request deploy telah ditolak.');
-    }
-
-    /** Retry pushing version to remote server */
-    public function retryPush(DeployRequest $deployRequest)
-    {
-        $application = $deployRequest->application;
-        
-        $releaseNotesRaw = $deployRequest->release_notes;
-        $releaseNotesText = '';
-        if (is_array($releaseNotesRaw)) {
-            $lines = [];
-            if (!empty($releaseNotesRaw['perubahan_besar'])) {
-                $lines[] = "• Perubahan Besar:\n" . $releaseNotesRaw['perubahan_besar'];
-            }
-            if (!empty($releaseNotesRaw['perubahan_kecil'])) {
-                $lines[] = "• Perubahan Kecil:\n" . $releaseNotesRaw['perubahan_kecil'];
-            }
-            if (!empty($releaseNotesRaw['bug_fixing'])) {
-                $lines[] = "• Bug Fixing:\n" . $releaseNotesRaw['bug_fixing'];
-            }
-            $releaseNotesText = implode("\n\n", $lines);
-        } else {
-            $releaseNotesText = (string) $releaseNotesRaw;
-        }
-
-        $result = $application->pushVersionToRemote($deployRequest->version, $releaseNotesText);
-
-        if ($result['success']) {
-            return back()->with('success', "Sukses push versi: {$result['message']}");
-        } else {
-            return back()->with('error', "Gagal push versi: {$result['message']}");
-        }
     }
 }

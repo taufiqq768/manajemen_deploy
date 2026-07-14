@@ -118,27 +118,6 @@
                         </td>
                         <td class="px-5 py-4 text-right">
                             <div class="flex items-center justify-end gap-3">
-                                @if($app->version_api_write)
-                                <form method="POST" action="{{ route('applications.push-version', $app) }}"
-                                      onsubmit="return confirm('Kirim/push pembaruan versi {{ $app->version }} ke remote server?')">
-                                    @csrf
-                                    <button type="submit" class="text-emerald-400 hover:text-emerald-300 text-xs transition-colors" title="Kirim paksa versi lokal ke remote server">
-                                        Push
-                                    </button>
-                                </form>
-                                @endif
-                                <button type="button" 
-                                   onclick="openVersionApiModal(this)"
-                                   data-id="{{ $app->id }}"
-                                   data-name="{{ $app->name }}"
-                                   data-api-write="{{ $app->version_api_write }}"
-                                   data-api-write-key="{{ $app->version_api_write_key }}"
-                                   data-api-write-notes-key="{{ $app->version_api_write_notes_key }}"
-                                   data-version="{{ $app->version }}"
-                                   class="text-indigo-400 hover:text-indigo-300 text-xs transition-colors"
-                                   title="Klik untuk atur API Versi Write">
-                                    API
-                                </button>
                                 <button type="button" 
                                    onclick="openEditModal(this)"
                                    data-id="{{ $app->id }}"
@@ -227,49 +206,6 @@
         </div>
     </div>
 
-    <!-- Version API Modal -->
-    <div id="versionApiModal" class="fixed inset-0 z-50 hidden bg-black/60 items-center justify-center p-4">
-        <div class="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-lg shadow-xl transform scale-95 opacity-0 transition-all duration-200" id="versionApiModalContent">
-            <div class="p-6 sm:p-8 flex-shrink-0 border-b border-slate-800 flex justify-between items-center">
-                <h2 class="text-lg font-bold text-white">Atur API Versi Write <span id="version_modal_app_name" class="text-indigo-400 font-medium"></span></h2>
-                <div class="text-sm text-slate-400">
-                    Versi Saat Ini: <span id="version_modal_current_version" class="text-emerald-400 font-semibold"></span>
-                </div>
-            </div>
-            <div class="p-6 sm:p-8">
-                <form id="versionApiForm" method="POST" action="">
-                    @csrf @method('PUT')
-                    <div class="space-y-5">
-                        <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-1.5">API Write / Update Versi</label>
-                            <input type="url" id="version_api_write" name="version_api_write" placeholder="https://api.example.com/update-version"
-                                   class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <p class="text-xs text-slate-500 mt-1.5">Endpoint API untuk menulis / memperbarui status versi aplikasi.</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-1.5">Key Parameter Versi (API Write)</label>
-                            <input type="text" id="version_api_write_key" name="version_api_write_key" placeholder="contoh: version, atau no_versi"
-                                   class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <p class="text-xs text-slate-500 mt-1.5">Key payload JSON untuk data nomor versi (default: <code>version</code>).</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-1.5">Key Parameter Catatan Rilis (API Write)</label>
-                            <input type="text" id="version_api_write_notes_key" name="version_api_write_notes_key" placeholder="contoh: release_notes, atau keterangan"
-                                   class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <p class="text-xs text-slate-500 mt-1.5">Key payload JSON untuk data catatan rilis/release notes (default: <code>release_notes</code>).</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center justify-end pt-6 mt-6 border-t border-slate-800">
-                        <div class="flex items-center gap-3">
-                            <button type="button" onclick="closeVersionApiModal()" class="px-5 py-2.5 text-sm text-slate-400 hover:text-white transition-colors">Batal</button>
-                            <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors">Simpan</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- Edit Version Modal -->
     <div id="editVersionModal" class="fixed inset-0 z-50 hidden bg-black/60 items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-md shadow-xl transform scale-95 opacity-0 transition-all duration-200" id="editVersionModalContent">
@@ -305,11 +241,6 @@
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
     <script>
         let tsInstance = null;
-        let initialApiGet = '';
-        let initialApiWrite = '';
-        let initialApiKey = '';
-        let initialApiWriteKey = '';
-        let initialApiWriteNotesKey = '';
         function openEditModal(btn) {
             const modal = document.getElementById('editModal');
             const content = document.getElementById('editModalContent');
@@ -394,95 +325,7 @@
             }, 200);
         }
 
-        function openVersionApiModal(btn) {
-            const modal = document.getElementById('versionApiModal');
-            const content = document.getElementById('versionApiModalContent');
-            const form = document.getElementById('versionApiForm');
-            
-            form.action = `/applications/${btn.dataset.id}/version-api`;
-            document.getElementById('version_modal_app_name').textContent = `(${btn.dataset.name})`;
-            document.getElementById('version_modal_current_version').textContent = btn.dataset.version || '—';
-            
-            initialApiWrite = btn.dataset.apiWrite || '';
-            initialApiWriteKey = btn.dataset.apiWriteKey || 'version';
-            initialApiWriteNotesKey = btn.dataset.apiWriteNotesKey || 'release_notes';
 
-            document.getElementById('version_api_write').value = initialApiWrite;
-            document.getElementById('version_api_write_key').value = initialApiWriteKey;
-            document.getElementById('version_api_write_notes_key').value = initialApiWriteNotesKey;
-            
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            setTimeout(() => {
-                content.classList.remove('scale-95', 'opacity-0');
-                content.classList.add('scale-100', 'opacity-100');
-            }, 10);
-        }
-
-        function closeVersionApiModal(force = false) {
-            const currentWrite = document.getElementById('version_api_write').value.trim();
-            const currentWriteKey = document.getElementById('version_api_write_key').value.trim();
-            const currentWriteNotesKey = document.getElementById('version_api_write_notes_key').value.trim();
-            
-            if (!force && (currentWrite !== initialApiWrite || currentWriteKey !== initialApiWriteKey || currentWriteNotesKey !== initialApiWriteNotesKey)) {
-                if (!confirm('Ada perubahan konfigurasi API yang belum disimpan. Yakin ingin membatalkan?')) {
-                    return;
-                }
-            }
-
-            const modal = document.getElementById('versionApiModal');
-            const content = document.getElementById('versionApiModalContent');
-            content.classList.remove('scale-100', 'opacity-100');
-            content.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => {
-                modal.classList.remove('flex');
-                modal.classList.add('hidden');
-            }, 200);
-        }
-
-        // Intercept Simpan API Versi menggunakan AJAX
-        document.getElementById('versionApiForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const form = this;
-            const btn = form.querySelector('button[type="submit"]');
-            const originalText = btn.textContent;
-            
-            btn.disabled = true;
-            btn.classList.add('cursor-not-allowed', 'opacity-50');
-            btn.textContent = 'Menyimpan...';
-            
-            const formData = new FormData(form);
-            
-            fetch(form.action, {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    closeVersionApiModal();
-                    window.location.reload();
-                } else {
-                    alert('Gagal menyimpan: ' + (data.message || 'Terjadi kesalahan'));
-                    btn.disabled = false;
-                    btn.classList.remove('cursor-not-allowed', 'opacity-50');
-                    btn.textContent = originalText;
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert('Terjadi kesalahan koneksi saat menyimpan.');
-                btn.disabled = false;
-                btn.classList.remove('cursor-not-allowed', 'opacity-50');
-                btn.textContent = originalText;
-            });
-        });
 
         let initialManualVersion = '';
         function openEditVersionModal(btn) {
