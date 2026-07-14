@@ -51,16 +51,7 @@
                 <thead class="bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 text-xs uppercase tracking-wider">
                     <tr>
                         <th class="px-5 py-3 text-left">Nama Aplikasi</th>
-                        <th class="px-5 py-3 text-left">
-                            <div class="flex items-center gap-1.5">
-                                <span>Versi</span>
-                                <button type="button" id="btnRefreshVersions" onclick="ajaxRefreshVersions()" title="Refresh semua versi aplikasi" class="text-slate-400 hover:text-slate-800 dark:hover:text-white transition-colors focus:outline-none p-0.5 rounded hover:bg-slate-200 dark:hover:bg-slate-800">
-                                    <svg id="iconRefreshVersions" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </th>
+                        <th class="px-5 py-3 text-left">Versi</th>
                         <th class="px-5 py-3 text-left">URL Live</th>
                         <th class="px-5 py-3 text-left">Repository</th>
                         <th class="px-5 py-3 text-left">PIC</th>
@@ -233,7 +224,7 @@
     <div id="versionApiModal" class="fixed inset-0 z-50 hidden bg-black/60 items-center justify-center p-4">
         <div class="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-lg shadow-xl transform scale-95 opacity-0 transition-all duration-200" id="versionApiModalContent">
             <div class="p-6 sm:p-8 flex-shrink-0 border-b border-slate-800 flex justify-between items-center">
-                <h2 class="text-lg font-bold text-white">Atur API Versi <span id="version_modal_app_name" class="text-indigo-400 font-medium"></span></h2>
+                <h2 class="text-lg font-bold text-white">Atur API Versi Write <span id="version_modal_app_name" class="text-indigo-400 font-medium"></span></h2>
                 <div class="text-sm text-slate-400">
                     Versi Saat Ini: <span id="version_modal_current_version" class="text-emerald-400 font-semibold"></span>
                 </div>
@@ -242,18 +233,6 @@
                 <form id="versionApiForm" method="POST" action="">
                     @csrf @method('PUT')
                     <div class="space-y-5">
-                        <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-1.5">API GET Versi Aplikasi</label>
-                            <input type="url" id="version_api_get" name="version_api_get" placeholder="https://api.example.com/version"
-                                   class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <p class="text-xs text-slate-500 mt-1.5">Endpoint GET untuk mengambil versi aplikasi yang berjalan saat ini.</p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-slate-300 mb-1.5">Key Field Respon API (JSON)</label>
-                            <input type="text" id="version_api_key" name="version_api_key" placeholder="contoh: version, atau data.no_versi"
-                                   class="w-full bg-slate-800 border border-slate-700 text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <p class="text-xs text-slate-500 mt-1.5">Key path JSON respons API (misal <code>version</code>, <code>data.no_versi</code>).</p>
-                        </div>
                         <div>
                             <label class="block text-sm font-medium text-slate-300 mb-1.5">API Write / Update Versi</label>
                             <input type="url" id="version_api_write" name="version_api_write" placeholder="https://api.example.com/update-version"
@@ -273,16 +252,7 @@
                             <p class="text-xs text-slate-500 mt-1.5">Key payload JSON untuk data catatan rilis/release notes (default: <code>release_notes</code>).</p>
                         </div>
                     </div>
-                    <div class="flex items-center justify-between pt-6 mt-6 border-t border-slate-800">
-                        <div>
-                            <button type="button" id="btnTestVersionApi" onclick="testVersionApi()" 
-                                    class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-indigo-400 hover:text-indigo-300 text-xs font-medium rounded-lg transition-colors border border-slate-700 inline-flex items-center gap-1.5 focus:outline-none">
-                                <svg id="iconTestVersionApi" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Tes Get Versi
-                            </button>
-                        </div>
+                    <div class="flex items-center justify-end pt-6 mt-6 border-t border-slate-800">
                         <div class="flex items-center gap-3">
                             <button type="button" onclick="closeVersionApiModal()" class="px-5 py-2.5 text-sm text-slate-400 hover:text-white transition-colors">Batal</button>
                             <button type="submit" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-lg transition-colors">Simpan</button>
@@ -395,15 +365,11 @@
             document.getElementById('version_modal_app_name').textContent = `(${btn.dataset.name})`;
             document.getElementById('version_modal_current_version').textContent = btn.dataset.version || '—';
             
-            initialApiGet = btn.dataset.apiGet || '';
             initialApiWrite = btn.dataset.apiWrite || '';
-            initialApiKey = btn.dataset.apiKey || '';
             initialApiWriteKey = btn.dataset.apiWriteKey || 'version';
             initialApiWriteNotesKey = btn.dataset.apiWriteNotesKey || 'release_notes';
 
-            document.getElementById('version_api_get').value = initialApiGet;
             document.getElementById('version_api_write').value = initialApiWrite;
-            document.getElementById('version_api_key').value = initialApiKey;
             document.getElementById('version_api_write_key').value = initialApiWriteKey;
             document.getElementById('version_api_write_notes_key').value = initialApiWriteNotesKey;
             
@@ -416,13 +382,11 @@
         }
 
         function closeVersionApiModal(force = false) {
-            const currentGet = document.getElementById('version_api_get').value.trim();
             const currentWrite = document.getElementById('version_api_write').value.trim();
-            const currentKey = document.getElementById('version_api_key').value.trim();
             const currentWriteKey = document.getElementById('version_api_write_key').value.trim();
             const currentWriteNotesKey = document.getElementById('version_api_write_notes_key').value.trim();
             
-            if (!force && (currentGet !== initialApiGet || currentWrite !== initialApiWrite || currentKey !== initialApiKey || currentWriteKey !== initialApiWriteKey || currentWriteNotesKey !== initialApiWriteNotesKey)) {
+            if (!force && (currentWrite !== initialApiWrite || currentWriteKey !== initialApiWriteKey || currentWriteNotesKey !== initialApiWriteNotesKey)) {
                 if (!confirm('Ada perubahan konfigurasi API yang belum disimpan. Yakin ingin membatalkan?')) {
                     return;
                 }
@@ -436,101 +400,6 @@
                 modal.classList.remove('flex');
                 modal.classList.add('hidden');
             }, 200);
-        }
-
-        function ajaxRefreshVersions() {
-            const btn = document.getElementById('btnRefreshVersions');
-            const icon = document.getElementById('iconRefreshVersions');
-            
-            if (btn.disabled) return;
-            
-            btn.disabled = true;
-            btn.classList.add('cursor-not-allowed', 'opacity-50');
-            icon.classList.add('animate-spin', 'text-indigo-400');
-            
-            fetch('{{ route('applications.refresh-versions') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(data.message);
-                    window.location.reload();
-                } else {
-                    alert('Gagal me-refresh versi: ' + (data.message || 'Terjadi kesalahan'));
-                    btn.disabled = false;
-                    btn.classList.remove('cursor-not-allowed', 'opacity-50');
-                    icon.classList.remove('animate-spin', 'text-indigo-400');
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert('Terjadi kesalahan koneksi saat me-refresh versi.');
-                btn.disabled = false;
-                btn.classList.remove('cursor-not-allowed', 'opacity-50');
-                icon.classList.remove('animate-spin', 'text-indigo-400');
-            });
-        }
-
-        function testVersionApi() {
-            const urlInput = document.getElementById('version_api_get');
-            const keyInput = document.getElementById('version_api_key');
-            const btn = document.getElementById('btnTestVersionApi');
-            const icon = document.getElementById('iconTestVersionApi');
-            
-            const url = urlInput.value.trim();
-            const key = keyInput.value.trim();
-            
-            if (!url) {
-                alert('Harap isi API GET Versi Aplikasi terlebih dahulu.');
-                urlInput.focus();
-                return;
-            }
-            
-            if (btn.disabled) return;
-            
-            btn.disabled = true;
-            btn.classList.add('cursor-not-allowed', 'opacity-50');
-            icon.classList.add('animate-spin');
-            
-            fetch('{{ route('applications.test-version-api') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                    'Accept': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({
-                    version_api_get: url,
-                    version_api_key: key
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Koneksi Sukses!\nVersi Terbaca: ' + data.version);
-                    // Update versi saat ini di modal secara real-time
-                    document.getElementById('version_modal_current_version').textContent = data.version;
-                } else {
-                    alert('Koneksi Gagal!\nDetail: ' + (data.message || 'Respons tidak valid'));
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert('Terjadi kesalahan koneksi saat menghubungi endpoint uji coba.');
-            })
-            .finally(() => {
-                btn.disabled = false;
-                btn.classList.remove('cursor-not-allowed', 'opacity-50');
-                icon.classList.remove('animate-spin');
-            });
         }
 
         // Intercept Simpan API Versi menggunakan AJAX
