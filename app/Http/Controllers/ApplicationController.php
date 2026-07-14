@@ -132,4 +132,36 @@ class ApplicationController extends Controller
                 ->with('error', "Gagal push versi: {$result['message']}");
         }
     }
+
+    public function getVersion(Request $request)
+    {
+        $query = Application::query();
+
+        if ($request->has('api_id')) {
+            $query->where('api_id', $request->api_id);
+        } elseif ($request->has('name')) {
+            $query->where('name', $request->name);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'Parameter "name" atau "api_id" wajib diisi.'
+            ], 400);
+        }
+
+        $application = $query->first();
+
+        if (!$application) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Aplikasi tidak ditemukan.'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'application' => $application->name,
+            'version' => $application->version ?? '0.0.0',
+            'updated_at' => $application->updated_at ? $application->updated_at->toIso8601String() : null
+        ]);
+    }
 }

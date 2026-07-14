@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Route;
 
 /* ── Public ───────────────────────────────────────────── */
 Route::get('/', fn() => redirect()->route('dashboard'));
+Route::get('/api/version', [ApplicationController::class, 'getVersion']);
 
 if (file_exists(__DIR__ . '/dev.php')) {
     require __DIR__ . '/dev.php';
