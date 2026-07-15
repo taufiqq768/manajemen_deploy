@@ -131,6 +131,7 @@ class ItWhGovernanceController extends Controller
                 'activities.*.adjustment_date' => 'nullable|date',
                 'activities.*.notes' => 'nullable|string',
                 'activities.*.status' => 'required|string',
+                'activities.*.progress' => 'required|integer|min:0|max:100',
                 'activities.*.sort_order' => 'required|integer',
                 'activities.*.pics' => 'nullable|array',
                 'activities.*.pics.*' => 'exists:users,id',
@@ -154,6 +155,7 @@ class ItWhGovernanceController extends Controller
                         'adjustment_date' => $actData['adjustment_date'] ?: null,
                         'notes' => $actData['notes'] ?? null,
                         'status' => $actData['status'],
+                        'progress' => $actData['progress'],
                         'sort_order' => $actData['sort_order'],
                     ]
                 );

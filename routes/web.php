@@ -62,6 +62,7 @@ Route::middleware('auth')->group(function () {
     // IT Work Hub
     Route::prefix('it-work-hub')->name('it-work-hub.')->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\ItWorkHubController::class, 'dashboard'])->name('dashboard');
+        Route::get('/overdue-activities', [\App\Http\Controllers\ItWorkHubController::class, 'overdueActivities'])->name('overdue-activities');
         Route::get('/longlist', [\App\Http\Controllers\ItWorkHubController::class, 'longlist'])->name('longlist');
         Route::get('/create', [\App\Http\Controllers\ItWorkHubController::class, 'create'])->name('create');
         Route::post('/store', [\App\Http\Controllers\ItWorkHubController::class, 'store'])->name('store');
@@ -99,6 +100,7 @@ Route::middleware('auth')->group(function () {
         Route::prefix('governance')->name('governance.')->group(function () {
             Route::get('/longlist', [\App\Http\Controllers\ItWhGovernanceController::class, 'longlist'])->name('longlist');
             Route::post('/store', [\App\Http\Controllers\ItWhGovernanceController::class, 'store'])->name('store');
+            Route::post('/update-sort', [\App\Http\Controllers\ItWhGovernanceController::class, 'updateSortOrder'])->name('update-sort');
             Route::get('/show/{id}', [\App\Http\Controllers\ItWhGovernanceController::class, 'show'])->name('show');
             Route::post('/update/{id}', [\App\Http\Controllers\ItWhGovernanceController::class, 'update'])->name('update');
             Route::delete('/destroy/{id}', [\App\Http\Controllers\ItWhGovernanceController::class, 'destroy'])->name('destroy');

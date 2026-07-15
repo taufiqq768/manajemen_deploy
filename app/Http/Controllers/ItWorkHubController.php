@@ -87,12 +87,29 @@ class ItWorkHubController extends Controller
         $picDone = $picSummary->pluck('done')->toArray();
         $picProgress = $picSummary->map(fn($p) => $p['total'] > 0 ? round(($p['done'] / $p['total']) * 100) : 0)->toArray();
 
+        // Total Activities & Overdue
+        $overdueAppDev = \App\Models\ItWhActivity::where('status', '!=', 'Done')
+            ->whereRaw('COALESCE(adjustment_date, deadline) < ?', [today()])->count();
+        $overdueNonApp = \App\Models\ItWhNonappActivity::where('status', '!=', 'Done')
+            ->whereRaw('COALESCE(adjustment_date, deadline) < ?', [today()])->count();
+        $overdueGov = \App\Models\ItWhGovernanceActivity::where('status', '!=', 'Done')
+            ->whereRaw('COALESCE(adjustment_date, deadline) < ?', [today()])->count();
+
+        $totalAppDevAct = \App\Models\ItWhActivity::count();
+        $totalNonAppAct = \App\Models\ItWhNonappActivity::count();
+        $totalGovAct = \App\Models\ItWhGovernanceActivity::count();
+
+        $totalActivities = $totalAppDevAct + $totalNonAppAct + $totalGovAct;
+        $totalOverdue = $overdueAppDev + $overdueNonApp + $overdueGov;
+
         return view('it-work-hub.dashboard', compact(
             'appDevStats', 'appDevTotal', 'appDevAvgProgress', 'appDevPriorityStats',
             'nonAppStats', 'nonAppTotal', 'nonAppAvgProgress', 'nonAppPriorityStats',
             'governanceStats', 'governancePriorityStats', 'governanceTotal', 'governanceAvgProgress',
             'groupStats', 'groupTotal', 'groupAvgProgress',
-            'picSummary', 'picNames', 'picTotals', 'picDone', 'picProgress'
+            'picSummary', 'picNames', 'picTotals', 'picDone', 'picProgress',
+            'totalAppDevAct', 'totalNonAppAct', 'totalGovAct', 'totalActivities',
+            'overdueAppDev', 'overdueNonApp', 'overdueGov', 'totalOverdue'
         ));
     }
 
@@ -511,5 +528,71 @@ class ItWorkHubController extends Controller
         $deleteQuery->delete();
 
         return response()->json(['success' => true, 'message' => 'To-Do List berhasil disimpan.']);
+    }
+
+    public function overdueActivities()
+    {
+        $today = today();
+        
+        // 1. App Dev Activities
+        $appDev = \App\Models\ItWhActivity::with('project')
+            ->where('status', '!=', 'Done')
+            ->whereRaw('COALESCE(adjustment_date, deadline) < ?', [$today])
+            ->get()
+            ->map(function ($act) use ($today) {
+                $dueDate = $act->adjustment_date ? \Carbon\Carbon::parse($act->adjustment_date) : \Carbon\Carbon::parse($act->deadline);
+                return (object) [
+                    'name' => $act->name,
+                    'feature' => 'App Dev',
+                    'parent_name' => $act->project ? $act->project->name : '-',
+                    'due_date' => $dueDate,
+                    'days_overdue' => $dueDate->diffInDays($today, false),
+                    'action_url' => $act->project ? route('it-work-hub.activities', $act->project->id) : '#'
+                ];
+            });
+
+        // 2. Non App Activities
+        $nonApp = \App\Models\ItWhNonappActivity::with('project')
+            ->where('status', '!=', 'Done')
+            ->whereRaw('COALESCE(adjustment_date, deadline) < ?', [$today])
+            ->get()
+            ->map(function ($act) use ($today) {
+                $dueDate = $act->adjustment_date ? \Carbon\Carbon::parse($act->adjustment_date) : \Carbon\Carbon::parse($act->deadline);
+                return (object) [
+                    'name' => $act->name,
+                    'feature' => 'Non App',
+                    'parent_name' => $act->project ? $act->project->name : '-',
+                    'due_date' => $dueDate,
+                    'days_overdue' => $dueDate->diffInDays($today, false),
+                    'action_url' => $act->project ? route('it-work-hub.non-app.activities', $act->project->id) : '#'
+                ];
+            });
+
+        // 3. Governance Activities
+        $governance = \App\Models\ItWhGovernanceActivity::with('governance')
+            ->where('status', '!=', 'Done')
+            ->whereRaw('COALESCE(adjustment_date, deadline) < ?', [$today])
+            ->get()
+            ->map(function ($act) use ($today) {
+                $dueDate = $act->adjustment_date ? \Carbon\Carbon::parse($act->adjustment_date) : \Carbon\Carbon::parse($act->deadline);
+                return (object) [
+                    'name' => $act->name,
+                    'feature' => 'Governance',
+                    'parent_name' => $act->governance ? $act->governance->name : '-',
+                    'due_date' => $dueDate,
+                    'days_overdue' => $dueDate->diffInDays($today, false),
+                    'action_url' => $act->governance ? route('it-work-hub.governance.activities', $act->governance->id) : '#'
+                ];
+            });
+
+        // Merge and sort
+        $overdueActivities = collect()
+            ->merge($appDev)
+            ->merge($nonApp)
+            ->merge($governance)
+            ->sortByDesc('days_overdue')
+            ->values();
+
+        return view('it-work-hub.overdue-activities', compact('overdueActivities'));
     }
 }

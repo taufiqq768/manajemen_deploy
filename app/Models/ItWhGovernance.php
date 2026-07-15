@@ -42,13 +42,8 @@ class ItWhGovernance extends Model
         if ($allActivities->count() > 0) {
             $totalWeight = 0;
             foreach ($allActivities as $act) {
-                $weight = match($act->status) {
-                    'On Progress' => 50,
-                    'Hold' => 50, // Keep progress if on hold
-                    'Done' => 100,
-                    default => 0, // Not Started
-                };
-                $totalWeight += $weight;
+                // Gunakan progress dari masing-masing activity yang diinput manual
+                $totalWeight += $act->progress;
             }
             $this->progress = (int) round($totalWeight / $allActivities->count());
         } else {
