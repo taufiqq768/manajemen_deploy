@@ -109,7 +109,19 @@ Route::middleware('auth')->group(function () {
             Route::delete('/documents/{id}', [\App\Http\Controllers\ItWhGovernanceController::class, 'destroyDocument'])->name('documents.destroy');
         });
 
-        Route::get('/repository', [\App\Http\Controllers\ItWorkHubController::class, 'repository'])->name('repository');
+        Route::get('/repository', [\App\Http\Controllers\ItWhRepositoryController::class, 'index'])->name('repository');
+        // Jenis
+        Route::post('/repository/types', [\App\Http\Controllers\ItWhRepositoryController::class, 'storeType'])->name('repository.types.store');
+        Route::post('/repository/types/{id}/update', [\App\Http\Controllers\ItWhRepositoryController::class, 'updateType'])->name('repository.types.update');
+        Route::delete('/repository/types/{id}', [\App\Http\Controllers\ItWhRepositoryController::class, 'destroyType'])->name('repository.types.destroy');
+        // Sub Jenis
+        Route::post('/repository/sub-types', [\App\Http\Controllers\ItWhRepositoryController::class, 'storeSubType'])->name('repository.sub-types.store');
+        Route::post('/repository/sub-types/{id}/update', [\App\Http\Controllers\ItWhRepositoryController::class, 'updateSubType'])->name('repository.sub-types.update');
+        Route::delete('/repository/sub-types/{id}', [\App\Http\Controllers\ItWhRepositoryController::class, 'destroySubType'])->name('repository.sub-types.destroy');
+        // Dokumen
+        Route::post('/repository/documents', [\App\Http\Controllers\ItWhRepositoryController::class, 'storeDocument'])->name('repository.documents.store');
+        Route::post('/repository/documents/{id}/update', [\App\Http\Controllers\ItWhRepositoryController::class, 'updateDocument'])->name('repository.documents.update');
+        Route::delete('/repository/documents/{id}', [\App\Http\Controllers\ItWhRepositoryController::class, 'destroyDocument'])->name('repository.documents.destroy');
         Route::get('/project-groups', [\App\Http\Controllers\ItWorkHubController::class, 'projectGroups'])->name('project-groups');
         Route::post('/project-groups/save', [\App\Http\Controllers\ItWorkHubController::class, 'updateProjectGroups'])->name('project-groups.save');
         
