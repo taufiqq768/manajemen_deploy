@@ -40,6 +40,13 @@
     </td>
     <td class="px-4 py-2.5 text-right">
         <div class="flex items-center justify-end gap-1">
+            @if($doc->file_path)
+            <button type="button"
+                onclick="openPreview('{{ asset('storage/' . $doc->file_path) }}', '{{ addslashes($doc->name) }}')"
+                class="p-1.5 rounded text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 transition-colors text-xs" title="Preview">
+                <i class="ti ti-eye"></i>
+            </button>
+            @endif
             <button type="button"
                 onclick="openEditDocument({{ $doc->id }}, '{{ addslashes($doc->name) }}', '{{ addslashes($doc->version ?? '') }}', '{{ $doc->document_date ? $doc->document_date->format('Y-m-d') : '' }}', '{{ addslashes($doc->link ?? '') }}', '{{ $doc->file_path ? basename($doc->file_path) : '' }}')"
                 class="p-1.5 rounded text-slate-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-500/10 transition-colors text-xs" title="Edit">

@@ -340,8 +340,39 @@
         </div>
     </div>
 
+    {{-- ── MODAL: Preview Dokumen ── --}}
+    <div id="modal-preview" class="fixed inset-0 z-[60] hidden bg-slate-900/80 backdrop-blur-sm">
+        <div class="bg-white dark:bg-slate-900 rounded-xl shadow-2xl absolute inset-2 sm:inset-6 lg:inset-10 flex flex-col overflow-hidden">
+            <div class="px-5 py-3 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-800/80">
+                <h3 id="preview-modal-title" class="text-base font-bold text-slate-800 dark:text-white truncate pr-4">Preview Dokumen</h3>
+                <div class="flex items-center gap-2">
+                    <a id="preview-download-btn" href="#" target="_blank" class="px-3 py-1.5 text-xs font-medium text-emerald-600 bg-emerald-50 hover:bg-emerald-100 dark:text-emerald-400 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 rounded-lg transition-colors flex items-center gap-1.5" title="Buka di tab baru / Unduh">
+                        <i class="ti ti-external-link"></i> Buka / Unduh
+                    </a>
+                    <button type="button" onclick="closeModal('modal-preview'); document.getElementById('preview-iframe').src = '';" class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 bg-slate-200 hover:bg-slate-300 dark:bg-slate-700 dark:hover:bg-slate-600 rounded-lg transition-colors">
+                        <i class="ti ti-x text-sm"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="flex-1 bg-slate-100 dark:bg-slate-950/50 p-2 sm:p-4 relative overflow-hidden flex items-center justify-center">
+                <div id="preview-loader" class="absolute inset-0 flex items-center justify-center bg-slate-100 dark:bg-slate-950/50 z-10">
+                    <i class="ti ti-loader animate-spin text-3xl text-slate-400"></i>
+                </div>
+                <iframe id="preview-iframe" class="w-full h-full border border-slate-200 dark:border-slate-800 rounded shadow-sm bg-white" onload="document.getElementById('preview-loader').classList.add('hidden')"></iframe>
+            </div>
+        </div>
+    </div>
+
     @push('scripts')
     <script>
+        function openPreview(url, title) {
+            document.getElementById('preview-modal-title').textContent = title || 'Preview Dokumen';
+            document.getElementById('preview-download-btn').href = url;
+            document.getElementById('preview-loader').classList.remove('hidden');
+            document.getElementById('preview-iframe').src = url;
+            openModal('modal-preview');
+        }
+
         function openModal(id) {
             document.getElementById(id).classList.remove('hidden');
         }
