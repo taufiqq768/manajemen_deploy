@@ -12,6 +12,7 @@ class DeployRequest extends Model
     protected $fillable = [
         'ticket_number',
         'application_id',
+        'kategori',
         'jenis',
         'requester_id',
         'approver_id',

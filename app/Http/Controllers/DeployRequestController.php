@@ -35,6 +35,10 @@ class DeployRequestController extends Controller
             $query->where('application_id', $request->application_id);
         }
 
+        if ($request->filled('kategori')) {
+            $query->where('kategori', $request->kategori);
+        }
+
         if ($request->filled('jenis')) {
             $query->whereJsonContains('jenis', $request->jenis);
         }
@@ -73,6 +77,7 @@ class DeployRequestController extends Controller
         $user = auth()->user();
         $validated = $request->validate([
             'application_id' => 'required|exists:applications,id',
+            'kategori' => 'required|in:cr,enhancement,bug_fixing',
             'jenis' => 'required|array|min:1',
             'jenis.*' => 'in:perubahan_besar,perubahan_kecil,bug_fixing',
             'version' => 'required|string|max:50',
@@ -190,6 +195,7 @@ class DeployRequestController extends Controller
         $user = auth()->user();
         $validated = $request->validate([
             'application_id' => 'required|exists:applications,id',
+            'kategori' => 'required|in:cr,enhancement,bug_fixing',
             'jenis' => 'required|array|min:1',
             'jenis.*' => 'in:perubahan_besar,perubahan_kecil,bug_fixing',
             'version' => 'required|string|max:50',

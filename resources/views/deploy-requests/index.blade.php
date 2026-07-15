@@ -46,6 +46,14 @@
         </select>
         @endif
 
+        <select name="kategori"
+                class="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option value="">Semua Kategori</option>
+            <option value="cr" {{ request('kategori') === 'cr' ? 'selected' : '' }}>CR</option>
+            <option value="enhancement" {{ request('kategori') === 'enhancement' ? 'selected' : '' }}>Enhancement</option>
+            <option value="bug_fixing" {{ request('kategori') === 'bug_fixing' ? 'selected' : '' }}>Bug Fixing</option>
+        </select>
+
         <select name="jenis"
                 class="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
             <option value="">Semua Jenis</option>
@@ -66,7 +74,7 @@
                 class="px-4 py-2 bg-slate-700 dark:bg-slate-700 hover:bg-slate-600 text-white text-sm rounded-lg transition-colors">
             Filter
         </button>
-        @if(request()->hasAny(['status','application_id','jenis','start_date','end_date']))
+        @if(request()->hasAny(['status','application_id','kategori','jenis','start_date','end_date']))
         <a href="{{ route('deploy-requests.index') }}"
            class="px-4 py-2 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white text-sm transition-colors">
             Reset
@@ -91,6 +99,7 @@
                     <tr>
                         <th class="px-5 py-3 text-left">Aplikasi</th>
                         <th class="px-5 py-3 text-left">Versi</th>
+                        <th class="px-5 py-3 text-left">Kategori</th>
                         <th class="px-5 py-3 text-left">Jenis</th>
                         @if(auth()->user()->isProjectManager() || auth()->user()->isAdmin())
                         <th class="px-5 py-3 text-left">Pemohon</th>
@@ -128,6 +137,15 @@
                                     @endif
                                 @endif
                             </div>
+                        </td>
+                        <td class="px-5 py-4">
+                            @if($req->kategori)
+                                <span class="bg-violet-500/10 text-violet-700 dark:text-violet-400 px-2 py-0.5 rounded text-[10px] font-medium border border-violet-500/20 uppercase">
+                                    {{ str_replace('_', ' ', $req->kategori) }}
+                                </span>
+                            @else
+                                <span class="text-slate-400">—</span>
+                            @endif
                         </td>
                         <td class="px-5 py-4">
                             <div class="flex flex-wrap gap-1 max-w-[150px]">

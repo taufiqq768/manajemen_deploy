@@ -70,6 +70,18 @@
                     </p>
                 </div>
                 <div>
+                    <p class="text-xs text-slate-400 dark:text-slate-500 mb-1">Kategori</p>
+                    <div class="mt-1">
+                        @if($deployRequest->kategori)
+                            <span class="bg-violet-500/10 text-violet-700 dark:text-violet-400 px-2 py-0.5 rounded text-xs border border-violet-500/20 font-medium uppercase">
+                                {{ str_replace('_', ' ', $deployRequest->kategori) }}
+                            </span>
+                        @else
+                            <span class="text-slate-500">—</span>
+                        @endif
+                    </div>
+                </div>
+                <div>
                     <p class="text-xs text-slate-400 dark:text-slate-500 mb-1">Jenis Request</p>
                     <div class="flex flex-wrap gap-1 mt-1">
                         @if(is_array($deployRequest->jenis))

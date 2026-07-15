@@ -99,6 +99,23 @@
                     </div>
                 </div>
 
+                {{-- Kategori --}}
+                <div>
+                    <label for="kategori" class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                        Kategori <span class="text-red-500">*</span>
+                    </label>
+                    <select id="kategori" name="kategori" required onchange="handleKategoriChange()"
+                        class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-slate-200 text-sm rounded-lg px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 @error('kategori') border-red-500 @enderror">
+                        <option value="">-- Pilih Kategori --</option>
+                        <option value="cr" {{ old('kategori', $deployRequest->kategori) == 'cr' ? 'selected' : '' }}>CR (Change Request)</option>
+                        <option value="enhancement" {{ old('kategori', $deployRequest->kategori) == 'enhancement' ? 'selected' : '' }}>Enhancement</option>
+                        <option value="bug_fixing" {{ old('kategori', $deployRequest->kategori) == 'bug_fixing' ? 'selected' : '' }}>Bug Fixing</option>
+                    </select>
+                    @error('kategori')
+                        <p class="mt-1 text-xs text-red-500">{{ $message }}</p>
+                    @enderror
+                </div>
+
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                         Jenis Request <span class="text-red-500">*</span>
@@ -358,6 +375,35 @@
             }
         }
         
+        function handleKategoriChange() {
+            const kategori = document.getElementById('kategori').value;
+            const cbBesar = document.getElementById('jenis_besar');
+            const cbKecil = document.getElementById('jenis_kecil');
+            const cbBug = document.getElementById('jenis_bug');
+
+            if (kategori === 'cr' || kategori === 'enhancement') {
+                cbBesar.disabled = false;
+                cbKecil.disabled = false;
+                
+                cbBug.checked = false;
+                cbBug.disabled = true;
+            } else if (kategori === 'bug_fixing') {
+                cbBesar.checked = false;
+                cbBesar.disabled = true;
+                
+                cbKecil.checked = false;
+                cbKecil.disabled = true;
+                
+                cbBug.disabled = false;
+                cbBug.checked = true;
+            } else {
+                cbBesar.disabled = false;
+                cbKecil.disabled = false;
+                cbBug.disabled = false;
+            }
+            updateFormStates();
+        }
+
         document.getElementById('application_id').addEventListener('change', updateFormStates);
         
         // Also trigger on checkbox changes
@@ -366,7 +412,7 @@
         document.getElementById('jenis_bug').addEventListener('change', updateFormStates);
         
         // Run on page load — DOM is already ready since script is at end of body
-        updateFormStates();
+        handleKategoriChange();
         
         // Show native picker on click of the scheduled_at input
         const scheduledInput = document.getElementById('scheduled_at');
