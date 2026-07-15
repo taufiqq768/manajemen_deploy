@@ -303,7 +303,7 @@
                 <h3 id="doc-modal-title" class="font-bold text-slate-800 dark:text-slate-100">Tambah Dokumen</h3>
                 <button onclick="closeModal('modal-document')" class="text-slate-400 hover:text-slate-600 transition-colors"><i class="ti ti-x text-xl"></i></button>
             </div>
-            <form id="form-document" method="POST" enctype="multipart/form-data" class="px-6 py-5 space-y-4">
+            <form id="form-document" method="POST" enctype="multipart/form-data" class="px-6 py-5 space-y-4" onsubmit="return validateFileSize(this)">
                 @csrf
                 <input type="hidden" name="it_wh_repo_type_id" id="doc-type-id">
                 <input type="hidden" name="it_wh_repo_sub_type_id" id="doc-sub-type-id">
@@ -326,7 +326,7 @@
                         <input type="url" name="link" id="doc-link" placeholder="https://..." class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-sm">
                     </div>
                     <div class="col-span-2 space-y-1">
-                        <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Upload File <span class="text-xs text-slate-400">(maks. 20 MB)</span></label>
+                        <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Upload File <span class="text-xs text-slate-400">(maks. 2 MB)</span></label>
                         <input type="file" name="file" id="doc-file" class="w-full text-sm text-slate-600 dark:text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 dark:file:bg-emerald-500/20 dark:file:text-emerald-400">
                         <p id="current-file-info" class="text-xs text-slate-400 hidden"></p>
                     </div>
@@ -365,6 +365,18 @@
 
     @push('scripts')
     <script>
+        function validateFileSize(form) {
+            const fileInput = document.getElementById('doc-file');
+            if (fileInput.files.length > 0) {
+                const fileSize = fileInput.files[0].size / 1024 / 1024; // in MB
+                if (fileSize > 2) {
+                    alert('Error: Ukuran file terlalu besar. Maksimal 2 MB!');
+                    return false; // prevent form submission
+                }
+            }
+            return true;
+        }
+
         function openPreview(url, title) {
             document.getElementById('preview-modal-title').textContent = title || 'Preview Dokumen';
             document.getElementById('preview-download-btn').href = url;
