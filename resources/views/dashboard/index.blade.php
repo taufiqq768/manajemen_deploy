@@ -71,7 +71,7 @@
                         <th class="px-5 py-3 text-left">Aplikasi</th>
                         <th class="px-5 py-3 text-left">Versi</th>
                         <th class="px-5 py-3 text-left">Kategori</th>
-                        <th class="px-5 py-3 text-left">Jenis</th>
+                        <th class="px-5 py-3 text-left">Jenis Versioning</th>
                         @if(auth()->user()->isProjectManager() || auth()->user()->isAdmin())
                         <th class="px-5 py-3 text-left">Pemohon</th>
                         @endif

@@ -56,7 +56,7 @@
 
         <select name="jenis"
                 class="bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-sm rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-            <option value="">Semua Jenis</option>
+            <option value="">Semua Jenis Versioning</option>
             <option value="perubahan_besar" {{ request('jenis') === 'perubahan_besar' ? 'selected' : '' }}>Perubahan Besar</option>
             <option value="perubahan_kecil" {{ request('jenis') === 'perubahan_kecil' ? 'selected' : '' }}>Perubahan Kecil</option>
             <option value="bug_fixing" {{ request('jenis') === 'bug_fixing' ? 'selected' : '' }}>Bug Fixing</option>
@@ -100,7 +100,7 @@
                         <th class="px-5 py-3 text-left">Aplikasi</th>
                         <th class="px-5 py-3 text-left">Versi</th>
                         <th class="px-5 py-3 text-left">Kategori</th>
-                        <th class="px-5 py-3 text-left">Jenis</th>
+                        <th class="px-5 py-3 text-left">Jenis Versioning</th>
                         @if(auth()->user()->isProjectManager() || auth()->user()->isAdmin())
                         <th class="px-5 py-3 text-left">Pemohon</th>
                         @endif

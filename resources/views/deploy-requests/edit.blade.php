@@ -118,7 +118,7 @@
 
                 <div>
                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
-                        Jenis Request <span class="text-red-500">*</span>
+                        Jenis Versioning <span class="text-red-500">*</span>
                     </label>
                     <div class="space-y-3 p-4 bg-slate-50 dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                         {{-- Perubahan Besar --}}
@@ -321,7 +321,7 @@
             
             if (!selectedOpt || !selectedOpt.value) {
                 document.getElementById('version').value = '';
-                document.getElementById('version').placeholder = 'Pilih aplikasi & jenis request';
+                document.getElementById('version').placeholder = 'Pilih aplikasi & jenis versioning';
                 document.getElementById('release_notes_section').classList.add('hidden');
                 return;
             }

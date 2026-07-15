@@ -82,7 +82,7 @@
                     </div>
                 </div>
                 <div>
-                    <p class="text-xs text-slate-400 dark:text-slate-500 mb-1">Jenis Request</p>
+                    <p class="text-xs text-slate-400 dark:text-slate-500 mb-1">Jenis Versioning</p>
                     <div class="flex flex-wrap gap-1 mt-1">
                         @if(is_array($deployRequest->jenis))
                             @foreach($deployRequest->jenis as $j)
