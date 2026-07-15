@@ -51,7 +51,7 @@ class DeployRequestController extends Controller
             $query->whereDate('created_at', '<=', $request->end_date);
         }
 
-        $deployRequests = $query->latest()->paginate(10)->withQueryString();
+        $deployRequests = $query->latest()->paginate(7)->withQueryString();
         $applications = Application::orderBy('name')->get();
 
         return view('deploy-requests.index', compact('deployRequests', 'applications'));

@@ -70,6 +70,7 @@
                     <tr>
                         <th class="px-5 py-3 text-left">Aplikasi</th>
                         <th class="px-5 py-3 text-left">Versi</th>
+                        <th class="px-5 py-3 text-left">Kategori</th>
                         <th class="px-5 py-3 text-left">Jenis</th>
                         @if(auth()->user()->isProjectManager() || auth()->user()->isAdmin())
                         <th class="px-5 py-3 text-left">Pemohon</th>
@@ -107,6 +108,15 @@
                                     @endif
                                 @endif
                             </div>
+                        </td>
+                        <td class="px-5 py-4">
+                            @if($req->kategori)
+                                <span class="bg-violet-500/10 text-violet-700 dark:text-violet-400 px-2 py-0.5 rounded text-[10px] font-medium border border-violet-500/20 uppercase">
+                                    {{ str_replace('_', ' ', $req->kategori) }}
+                                </span>
+                            @else
+                                <span class="text-slate-400">—</span>
+                            @endif
                         </td>
                         <td class="px-5 py-4 text-slate-500 dark:text-slate-400 text-xs">
                             @if(is_array($req->jenis))
