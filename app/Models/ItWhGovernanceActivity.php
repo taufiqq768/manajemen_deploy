@@ -14,6 +14,7 @@ class ItWhGovernanceActivity extends Model
         'adjustment_date',
         'notes',
         'status',
+        'progress',
         'sort_order',
     ];
 

@@ -33,25 +33,78 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
             @php
                 $kpis = [
-                    ['label' => 'Total App Dev', 'value' => $appDevTotal, 'sub' => 'Rata-rata progress ' . $appDevAvgProgress . '%', 'icon' => 'ti-code', 'color' => 'indigo'],
-                    ['label' => 'Total Non App', 'value' => $nonAppTotal, 'sub' => 'Rata-rata progress ' . $nonAppAvgProgress . '%', 'icon' => 'ti-apps', 'color' => 'blue'],
-                    ['label' => 'Total Governance', 'value' => $governanceTotal, 'sub' => 'Rata-rata progress ' . $governanceAvgProgress . '%', 'icon' => 'ti-shield-check', 'color' => 'emerald'],
-                    ['label' => 'Total Project Group', 'value' => $groupTotal, 'sub' => 'Rata-rata progress ' . $groupAvgProgress . '%', 'icon' => 'ti-layers-intersect', 'color' => 'pink'],
+                    [
+                        'label'    => 'App Development',
+                        'projects' => $appDevTotal,
+                        'avgProg'  => $appDevAvgProgress,
+                        'acts'     => $totalAppDevAct,
+                        'overdue'  => $overdueAppDev,
+                        'icon'     => 'ti-code',
+                        'color'    => 'indigo',
+                    ],
+                    [
+                        'label'    => 'Non App',
+                        'projects' => $nonAppTotal,
+                        'avgProg'  => $nonAppAvgProgress,
+                        'acts'     => $totalNonAppAct,
+                        'overdue'  => $overdueNonApp,
+                        'icon'     => 'ti-apps',
+                        'color'    => 'blue',
+                    ],
+                    [
+                        'label'    => 'Governance',
+                        'projects' => $governanceTotal,
+                        'avgProg'  => $governanceAvgProgress,
+                        'acts'     => $totalGovAct,
+                        'overdue'  => $overdueGov,
+                        'icon'     => 'ti-shield-check',
+                        'color'    => 'emerald',
+                    ],
+                    [
+                        'label'    => 'Project Group',
+                        'projects' => $groupTotal,
+                        'avgProg'  => $groupAvgProgress,
+                        'acts'     => null,
+                        'overdue'  => null,
+                        'icon'     => 'ti-layers-intersect',
+                        'color'    => 'pink',
+                    ],
                 ];
             @endphp
             @foreach($kpis as $kpi)
-            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5 flex items-start gap-4">
-                <div class="p-2.5 rounded-xl bg-{{ $kpi['color'] }}-100 dark:bg-{{ $kpi['color'] }}-500/20 flex-shrink-0">
-                    <i class="ti {{ $kpi['icon'] }} text-{{ $kpi['color'] }}-600 dark:text-{{ $kpi['color'] }}-400 text-xl"></i>
+            <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5">
+                <div class="flex items-start gap-3 mb-3">
+                    <div class="p-2 rounded-lg bg-{{ $kpi['color'] }}-100 dark:bg-{{ $kpi['color'] }}-500/20 flex-shrink-0">
+                        <i class="ti {{ $kpi['icon'] }} text-{{ $kpi['color'] }}-600 dark:text-{{ $kpi['color'] }}-400 text-lg"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">{{ $kpi['label'] }}</p>
+                        <p class="text-2xl font-bold text-slate-800 dark:text-white leading-tight">{{ $kpi['projects'] }}</p>
+                        <p class="text-[10px] text-slate-400 dark:text-slate-500">Avg progress {{ $kpi['avgProg'] }}%</p>
+                    </div>
                 </div>
-                <div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">{{ $kpi['label'] }}</p>
-                    <p class="text-3xl font-bold text-slate-800 dark:text-white">{{ $kpi['value'] }}</p>
-                    <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{{ $kpi['sub'] }}</p>
+                @if($kpi['acts'] !== null)
+                <div class="border-t border-slate-100 dark:border-slate-800 pt-2.5 flex items-center justify-between mt-1">
+                    <div class="flex items-center gap-1.5 text-xs text-slate-600 dark:text-slate-400">
+                        <i class="ti ti-list-check text-slate-400"></i>
+                        <span>Aktivitas: <span class="font-semibold text-slate-700 dark:text-slate-300">{{ $kpi['acts'] }}</span></span>
+                    </div>
+                    @if($kpi['overdue'] > 0)
+                        <a href="{{ route('it-work-hub.overdue-activities') }}" class="text-[10px] font-semibold text-red-500 dark:text-red-400 flex items-center gap-0.5 bg-red-50 dark:bg-red-500/10 px-1.5 py-0.5 rounded-full hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors">
+                            <i class="ti ti-alert-circle"></i> {{ $kpi['overdue'] }} Terlambat
+                        </a>
+                    @else
+                        <span class="text-[10px] text-emerald-600 dark:text-emerald-400 flex items-center gap-0.5 bg-emerald-50 dark:bg-emerald-500/10 px-1.5 py-0.5 rounded-full font-medium">
+                            <i class="ti ti-circle-check"></i> On Track
+                        </span>
+                    @endif
                 </div>
+                @endif
             </div>
             @endforeach
         </div>
+
+        {{-- ── Activity KPI Summary Row (removed — merged into KPI above) ── --}}
 
         @php
             $priorityDef = [

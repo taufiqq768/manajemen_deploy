@@ -29,6 +29,7 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                            <th class="px-2 py-3 w-8 text-center"></th>
                             <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase">Task Governance</th>
                             <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase text-center w-24">Priority</th>
                             <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase text-center w-32">Progress</th>
@@ -41,6 +42,7 @@
                     <tbody class="divide-y divide-slate-200 dark:divide-slate-800" id="sortable-list">
                         @forelse($governances as $gov)
                         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors" data-id="{{ $gov->id }}">
+                            <td class="px-2 py-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-move text-center"><i class="ti ti-grip-vertical text-lg"></i></td>
                             <td class="px-4 py-3">
                                 <div class="font-medium text-slate-800 dark:text-slate-200">{{ $gov->name }}</div>
                                 @if($gov->description)
@@ -94,7 +96,7 @@
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="7" class="px-4 py-8 text-center text-slate-500">Belum ada task governance yang ditambahkan.</td>
+                            <td colspan="8" class="px-4 py-8 text-center text-slate-500">Belum ada task governance yang ditambahkan.</td>
                         </tr>
                         @endforelse
                     </tbody>
@@ -174,8 +176,33 @@
     </div>
 
     @push('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script>
-        // Scripts
+        document.addEventListener('DOMContentLoaded', function() {
+            const list = document.getElementById('sortable-list');
+            if(list) {
+                new Sortable(list, {
+                    handle: '.cursor-move',
+                    animation: 150,
+                    onEnd: function() {
+                        const items = list.querySelectorAll('tr[data-id]');
+                        const order = Array.from(items).map(item => item.dataset.id);
+                        
+                        fetch("{{ route('it-work-hub.governance.update-sort') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: JSON.stringify({ order: order })
+                        }).then(response => response.json())
+                          .then(data => {
+                              if(!data.success) console.error('Failed to update sort order');
+                          });
+                    }
+                });
+            }
+        });
     </script>
     @endpush
 </x-layouts.app>
