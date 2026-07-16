@@ -122,6 +122,21 @@ Route::middleware('auth')->group(function () {
         Route::post('/repository/documents', [\App\Http\Controllers\ItWhRepositoryController::class, 'storeDocument'])->name('repository.documents.store');
         Route::post('/repository/documents/{id}/update', [\App\Http\Controllers\ItWhRepositoryController::class, 'updateDocument'])->name('repository.documents.update');
         Route::delete('/repository/documents/{id}', [\App\Http\Controllers\ItWhRepositoryController::class, 'destroyDocument'])->name('repository.documents.destroy');
+        
+        // Master Data
+        Route::prefix('master-data')->name('master-data.')->group(function () {
+            // Statuses
+            Route::get('/statuses', [\App\Http\Controllers\ITWorkHub\MasterDataController::class, 'indexStatuses'])->name('statuses.index');
+            Route::post('/statuses/store', [\App\Http\Controllers\ITWorkHub\MasterDataController::class, 'storeStatus'])->name('statuses.store');
+            Route::post('/statuses/{id}/update', [\App\Http\Controllers\ITWorkHub\MasterDataController::class, 'updateStatus'])->name('statuses.update');
+            Route::delete('/statuses/{id}', [\App\Http\Controllers\ITWorkHub\MasterDataController::class, 'destroyStatus'])->name('statuses.destroy');
+            
+            // Divisions
+            Route::get('/divisions', [\App\Http\Controllers\ITWorkHub\MasterDataController::class, 'indexDivisions'])->name('divisions.index');
+            Route::post('/divisions/store', [\App\Http\Controllers\ITWorkHub\MasterDataController::class, 'storeDivision'])->name('divisions.store');
+            Route::post('/divisions/{id}/update', [\App\Http\Controllers\ITWorkHub\MasterDataController::class, 'updateDivision'])->name('divisions.update');
+            Route::delete('/divisions/{id}', [\App\Http\Controllers\ITWorkHub\MasterDataController::class, 'destroyDivision'])->name('divisions.destroy');
+        });
         Route::get('/project-groups', [\App\Http\Controllers\ItWorkHubController::class, 'projectGroups'])->name('project-groups');
         Route::post('/project-groups/save', [\App\Http\Controllers\ItWorkHubController::class, 'updateProjectGroups'])->name('project-groups.save');
         

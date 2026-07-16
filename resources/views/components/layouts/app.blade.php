@@ -221,6 +221,24 @@
                         </svg>
                         Cek Koneksi WAHA
                     </a>
+
+                    <div class="pt-4 pb-1 mt-4 border-t border-slate-200 dark:border-slate-800">
+                        <p class="px-3 text-xs font-bold tracking-wider text-slate-400 uppercase">Master Data</p>
+                    </div>
+
+                    <a href="{{ route('it-work-hub.master-data.statuses.index') }}"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
+                                                  {{ request()->routeIs('it-work-hub.master-data.statuses.*') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                        <i class="ti ti-tags text-lg flex-shrink-0"></i>
+                        Status
+                    </a>
+
+                    <a href="{{ route('it-work-hub.master-data.divisions.index') }}"
+                        class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors
+                                                  {{ request()->routeIs('it-work-hub.master-data.divisions.*') ? 'bg-indigo-600 text-white' : 'text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white' }}">
+                        <i class="ti ti-building text-lg flex-shrink-0"></i>
+                        Divisi
+                    </a>
                 @endif
 
             </nav>
