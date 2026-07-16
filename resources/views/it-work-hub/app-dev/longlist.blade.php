@@ -18,7 +18,7 @@
         </div>
 
         {{-- Stat Cards --}}
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
             <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
                 <p class="text-xs font-medium text-slate-500 uppercase">Total Project</p>
                 <p class="text-2xl font-bold text-slate-800 dark:text-white mt-1">{{ $stats['total'] }}</p>
@@ -26,6 +26,10 @@
             <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
                 <p class="text-xs font-medium text-slate-500 uppercase">Not Started</p>
                 <p class="text-2xl font-bold text-slate-800 dark:text-white mt-1">{{ $stats['not_started'] }}</p>
+            </div>
+            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                <p class="text-xs font-medium text-blue-600 uppercase">Development</p>
+                <p class="text-2xl font-bold text-blue-700 dark:text-blue-500 mt-1">{{ $stats['development'] }}</p>
             </div>
             <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
                 <p class="text-xs font-medium text-green-600 uppercase">Live</p>
@@ -105,6 +109,7 @@
                                 @php
                                     $statusColors = [
                                         'Not Started' => 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+                                        'Development' => 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
                                         'Live' => 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
                                         'Live w/ CR' => 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
                                         'Live w/ Bug' => 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
@@ -115,6 +120,7 @@
                                 @endphp
                                 <select data-old-value="{{ $project->status }}" onchange="updateProjectStatus({{ $project->id }}, this)" class="px-2 py-1 rounded text-[10px] font-bold w-full {{ $color }} cursor-pointer outline-none appearance-none text-center">
                                     <option value="Not Started" class="bg-white text-slate-800" {{ $project->status == 'Not Started' ? 'selected' : '' }}>NOT STARTED</option>
+                                    <option value="Development" class="bg-white text-slate-800" {{ $project->status == 'Development' ? 'selected' : '' }}>DEVELOPMENT</option>
                                     <option value="Live" class="bg-white text-slate-800" {{ $project->status == 'Live' ? 'selected' : '' }}>LIVE</option>
                                     <option value="Live w/ CR" class="bg-white text-slate-800" {{ $project->status == 'Live w/ CR' ? 'selected' : '' }}>LIVE W/ CR</option>
                                     <option value="Live w/ Bug" class="bg-white text-slate-800" {{ $project->status == 'Live w/ Bug' ? 'selected' : '' }}>LIVE W/ BUG</option>
@@ -173,6 +179,7 @@
 
         const statusColors = {
             'Not Started': 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
+            'Development': 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
             'Live': 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
             'Live w/ CR': 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
             'Live w/ Bug': 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',

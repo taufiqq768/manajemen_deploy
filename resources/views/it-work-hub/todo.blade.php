@@ -108,12 +108,10 @@
                                     class="px-2 py-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-move text-center">
                                     <i class="ti ti-grip-vertical text-lg"></i>
                                 </td>
-                                <td class="px-2 py-1 text-center font-medium text-slate-500 row-number"><span
-                                        class="number-text">{{ $loop->iteration }}</span></td>
-                                <!-- <td class="px-2 py-2 text-center text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
-                                        {{ \Carbon\Carbon::parse($todo->date ?? now())->format('d/m/Y') }}
-                                        <input type="hidden" class="input-date" value="{{ \Carbon\Carbon::parse($todo->date ?? now())->format('Y-m-d') }}">
-                                    </td> -->
+                                <td class="px-2 py-1 text-center font-medium text-slate-500 row-number">
+                                    <span class="number-text">{{ $loop->iteration }}</span>
+                                    <input type="hidden" class="input-date" value="{{ \Carbon\Carbon::parse($todo->date ?? now())->format('Y-m-d') }}">
+                                </td>
                                 <td class="px-1 py-1">
                                     <select class="input-user w-full" placeholder="Pilih PIC..." {{ !$isAdminOrPM ? 'disabled' : '' }}>
                                         @foreach($users as $u)
@@ -147,7 +145,7 @@
                             </tr>
                         @empty
                             <tr class="empty-state">
-                                <td colspan="9" class="px-4 py-8 text-center text-slate-500">Belum ada tugas. Klik "Tambah
+                                <td colspan="8" class="px-4 py-8 text-center text-slate-500">Belum ada tugas. Klik "Tambah
                                     Tugas" untuk membuat list baru.</td>
                             </tr>
                         @endforelse
@@ -163,10 +161,8 @@
             <td class="px-2 py-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 cursor-move text-center">
                 <i class="ti ti-grip-vertical text-lg"></i>
             </td>
-            <td class="px-2 py-1 text-center font-medium text-slate-500 row-number"><span class="number-text"></span>
-            </td>
-            <td class="px-2 py-2 text-center text-xs text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
-                <span class="display-date">{{ date('d/m/Y') }}</span>
+            <td class="px-2 py-1 text-center font-medium text-slate-500 row-number">
+                <span class="number-text"></span>
                 <input type="hidden" class="input-date" value="{{ date('Y-m-d') }}">
             </td>
             <td class="px-1 py-1">
@@ -218,7 +214,8 @@
                     new TomSelect(el, {
                         maxItems: 1,
                         hideSelected: true,
-                        placeholder: "Pilih PIC..."
+                        placeholder: "Pilih PIC...",
+                        dropdownParent: 'body'
                     });
                 }
             }
@@ -354,7 +351,7 @@
                 if (remainingTrs.length === 0) {
                     const emptyRow = document.createElement('tr');
                     emptyRow.className = 'empty-state';
-                    emptyRow.innerHTML = `<td colspan="9" class="px-4 py-8 text-center text-slate-500">Belum ada tugas. Klik "Tambah Tugas" untuk membuat list baru.</td>`;
+                    emptyRow.innerHTML = `<td colspan="8" class="px-4 py-8 text-center text-slate-500">Belum ada tugas. Klik "Tambah Tugas" untuk membuat list baru.</td>`;
                     tbody.appendChild(emptyRow);
                 }
             }

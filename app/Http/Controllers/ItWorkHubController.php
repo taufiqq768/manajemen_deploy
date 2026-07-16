@@ -9,7 +9,7 @@ class ItWorkHubController extends Controller
     public function dashboard()
     {
         // App Dev Stats
-        $allAppDevStatuses = ['Not Started', 'Live', 'Live w/ CR', 'Live w/ Bug', 'Hold', 'Retired'];
+        $allAppDevStatuses = ['Not Started', 'Development', 'Live', 'Live w/ CR', 'Live w/ Bug', 'Hold', 'Retired'];
         $appDevRaw = \App\Models\ItWhProject::selectRaw('status, count(*) as count')->groupBy('status')->pluck('count', 'status');
         $appDevStats = collect($allAppDevStatuses)->mapWithKeys(fn($s) => [$s => $appDevRaw[$s] ?? 0]);
         $appDevTotal = (int) $appDevStats->sum();
@@ -18,7 +18,7 @@ class ItWorkHubController extends Controller
         $appDevPriorityStats = ['High' => $appDevPriorityRaw['High'] ?? 0, 'Medium' => $appDevPriorityRaw['Medium'] ?? 0, 'Low' => $appDevPriorityRaw['Low'] ?? 0];
 
         // Non App Stats
-        $allNonAppStatuses = ['Not Started', 'On Progress', 'Hold', 'Done'];
+        $allNonAppStatuses = ['Not Started', 'Development', 'Live', 'Live w/ CR', 'Live w/ Bug', 'Hold', 'Retired'];
         $nonAppRaw = \App\Models\ItWhNonappProject::selectRaw('status, count(*) as count')->groupBy('status')->pluck('count', 'status');
         $nonAppStats = collect($allNonAppStatuses)->mapWithKeys(fn($s) => [$s => $nonAppRaw[$s] ?? 0]);
         $nonAppTotal = (int) $nonAppStats->sum();
@@ -130,6 +130,7 @@ class ItWorkHubController extends Controller
         $stats = [
             'total' => \App\Models\ItWhProject::count(),
             'not_started' => \App\Models\ItWhProject::where('status', 'Not Started')->count(),
+            'development' => \App\Models\ItWhProject::where('status', 'Development')->count(),
             'live' => \App\Models\ItWhProject::where('status', 'Live')->count(),
             'live_cr' => \App\Models\ItWhProject::where('status', 'Live w/ CR')->count(),
             'live_bug' => \App\Models\ItWhProject::where('status', 'Live w/ Bug')->count(),

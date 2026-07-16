@@ -359,6 +359,7 @@
             const STATUS_COLORS = {
                 // Shared Statuses
                 'Not Started':  '#94a3b8', // slate-400
+                'Development':  '#3b82f6', // blue-500
                 'Progress':     '#3b82f6', // blue-500
                 'On Progress':  '#3b82f6', // blue-500
                 'Done':         '#22c55e', // green-500

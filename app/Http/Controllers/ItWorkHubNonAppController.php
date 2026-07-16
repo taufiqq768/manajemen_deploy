@@ -26,6 +26,7 @@ class ItWorkHubNonAppController extends Controller
         $stats = [
             'total' => ItWhNonappProject::count(),
             'not_started' => ItWhNonappProject::where('status', 'Not Started')->count(),
+            'development' => ItWhNonappProject::where('status', 'Development')->count(),
             'live' => ItWhNonappProject::where('status', 'Live')->count(),
             'live_cr' => ItWhNonappProject::where('status', 'Live w/ CR')->count(),
             'live_bug' => ItWhNonappProject::where('status', 'Live w/ Bug')->count(),

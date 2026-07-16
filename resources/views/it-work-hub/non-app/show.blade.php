@@ -182,7 +182,66 @@
     </div>
 
     @push('scripts')
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+    <style>
+        .ts-control {
+            border: 1px solid #cbd5e1 !important;
+            background-color: #ffffff !important;
+            border-radius: 0.5rem !important;
+            padding: 0.5rem 0.75rem !important;
+            font-size: 0.875rem !important;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .dark .ts-control {
+            border-color: #334155 !important;
+            background-color: #020617 !important;
+            color: #f8fafc !important;
+        }
+        .ts-wrapper.focus .ts-control {
+            border-color: #639922 !important;
+            box-shadow: 0 0 0 1px #639922 !important;
+        }
+        .ts-dropdown {
+            border-radius: 0.5rem !important;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+        .dark .ts-dropdown {
+            background-color: #0f172a !important;
+            border-color: #334155 !important;
+            color: #cbd5e1 !important;
+        }
+        .dark .ts-dropdown .option.active, .dark .ts-dropdown .option:hover {
+            background-color: #1e293b !important;
+            color: #ffffff !important;
+        }
+        .ts-wrapper.multi .ts-control > div {
+            background: #e2e8f0;
+            color: #475569;
+            border-radius: 4px;
+            padding: 2px 6px;
+            font-weight: 500;
+        }
+        .dark .ts-wrapper.multi .ts-control > div {
+            background: #334155;
+            color: #cbd5e1;
+            border: 1px solid #475569;
+        }
+        .ts-wrapper.multi.has-items .ts-control {
+            padding: 0.25rem 0.5rem !important;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            new TomSelect('#edit-select-squads', {
+                plugins: ['remove_button'],
+                hideSelected: true,
+                placeholder: "Pilih anggota tim/squad...",
+                dropdownParent: 'body'
+            });
+        });
+
         function addRow(tbodyId) {
             const tbody = document.getElementById(tbodyId);
             const emptyRow = tbody.querySelector('.empty-state');
@@ -312,8 +371,8 @@
                         <div class="px-4 py-5 sm:p-6 space-y-4">
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="col-span-2">
-                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Squad / Tim <span class="font-normal text-slate-400 text-xs">(Gunakan Ctrl/Cmd untuk pilih lebih dari 1)</span></label>
-                                    <select name="squads[]" multiple class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922] h-32">
+                                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Squad / Tim</label>
+                                    <select name="squads[]" id="edit-select-squads" multiple class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]">
                                         @foreach($users as $user)
                                             <option value="{{ $user->id }}" {{ $project->squads->contains('id', $user->id) ? 'selected' : '' }}>{{ $user->name }} ({{ ucfirst($user->role) }})</option>
                                         @endforeach

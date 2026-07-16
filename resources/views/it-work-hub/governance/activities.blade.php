@@ -246,7 +246,8 @@
                 new TomSelect(el, {
                     plugins: ['remove_button'],
                     hideSelected: true,
-                    placeholder: "Pilih PIC..."
+                    placeholder: "Pilih PIC...",
+                    dropdownParent: 'body'
                 });
             });
         });
@@ -334,7 +335,8 @@
                 new TomSelect(newSelect, {
                     plugins: ['remove_button'],
                     hideSelected: true,
-                    placeholder: "Pilih PIC..."
+                    placeholder: "Pilih PIC...",
+                    dropdownParent: 'body'
                 });
             }
         }

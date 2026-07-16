@@ -304,6 +304,7 @@
             tsInstance = new TomSelect(selectEl, {
                 plugins: ['remove_button'],
                 maxItems: null,
+                dropdownParent: 'body'
             });
             
             modal.classList.remove('hidden');

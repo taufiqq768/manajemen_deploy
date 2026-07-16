@@ -249,7 +249,8 @@
                 new TomSelect(el, {
                     plugins: ['remove_button'],
                     hideSelected: true,
-                    placeholder: "Pilih Aplikasi..."
+                    placeholder: "Pilih Aplikasi...",
+                    dropdownParent: 'body'
                 });
             });
         });
@@ -332,7 +333,8 @@
                 new TomSelect(newSelect, {
                     plugins: ['remove_button'],
                     hideSelected: true,
-                    placeholder: "Pilih Aplikasi..."
+                    placeholder: "Pilih Aplikasi...",
+                    dropdownParent: 'body'
                 });
             }
         }
