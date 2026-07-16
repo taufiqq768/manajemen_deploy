@@ -14,7 +14,7 @@
                 </h1>
                 <p class="text-sm text-slate-500 mt-1">Perpustakaan dokumen IT terorganisir per kategori dan sub-kategori.</p>
             </div>
-            <button onclick="openModal('modal-add-type')" class="w-full sm:w-auto inline-flex justify-center items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium rounded-lg transition-all shadow-sm">
+            <button onclick="openModal('modal-add-type')" class="w-full sm:w-auto inline-flex justify-center items-center gap-2 px-4 py-2 bg-[#639922] hover:bg-[#3B6D11] text-white text-sm font-medium rounded-lg transition-all shadow-sm">
                 <i class="ti ti-folder-plus"></i> Tambah Jenis
             </button>
         </div>
@@ -211,7 +211,7 @@
                 </div>
                 <h3 class="text-lg font-semibold text-slate-700 dark:text-slate-300 mb-2">Repository masih kosong</h3>
                 <p class="text-slate-400 text-sm mb-4">Mulai dengan menambahkan Jenis dokumen pertama.</p>
-                <button onclick="openModal('modal-add-type')" class="inline-flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium rounded-lg transition-all">
+                <button onclick="openModal('modal-add-type')" class="inline-flex items-center gap-2 px-4 py-2 bg-[#639922] hover:bg-[#3B6D11] text-white text-sm font-medium rounded-lg transition-all">
                     <i class="ti ti-folder-plus"></i> Tambah Jenis
                 </button>
             </div>
@@ -239,7 +239,7 @@
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" onclick="closeModal('modal-add-type')" class="px-4 py-2 text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">Batal</button>
-                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-colors">Simpan</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-[#639922] hover:bg-[#3B6D11] rounded-lg transition-colors">Simpan</button>
                 </div>
             </form>
         </div>
@@ -264,7 +264,7 @@
                 </div>
                 <div class="flex justify-end gap-2 pt-2">
                     <button type="button" onclick="closeModal('modal-edit-type')" class="px-4 py-2 text-sm text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg transition-colors">Batal</button>
-                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-violet-600 hover:bg-violet-700 rounded-lg transition-colors">Simpan</button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-[#639922] hover:bg-[#3B6D11] rounded-lg transition-colors">Simpan</button>
                 </div>
             </form>
         </div>
