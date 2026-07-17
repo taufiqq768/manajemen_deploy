@@ -16,14 +16,33 @@
 
         <div class="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
             <div class="border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 p-4">
-                <form method="GET" action="{{ route('it-work-hub.master-data.statuses.index') }}" class="flex items-center gap-4" id="categoryForm">
-                    <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Pilih Kategori:</label>
-                    <select name="category" onchange="document.getElementById('categoryForm').submit()" class="rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-indigo-500 focus:ring-indigo-500 min-w-[200px]">
-                        <option value="Project App" {{ $category == 'Project App' ? 'selected' : '' }}>Project App Dev</option>
-                        <option value="Project Non-App" {{ $category == 'Project Non-App' ? 'selected' : '' }}>Project Non-App</option>
-                        <option value="Activity" {{ $category == 'Activity' ? 'selected' : '' }}>Activity</option>
-                        <option value="Governance" {{ $category == 'Governance' ? 'selected' : '' }}>Governance</option>
-                    </select>
+                <form method="GET" action="{{ route('it-work-hub.master-data.statuses.index') }}" class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <div class="flex-1 w-full sm:w-auto relative">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <i class="ti ti-search text-slate-400"></i>
+                        </div>
+                        <input type="text" name="search" value="{{ $search ?? '' }}" style="padding-left: 2.5rem;" class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-indigo-500 focus:ring-indigo-500 placeholder-slate-400" placeholder="Cari nama status...">
+                    </div>
+                    
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <label class="text-sm font-medium text-slate-700 dark:text-slate-300 whitespace-nowrap">Status Aktif:</label>
+                        <select name="status" onchange="this.form.submit()" class="rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-indigo-500 focus:ring-indigo-500 min-w-[120px]">
+                            <option value="">Semua</option>
+                            <option value="1" {{ ($isActive ?? '') === '1' ? 'selected' : '' }}>Aktif</option>
+                            <option value="0" {{ ($isActive ?? '') === '0' ? 'selected' : '' }}>Tidak Aktif</option>
+                        </select>
+
+                        <label class="text-sm font-medium text-slate-700 dark:text-slate-300 whitespace-nowrap ml-2">Kategori:</label>
+                        <select name="category" onchange="this.form.submit()" class="rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-indigo-500 focus:ring-indigo-500 min-w-[160px]">
+                            <option value="Project App" {{ $category == 'Project App' ? 'selected' : '' }}>Project App Dev</option>
+                            <option value="Project Non-App" {{ $category == 'Project Non-App' ? 'selected' : '' }}>Project Non-App</option>
+                            <option value="Activity" {{ $category == 'Activity' ? 'selected' : '' }}>Activity</option>
+                            <option value="Governance" {{ $category == 'Governance' ? 'selected' : '' }}>Governance</option>
+                        </select>
+                        <button type="submit" class="hidden sm:inline-flex justify-center items-center gap-2 px-4 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm font-medium rounded-lg transition-all border border-slate-200 dark:border-slate-700">
+                            Cari
+                        </button>
+                    </div>
                 </form>
             </div>
             
@@ -88,6 +107,12 @@
                     </tbody>
                 </table>
             </div>
+            
+            @if($statuses->hasPages())
+                <div class="border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 p-4">
+                    {{ $statuses->links() }}
+                </div>
+            @endif
         </div>
     </div>
 

@@ -5,6 +5,12 @@ namespace App\Http\Controllers\ITWorkHub;
 use App\Http\Controllers\Controller;
 use App\Models\ItWhMasterStatus;
 use App\Models\ItWhMasterDivision;
+use App\Models\ItWhProject;
+use App\Models\ItWhNonappProject;
+use App\Models\ItWhActivity;
+use App\Models\ItWhNonappActivity;
+use App\Models\ItWhGovernanceActivity;
+use App\Models\ItWhProjectGroup;
 use Illuminate\Http\Request;
 
 class MasterDataController extends Controller
@@ -14,13 +20,23 @@ class MasterDataController extends Controller
     // ==========================================
     public function indexStatuses(Request $request)
     {
+        $search = $request->input('search');
+        $isActive = $request->input('status');
         $category = $request->get('category', 'Project App');
         
-        $statuses = ItWhMasterStatus::where('category', $category)
-            ->orderBy('sort_order')
-            ->get();
+        $query = ItWhMasterStatus::where('category', $category);
 
-        return view('it-work-hub.master-data.statuses.index', compact('statuses', 'category'));
+        if ($search) {
+            $query->where('name', 'like', '%' . $search . '%');
+        }
+
+        if ($isActive !== null && $isActive !== '') {
+            $query->where('is_active', $isActive);
+        }
+
+        $statuses = $query->orderBy('sort_order')->paginate(10)->appends($request->all());
+
+        return view('it-work-hub.master-data.statuses.index', compact('statuses', 'category', 'search', 'isActive'));
     }
 
     public function storeStatus(Request $request)
@@ -74,6 +90,19 @@ class MasterDataController extends Controller
     {
         $status = ItWhMasterStatus::findOrFail($id);
         $category = $status->category;
+
+        $isUsed = ItWhProject::where('status_id', $id)->exists()
+               || ItWhNonappProject::where('status_id', $id)->exists()
+               || ItWhActivity::where('status_id', $id)->exists()
+               || ItWhNonappActivity::where('status_id', $id)->exists()
+               || ItWhGovernanceActivity::where('status_id', $id)->exists()
+               || ItWhProjectGroup::where('status_id', $id)->exists();
+
+        if ($isUsed) {
+            return redirect()->route('it-work-hub.master-data.statuses.index', ['category' => $category])
+                             ->with('error', 'Status tidak dapat dihapus karena sedang digunakan pada data transaksi (Project/Activity/Group).');
+        }
+
         $status->delete();
 
         return redirect()->route('it-work-hub.master-data.statuses.index', ['category' => $category])
@@ -142,6 +171,15 @@ class MasterDataController extends Controller
     public function destroyDivision($id)
     {
         $division = ItWhMasterDivision::findOrFail($id);
+
+        $isUsed = ItWhProject::where('bpo_division_id', $id)->exists()
+               || ItWhNonappProject::where('bpo_division_id', $id)->exists();
+
+        if ($isUsed) {
+            return redirect()->route('it-work-hub.master-data.divisions.index')
+                             ->with('error', 'Divisi tidak dapat dihapus karena sedang digunakan sebagai BPO pada Project.');
+        }
+
         $division->delete();
 
         return redirect()->route('it-work-hub.master-data.divisions.index')
