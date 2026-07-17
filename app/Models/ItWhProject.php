@@ -10,13 +10,23 @@ class ItWhProject extends Model
         'name',
         'description',
         'priority',
-        'status',
-        'bpo',
+        'status_id',
+        'bpo_division_id',
         'progress',
         'pain_point_uraian',
         'pain_point_impact',
         'sort_order'
     ];
+
+    public function status()
+    {
+        return $this->belongsTo(ItWhMasterStatus::class, 'status_id');
+    }
+
+    public function bpoDivision()
+    {
+        return $this->belongsTo(ItWhMasterDivision::class, 'bpo_division_id');
+    }
 
     public function squads()
     {
@@ -40,19 +50,11 @@ class ItWhProject extends Model
 
     public function recalculateProgress()
     {
-        $allActivities = $this->activities()->get();
+        $allActivities = $this->activities()->with('status')->get();
         if ($allActivities->count() > 0) {
             $totalWeight = 0;
             foreach ($allActivities as $act) {
-                $weight = match($act->status) {
-                    'Ureq Analysis' => 15,
-                    'Programming' => 50,
-                    'Tech Testing' => 70,
-                    'SIT' => 85,
-                    'UAT' => 95,
-                    'Done' => 100,
-                    default => 0,
-                };
+                $weight = $act->status ? $act->status->weight : 0;
                 $totalWeight += $weight;
             }
             $this->progress = (int) round($totalWeight / $allActivities->count());

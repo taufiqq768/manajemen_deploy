@@ -119,10 +119,9 @@
                                 <td class="px-1 py-1">
                                     <div class="flex items-center gap-1">
                                         <select onchange="updateStatusColor(this)" class="status-dropdown w-2/3 bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold px-1 py-1.5 rounded uppercase appearance-none cursor-pointer">
-                                            <option value="Not Started" {{ $activity->status == 'Not Started' ? 'selected' : '' }}>NOT STARTED</option>
-                                            <option value="On Progress" {{ $activity->status == 'On Progress' ? 'selected' : '' }}>ON PROGRESS</option>
-                                            <option value="Hold" {{ $activity->status == 'Hold' ? 'selected' : '' }}>HOLD</option>
-                                            <option value="Done" {{ $activity->status == 'Done' ? 'selected' : '' }}>DONE</option>
+                                            @foreach($statuses as $st)
+                                                <option value="{{ $st->id }}" style="color: {{ $st->color }}; background-color: #fff;" data-name="{{ $st->name }}" data-color="{{ $st->color }}" {{ $activity->status_id == $st->id ? 'selected' : '' }}>{{ strtoupper($st->name) }}</option>
+                                            @endforeach
                                         </select>
                                         <div class="w-1/3 relative">
                                             <input type="number" min="0" max="100" class="input-progress w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded text-right pr-4" value="{{ $activity->progress ?? 0 }}">
@@ -165,10 +164,9 @@
             <td class="px-1 py-1">
                 <div class="flex items-center gap-1">
                     <select onchange="updateStatusColor(this)" class="status-dropdown text-slate-600 w-2/3 bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold px-1 py-1.5 rounded uppercase appearance-none cursor-pointer">
-                        <option value="Not Started" class="text-slate-600" selected>NOT STARTED</option>
-                        <option value="On Progress" class="text-blue-500">ON PROGRESS</option>
-                        <option value="Hold" class="text-red-500">HOLD</option>
-                        <option value="Done" class="text-green-500">DONE</option>
+                        @foreach($statuses as $st)
+                            <option value="{{ $st->id }}" style="color: {{ $st->color }}; background-color: #fff;" data-name="{{ $st->name }}" data-color="{{ $st->color }}" {{ $loop->first ? 'selected' : '' }}>{{ strtoupper($st->name) }}</option>
+                        @endforeach
                     </select>
                     <div class="w-1/3 relative">
                         <input type="number" min="0" max="100" class="input-progress w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-xs px-1 py-1.5 rounded text-right pr-4" value="0" readonly>
@@ -185,42 +183,41 @@
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
         function updateStatusColor(select) {
-            select.classList.remove('text-red-600', 'text-red-500', 'text-orange-500', 'text-amber-500', 'text-blue-500', 'text-indigo-500', 'text-teal-500', 'text-green-500', 'text-[#639922]', 'text-slate-600', 'text-slate-500');
-            
+            const opt = select.options[select.selectedIndex];
+            if (!opt) return;
+
+            if (opt.dataset.color) {
+                select.style.color = opt.dataset.color;
+            }
+
+            const statusName = opt.dataset.name;
             const progressInput = select.closest('td').querySelector('.input-progress');
 
-            switch (select.value) {
-                case 'Not Started': 
-                    select.classList.add('text-slate-600'); 
-                    if(progressInput) { 
-                        progressInput.value = 0; 
-                        progressInput.readOnly = true; 
+            if (progressInput) {
+                switch (statusName) {
+                    case 'Not Started':
+                        progressInput.value = 0;
+                        progressInput.readOnly = true;
                         progressInput.classList.add('text-slate-400', 'bg-slate-50');
-                    }
-                    break;
-                case 'On Progress': 
-                    select.classList.add('text-blue-500'); 
-                    if(progressInput) { 
-                        progressInput.readOnly = false; 
+                        break;
+                    case 'On Progress':
+                        progressInput.readOnly = false;
                         progressInput.classList.remove('text-slate-400', 'bg-slate-50');
-                    }
-                    break;
-                case 'Hold': 
-                    select.classList.add('text-red-500'); 
-                    if(progressInput) { 
-                        progressInput.readOnly = true; 
+                        break;
+                    case 'Hold':
+                        progressInput.readOnly = true;
                         progressInput.classList.add('text-slate-400', 'bg-slate-50');
-                    }
-                    break;
-                case 'Done': 
-                    select.classList.add('text-green-500'); 
-                    if(progressInput) { 
-                        progressInput.value = 100; 
-                        progressInput.readOnly = true; 
+                        break;
+                    case 'Done':
+                        progressInput.value = 100;
+                        progressInput.readOnly = true;
                         progressInput.classList.add('text-slate-400', 'bg-slate-50');
-                    }
-                    break;
-                default: select.classList.add('text-slate-500'); break;
+                        break;
+                    default:
+                        progressInput.readOnly = false;
+                        progressInput.classList.remove('text-slate-400', 'bg-slate-50');
+                        break;
+                }
             }
         }
 
@@ -272,7 +269,7 @@
                     adjustment_date: row.querySelector('.input-adjusted-date').value,
                     notes: row.querySelector('.input-desc').value,
                     pics: Array.from(row.querySelector('.input-pics').selectedOptions).map(opt => opt.value),
-                    status: row.querySelector('.status-dropdown').value,
+                    status_id: row.querySelector('.status-dropdown').value,
                     progress: parseInt(row.querySelector('.input-progress').value) || 0
                 };
                 if (activity.name.trim() !== '') {

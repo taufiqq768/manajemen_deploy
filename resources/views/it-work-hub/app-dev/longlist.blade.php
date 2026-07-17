@@ -18,32 +18,32 @@
         </div>
 
         {{-- Stat Cards --}}
-        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+        <div class="flex flex-nowrap overflow-x-auto gap-4 pb-2 w-full custom-scrollbar">
+            <div class="flex-1 min-w-[140px] bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
                 <p class="text-xs font-medium text-slate-500 uppercase">Total Project</p>
                 <p class="text-2xl font-bold text-slate-800 dark:text-white mt-1">{{ $stats['total'] }}</p>
             </div>
-            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+            <div class="flex-1 min-w-[140px] bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
                 <p class="text-xs font-medium text-slate-500 uppercase">Not Started</p>
                 <p class="text-2xl font-bold text-slate-800 dark:text-white mt-1">{{ $stats['not_started'] }}</p>
             </div>
-            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+            <div class="flex-1 min-w-[140px] bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
                 <p class="text-xs font-medium text-blue-600 uppercase">Development</p>
                 <p class="text-2xl font-bold text-blue-700 dark:text-blue-500 mt-1">{{ $stats['development'] }}</p>
             </div>
-            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+            <div class="flex-1 min-w-[140px] bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
                 <p class="text-xs font-medium text-green-600 uppercase">Live</p>
                 <p class="text-2xl font-bold text-green-700 dark:text-green-500 mt-1">{{ $stats['live'] }}</p>
             </div>
-            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+            <div class="flex-1 min-w-[140px] bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
                 <p class="text-xs font-medium text-purple-600 uppercase">Live w/ CR</p>
                 <p class="text-2xl font-bold text-purple-700 dark:text-purple-500 mt-1">{{ $stats['live_cr'] }}</p>
             </div>
-            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+            <div class="flex-1 min-w-[140px] bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
                 <p class="text-xs font-medium text-amber-600 uppercase">Live w/ Bug</p>
                 <p class="text-2xl font-bold text-amber-700 dark:text-amber-500 mt-1">{{ $stats['live_bug'] }}</p>
             </div>
-            <div class="bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+            <div class="flex-1 min-w-[140px] bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
                 <p class="text-xs font-medium text-red-600 uppercase">Hold/Retired</p>
                 <p class="text-2xl font-bold text-red-700 dark:text-red-500 mt-1">{{ $stats['hold'] }}</p>
             </div>
@@ -106,26 +106,14 @@
                                 @endif
                             </td>
                             <td class="px-4 py-3 text-center">
-                                @php
-                                    $statusColors = [
-                                        'Not Started' => 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-                                        'Development' => 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
-                                        'Live' => 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
-                                        'Live w/ CR' => 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
-                                        'Live w/ Bug' => 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
-                                        'Hold' => 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
-                                        'Retired' => 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300',
-                                    ];
-                                    $color = $statusColors[$project->status] ?? 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400';
-                                @endphp
-                                <select data-old-value="{{ $project->status }}" onchange="updateProjectStatus({{ $project->id }}, this)" class="px-2 py-1 rounded text-[10px] font-bold w-full {{ $color }} cursor-pointer outline-none appearance-none text-center">
-                                    <option value="Not Started" class="bg-white text-slate-800" {{ $project->status == 'Not Started' ? 'selected' : '' }}>NOT STARTED</option>
-                                    <option value="Development" class="bg-white text-slate-800" {{ $project->status == 'Development' ? 'selected' : '' }}>DEVELOPMENT</option>
-                                    <option value="Live" class="bg-white text-slate-800" {{ $project->status == 'Live' ? 'selected' : '' }}>LIVE</option>
-                                    <option value="Live w/ CR" class="bg-white text-slate-800" {{ $project->status == 'Live w/ CR' ? 'selected' : '' }}>LIVE W/ CR</option>
-                                    <option value="Live w/ Bug" class="bg-white text-slate-800" {{ $project->status == 'Live w/ Bug' ? 'selected' : '' }}>LIVE W/ BUG</option>
-                                    <option value="Hold" class="bg-white text-slate-800" {{ $project->status == 'Hold' ? 'selected' : '' }}>HOLD</option>
-                                    <option value="Retired" class="bg-white text-slate-800" {{ $project->status == 'Retired' ? 'selected' : '' }}>RETIRED</option>
+                                <select data-old-value="{{ $project->status_id }}" onchange="updateProjectStatus({{ $project->id }}, this)" 
+                                        style="background-color: {{ $project->status ? $project->status->color . '15' : '#f1f5f9' }}; color: {{ $project->status ? $project->status->color : '#475569' }};"
+                                        class="px-2 py-1 rounded text-[10px] font-bold w-full cursor-pointer outline-none appearance-none text-center">
+                                    @foreach($statuses as $st)
+                                        <option value="{{ $st->id }}" style="color: {{ $st->color }}; background-color: #fff;" {{ $project->status_id == $st->id ? 'selected' : '' }}>
+                                            {{ strtoupper($st->name) }}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </td>
                             <td class="px-4 py-3 text-center">
@@ -136,7 +124,7 @@
                                     <span class="text-xs font-semibold">{{ $project->progress }}%</span>
                                 </div>
                             </td>
-                            <td class="px-4 py-3 text-xs">{{ $project->bpo ?? '-' }}</td>
+                            <td class="px-4 py-3 text-xs">{{ $project->bpoDivision?->name ?? '-' }}</td>
                             <td class="px-4 py-3 text-center">
                                 <div class="flex items-center justify-center gap-1">
                                     <a href="{{ route('it-work-hub.show', $project->id) }}" class="inline-flex items-center gap-1 px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-medium rounded-md transition-colors" title="Detail">
@@ -177,18 +165,12 @@
             return;
         }
 
-        const statusColors = {
-            'Not Started': 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-            'Development': 'bg-blue-100 text-blue-700 dark:bg-blue-500/20 dark:text-blue-400',
-            'Live': 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
-            'Live w/ CR': 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
-            'Live w/ Bug': 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
-            'Hold': 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
-            'Retired': 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300'
-        };
+        const selectedOption = selectElement.options[selectElement.selectedIndex];
+        const color = selectedOption.style.color;
 
         // Update color
-        selectElement.className = `px-2 py-1 rounded text-[10px] font-bold w-full ${statusColors[newStatus]} cursor-pointer outline-none appearance-none text-center`;
+        selectElement.style.color = color;
+        selectElement.style.backgroundColor = color + '15';
 
         fetch(`/it-work-hub/status/${id}`, {
             method: 'POST',
@@ -196,7 +178,7 @@
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
-            body: JSON.stringify({ status: newStatus })
+            body: JSON.stringify({ status_id: newStatus })
         })
         .then(response => response.json())
         .then(data => {
@@ -212,7 +194,9 @@
             alert('Gagal memperbarui status project');
             // Revert back on error
             selectElement.value = oldStatus;
-            selectElement.className = `px-2 py-1 rounded text-[10px] font-bold w-full ${statusColors[oldStatus]} cursor-pointer outline-none appearance-none text-center`;
+            const oldOption = selectElement.options[selectElement.selectedIndex];
+            selectElement.style.color = oldOption.style.color;
+            selectElement.style.backgroundColor = oldOption.style.color + '15';
         });
     }
 </script>

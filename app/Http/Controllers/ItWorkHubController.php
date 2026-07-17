@@ -9,18 +9,18 @@ class ItWorkHubController extends Controller
     public function dashboard()
     {
         // App Dev Stats
-        $allAppDevStatuses = ['Not Started', 'Development', 'Live', 'Live w/ CR', 'Live w/ Bug', 'Hold', 'Retired'];
-        $appDevRaw = \App\Models\ItWhProject::selectRaw('status, count(*) as count')->groupBy('status')->pluck('count', 'status');
-        $appDevStats = collect($allAppDevStatuses)->mapWithKeys(fn($s) => [$s => $appDevRaw[$s] ?? 0]);
+        $appDevStatuses = \App\Models\ItWhMasterStatus::where('category', 'Project App')->get();
+        $appDevRaw = \App\Models\ItWhProject::selectRaw('status_id, count(*) as count')->groupBy('status_id')->pluck('count', 'status_id');
+        $appDevStats = $appDevStatuses->mapWithKeys(fn($s) => [$s->name => $appDevRaw[$s->id] ?? 0]);
         $appDevTotal = (int) $appDevStats->sum();
         $appDevAvgProgress = round(\App\Models\ItWhProject::avg('progress') ?? 0);
         $appDevPriorityRaw = \App\Models\ItWhProject::selectRaw('priority, count(*) as count')->groupBy('priority')->pluck('count', 'priority');
         $appDevPriorityStats = ['High' => $appDevPriorityRaw['High'] ?? 0, 'Medium' => $appDevPriorityRaw['Medium'] ?? 0, 'Low' => $appDevPriorityRaw['Low'] ?? 0];
 
         // Non App Stats
-        $allNonAppStatuses = ['Not Started', 'Development', 'Live', 'Live w/ CR', 'Live w/ Bug', 'Hold', 'Retired'];
-        $nonAppRaw = \App\Models\ItWhNonappProject::selectRaw('status, count(*) as count')->groupBy('status')->pluck('count', 'status');
-        $nonAppStats = collect($allNonAppStatuses)->mapWithKeys(fn($s) => [$s => $nonAppRaw[$s] ?? 0]);
+        $nonAppStatuses = \App\Models\ItWhMasterStatus::where('category', 'Project Non-App')->get();
+        $nonAppRaw = \App\Models\ItWhNonappProject::selectRaw('status_id, count(*) as count')->groupBy('status_id')->pluck('count', 'status_id');
+        $nonAppStats = $nonAppStatuses->mapWithKeys(fn($s) => [$s->name => $nonAppRaw[$s->id] ?? 0]);
         $nonAppTotal = (int) $nonAppStats->sum();
         $nonAppAvgProgress = round(\App\Models\ItWhNonappProject::avg('progress') ?? 0);
         $nonAppPriorityRaw = \App\Models\ItWhNonappProject::selectRaw('priority, count(*) as count')->groupBy('priority')->pluck('count', 'priority');
@@ -40,9 +40,9 @@ class ItWorkHubController extends Controller
         $governanceAvgProgress = round($governanceAll->avg('progress') ?? 0);
 
         // Project Group Stats
-        $allGroupStatuses = ['Not Started', 'Progress', 'Live', 'Live w/ CR', 'Live (Bug Fixing)', 'Hold', 'Retired'];
-        $groupRaw = \App\Models\ItWhProjectGroup::selectRaw('status, count(*) as count')->groupBy('status')->pluck('count', 'status');
-        $groupStats = collect($allGroupStatuses)->mapWithKeys(fn($s) => [$s => $groupRaw[$s] ?? 0]);
+        $groupRaw = \App\Models\ItWhProjectGroup::selectRaw('status_id, count(*) as count')->groupBy('status_id')->pluck('count', 'status_id');
+        $projectAppStatuses = \App\Models\ItWhMasterStatus::where('category', 'Project App')->where('is_active', true)->orderBy('sort_order')->get();
+        $groupStats = $projectAppStatuses->mapWithKeys(fn($s) => [$s->name => $groupRaw[$s->id] ?? 0]);
         $groupTotal = (int) $groupStats->sum();
         $groupAvgProgress = round(\App\Models\ItWhProjectGroup::avg('progress') ?? 0);
 
@@ -50,22 +50,25 @@ class ItWorkHubController extends Controller
         $appDevActByPic = \Illuminate\Support\Facades\DB::table('it_wh_activity_user')
             ->join('users', 'users.id', '=', 'it_wh_activity_user.user_id')
             ->join('it_wh_activities', 'it_wh_activities.id', '=', 'it_wh_activity_user.it_wh_activity_id')
-            ->selectRaw('users.id as user_id, users.name, it_wh_activities.status, count(*) as count')
-            ->groupBy('users.id', 'users.name', 'it_wh_activities.status')
+            ->join('it_wh_master_statuses', 'it_wh_master_statuses.id', '=', 'it_wh_activities.status_id')
+            ->selectRaw('users.id as user_id, users.name, it_wh_master_statuses.name as status, count(*) as count')
+            ->groupBy('users.id', 'users.name', 'it_wh_master_statuses.name')
             ->get();
 
         $nonAppActByPic = \Illuminate\Support\Facades\DB::table('it_wh_nonapp_activity_user')
             ->join('users', 'users.id', '=', 'it_wh_nonapp_activity_user.user_id')
             ->join('it_wh_nonapp_activities', 'it_wh_nonapp_activities.id', '=', 'it_wh_nonapp_activity_user.it_wh_nonapp_activity_id')
-            ->selectRaw('users.id as user_id, users.name, it_wh_nonapp_activities.status, count(*) as count')
-            ->groupBy('users.id', 'users.name', 'it_wh_nonapp_activities.status')
+            ->join('it_wh_master_statuses', 'it_wh_master_statuses.id', '=', 'it_wh_nonapp_activities.status_id')
+            ->selectRaw('users.id as user_id, users.name, it_wh_master_statuses.name as status, count(*) as count')
+            ->groupBy('users.id', 'users.name', 'it_wh_master_statuses.name')
             ->get();
 
         $govActByPic = \Illuminate\Support\Facades\DB::table('it_wh_governance_activity_user')
             ->join('users', 'users.id', '=', 'it_wh_governance_activity_user.user_id')
             ->join('it_wh_governance_activities', 'it_wh_governance_activities.id', '=', 'it_wh_governance_activity_user.it_wh_governance_activity_id')
-            ->selectRaw('users.id as user_id, users.name, it_wh_governance_activities.status, count(*) as count')
-            ->groupBy('users.id', 'users.name', 'it_wh_governance_activities.status')
+            ->join('it_wh_master_statuses', 'it_wh_master_statuses.id', '=', 'it_wh_governance_activities.status_id')
+            ->selectRaw('users.id as user_id, users.name, it_wh_master_statuses.name as status, count(*) as count')
+            ->groupBy('users.id', 'users.name', 'it_wh_master_statuses.name')
             ->get();
 
         $picSummary = collect();
@@ -88,11 +91,11 @@ class ItWorkHubController extends Controller
         $picProgress = $picSummary->map(fn($p) => $p['total'] > 0 ? round(($p['done'] / $p['total']) * 100) : 0)->toArray();
 
         // Total Activities & Overdue
-        $overdueAppDev = \App\Models\ItWhActivity::where('status', '!=', 'Done')
+        $overdueAppDev = \App\Models\ItWhActivity::whereHas('status', fn($q) => $q->where('name', '!=', 'Done'))
             ->whereRaw('COALESCE(adjustment_date, deadline) < ?', [today()])->count();
-        $overdueNonApp = \App\Models\ItWhNonappActivity::where('status', '!=', 'Done')
+        $overdueNonApp = \App\Models\ItWhNonappActivity::whereHas('status', fn($q) => $q->where('name', '!=', 'Done'))
             ->whereRaw('COALESCE(adjustment_date, deadline) < ?', [today()])->count();
-        $overdueGov = \App\Models\ItWhGovernanceActivity::where('status', '!=', 'Done')
+        $overdueGov = \App\Models\ItWhGovernanceActivity::whereHas('status', fn($q) => $q->where('name', '!=', 'Done'))
             ->whereRaw('COALESCE(adjustment_date, deadline) < ?', [today()])->count();
 
         $totalAppDevAct = \App\Models\ItWhActivity::count();
@@ -102,6 +105,8 @@ class ItWorkHubController extends Controller
         $totalActivities = $totalAppDevAct + $totalNonAppAct + $totalGovAct;
         $totalOverdue = $overdueAppDev + $overdueNonApp + $overdueGov;
 
+        $dbStatusColors = \App\Models\ItWhMasterStatus::pluck('color', 'name')->toArray();
+
         return view('it-work-hub.dashboard', compact(
             'appDevStats', 'appDevTotal', 'appDevAvgProgress', 'appDevPriorityStats',
             'nonAppStats', 'nonAppTotal', 'nonAppAvgProgress', 'nonAppPriorityStats',
@@ -109,14 +114,15 @@ class ItWorkHubController extends Controller
             'groupStats', 'groupTotal', 'groupAvgProgress',
             'picSummary', 'picNames', 'picTotals', 'picDone', 'picProgress',
             'totalAppDevAct', 'totalNonAppAct', 'totalGovAct', 'totalActivities',
-            'overdueAppDev', 'overdueNonApp', 'overdueGov', 'totalOverdue'
+            'overdueAppDev', 'overdueNonApp', 'overdueGov', 'totalOverdue',
+            'dbStatusColors'
         ));
     }
 
 
     public function longlist(Request $request)
     {
-        $query = \App\Models\ItWhProject::with('squads');
+        $query = \App\Models\ItWhProject::with(['squads', 'status', 'bpoDivision']);
 
         // Search logic (optional if added later)
         if ($request->filled('search')) {
@@ -129,23 +135,27 @@ class ItWorkHubController extends Controller
         // Stats
         $stats = [
             'total' => \App\Models\ItWhProject::count(),
-            'not_started' => \App\Models\ItWhProject::where('status', 'Not Started')->count(),
-            'development' => \App\Models\ItWhProject::where('status', 'Development')->count(),
-            'live' => \App\Models\ItWhProject::where('status', 'Live')->count(),
-            'live_cr' => \App\Models\ItWhProject::where('status', 'Live w/ CR')->count(),
-            'live_bug' => \App\Models\ItWhProject::where('status', 'Live w/ Bug')->count(),
-            'hold' => \App\Models\ItWhProject::whereIn('status', ['Hold', 'Retired'])->count(),
+            'not_started' => \App\Models\ItWhProject::whereHas('status', fn($q) => $q->where('name', 'Not Started'))->count(),
+            'development' => \App\Models\ItWhProject::whereHas('status', fn($q) => $q->where('name', 'Development'))->count(),
+            'live' => \App\Models\ItWhProject::whereHas('status', fn($q) => $q->where('name', 'Live'))->count(),
+            'live_cr' => \App\Models\ItWhProject::whereHas('status', fn($q) => $q->where('name', 'Live w/ CR'))->count(),
+            'live_bug' => \App\Models\ItWhProject::whereHas('status', fn($q) => $q->where('name', 'Live w/ Bug'))->count(),
+            'hold' => \App\Models\ItWhProject::whereHas('status', fn($q) => $q->whereIn('name', ['Hold', 'Retired']))->count(),
         ];
 
-        return view('it-work-hub.app-dev.longlist', compact('projects', 'stats'));
+        $statuses = \App\Models\ItWhMasterStatus::where('category', 'Project App')->where('is_active', true)->orderBy('sort_order')->get();
+
+        return view('it-work-hub.app-dev.longlist', compact('projects', 'stats', 'statuses'));
     }
 
     public function create()
     {
         // Ambil data user selain admin dan project_manager untuk Squad
         $users = \App\Models\User::whereNotIn('role', ['admin', 'project_manager'])->get();
+        $statuses = \App\Models\ItWhMasterStatus::where('category', 'Project App')->where('is_active', true)->orderBy('sort_order')->get();
+        $divisions = \App\Models\ItWhMasterDivision::where('is_active', true)->orderBy('name')->get();
 
-        return view('it-work-hub.app-dev.create', compact('users'));
+        return view('it-work-hub.app-dev.create', compact('users', 'statuses', 'divisions'));
     }
 
     public function store(Request $request)
@@ -154,10 +164,10 @@ class ItWorkHubController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'priority' => 'required|in:High,Medium,Low',
-            'status' => 'required|string',
+            'status_id' => 'required|exists:it_wh_master_statuses,id',
             'squads' => 'required|array',
             'squads.*' => 'exists:users,id',
-            'bpo' => 'nullable|string|max:255',
+            'bpo_division_id' => 'nullable|exists:it_wh_master_divisions,id',
             'progress' => 'required|integer|min:0|max:100',
             'pain_point_uraian' => 'nullable|string',
             'pain_point_impact' => 'nullable|string',
@@ -167,8 +177,8 @@ class ItWorkHubController extends Controller
             'name' => $validated['name'],
             'description' => $validated['description'],
             'priority' => $validated['priority'],
-            'status' => $validated['status'],
-            'bpo' => $validated['bpo'],
+            'status_id' => $validated['status_id'],
+            'bpo_division_id' => $validated['bpo_division_id'] ?? null,
             'progress' => $validated['progress'],
             'pain_point_uraian' => $validated['pain_point_uraian'],
             'pain_point_impact' => $validated['pain_point_impact'],
@@ -182,9 +192,10 @@ class ItWorkHubController extends Controller
 
     public function show($id)
     {
-        $project = \App\Models\ItWhProject::with(['squads', 'documents'])->findOrFail($id);
+        $project = \App\Models\ItWhProject::with(['squads', 'documents', 'status', 'bpoDivision'])->findOrFail($id);
         $users = \App\Models\User::whereNotIn('role', ['admin', 'project_manager'])->get();
-        return view('it-work-hub.app-dev.show', compact('project', 'users'));
+        $divisions = \App\Models\ItWhMasterDivision::where('is_active', true)->orderBy('name')->get();
+        return view('it-work-hub.app-dev.show', compact('project', 'users', 'divisions'));
     }
 
     public function update(Request $request, $id)
@@ -192,7 +203,7 @@ class ItWorkHubController extends Controller
         $validated = $request->validate([
             'squads' => 'nullable|array',
             'squads.*' => 'exists:users,id',
-            'bpo' => 'nullable|string|max:255',
+            'bpo_division_id' => 'nullable|exists:it_wh_master_divisions,id',
             'pain_point_uraian' => 'nullable|string',
             'pain_point_impact' => 'nullable|string',
             'priority' => 'required|in:High,Medium,Low',
@@ -200,7 +211,7 @@ class ItWorkHubController extends Controller
 
         $project = \App\Models\ItWhProject::findOrFail($id);
         $project->update([
-            'bpo' => $validated['bpo'] ?? null,
+            'bpo_division_id' => $validated['bpo_division_id'] ?? null,
             'pain_point_uraian' => $validated['pain_point_uraian'] ?? null,
             'pain_point_impact' => $validated['pain_point_impact'] ?? null,
             'priority' => $validated['priority'],
@@ -233,11 +244,11 @@ class ItWorkHubController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|string',
+            'status_id' => 'required|exists:it_wh_master_statuses,id',
         ]);
 
         $project = \App\Models\ItWhProject::findOrFail($id);
-        $project->status = $request->status;
+        $project->status_id = $request->status_id;
         $project->save();
 
         return response()->json(['success' => true, 'message' => 'Status project berhasil diperbarui.']);
@@ -245,9 +256,10 @@ class ItWorkHubController extends Controller
 
     public function activities($id)
     {
-        $project = \App\Models\ItWhProject::with(['squads', 'activities.pics'])->findOrFail($id);
+        $project = \App\Models\ItWhProject::with(['squads', 'activities.pics', 'activities.status'])->findOrFail($id);
         $users = \App\Models\User::whereNotIn('role', ['admin', 'project_manager'])->get();
-        return view('it-work-hub.app-dev.activities', compact('project', 'users'));
+        $statuses = \App\Models\ItWhMasterStatus::where('category', 'Activity')->where('is_active', true)->orderBy('sort_order')->get();
+        return view('it-work-hub.app-dev.activities', compact('project', 'users', 'statuses'));
     }
 
     public function updateActivities(Request $request, $id)
@@ -264,7 +276,7 @@ class ItWorkHubController extends Controller
             'activities.*.adjustment_date' => 'nullable|date',
             'activities.*.notes' => 'nullable|string',
             'activities.*.document_link' => 'nullable|url',
-            'activities.*.status' => 'required|string',
+            'activities.*.status_id' => 'required|exists:it_wh_master_statuses,id',
             'activities.*.sort_order' => 'required|integer',
             'activities.*.pics' => 'nullable|array',
             'activities.*.pics.*' => 'exists:users,id',
@@ -284,7 +296,7 @@ class ItWorkHubController extends Controller
                     'adjustment_date' => $actData['adjustment_date'] ?: null,
                     'notes' => $actData['notes'] ?? null,
                     'document_link' => $actData['document_link'] ?? null,
-                    'status' => $actData['status'],
+                    'status_id' => $actData['status_id'],
                     'sort_order' => $actData['sort_order'],
                 ]
             );
@@ -383,20 +395,21 @@ class ItWorkHubController extends Controller
 
     public function projectGroups()
     {
-        $projectGroups = \App\Models\ItWhProjectGroup::with('projects')->orderBy('sort_order')->get();
+        $projectGroups = \App\Models\ItWhProjectGroup::with(['projects', 'status'])->orderBy('sort_order')->get();
         $projects = \App\Models\ItWhProject::orderBy('name')->get();
+        $statuses = \App\Models\ItWhMasterStatus::where('category', 'Project App')->where('is_active', true)->orderBy('sort_order')->get();
         
         $stats = [
             'total' => \App\Models\ItWhProjectGroup::count(),
-            'not_started' => \App\Models\ItWhProjectGroup::where('status', 'Not Started')->count(),
-            'progress' => \App\Models\ItWhProjectGroup::where('status', 'Progress')->count(),
-            'live' => \App\Models\ItWhProjectGroup::where('status', 'Live')->count(),
-            'live_cr' => \App\Models\ItWhProjectGroup::where('status', 'Live w/ CR')->count(),
-            'live_bug' => \App\Models\ItWhProjectGroup::where('status', 'Live (Bug Fixing)')->count(),
-            'hold' => \App\Models\ItWhProjectGroup::whereIn('status', ['Hold', 'Retired'])->count(),
+            'not_started' => \App\Models\ItWhProjectGroup::whereHas('status', fn($q) => $q->where('name', 'Not Started'))->count(),
+            'progress' => \App\Models\ItWhProjectGroup::whereHas('status', fn($q) => $q->where('name', 'Development'))->count(),
+            'live' => \App\Models\ItWhProjectGroup::whereHas('status', fn($q) => $q->where('name', 'Live'))->count(),
+            'live_cr' => \App\Models\ItWhProjectGroup::whereHas('status', fn($q) => $q->where('name', 'Live w/ CR'))->count(),
+            'live_bug' => \App\Models\ItWhProjectGroup::whereHas('status', fn($q) => $q->where('name', 'Live w/ Bug'))->count(),
+            'hold' => \App\Models\ItWhProjectGroup::whereHas('status', fn($q) => $q->whereIn('name', ['Hold', 'Dropped']))->count(),
         ];
 
-        return view('it-work-hub.project-groups', compact('projectGroups', 'projects', 'stats'));
+        return view('it-work-hub.project-groups', compact('projectGroups', 'projects', 'stats', 'statuses'));
     }
 
     public function updateProjectGroups(Request $request)
@@ -405,7 +418,7 @@ class ItWorkHubController extends Controller
             'groups' => 'present|array',
             'groups.*.id' => 'nullable',
             'groups.*.name' => 'required|string',
-            'groups.*.status' => 'required|string',
+            'groups.*.status_id' => 'required|exists:it_wh_master_statuses,id',
             'groups.*.deadline' => 'nullable|date',
             'groups.*.description' => 'nullable|string',
             'groups.*.sort_order' => 'required|integer',
@@ -421,7 +434,7 @@ class ItWorkHubController extends Controller
                 ['id' => (isset($groupData['id']) && is_numeric($groupData['id'])) ? $groupData['id'] : null],
                 [
                     'name' => $groupData['name'],
-                    'status' => $groupData['status'],
+                    'status_id' => $groupData['status_id'],
                     'deadline' => $groupData['deadline'] ?: null,
                     'description' => $groupData['description'] ?? null,
                     'sort_order' => $groupData['sort_order'],

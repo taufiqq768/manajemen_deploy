@@ -11,12 +11,17 @@ class ItWhProjectGroup extends Model
 
     protected $fillable = [
         'name',
-        'status',
+        'status_id',
         'progress',
         'deadline',
         'description',
         'sort_order',
     ];
+
+    public function status()
+    {
+        return $this->belongsTo(ItWhMasterStatus::class, 'status_id');
+    }
 
     protected $casts = [
         'deadline' => 'date',

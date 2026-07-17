@@ -112,9 +112,10 @@ class ItWhGovernanceController extends Controller
 
     public function activities($id)
     {
-        $gov = ItWhGovernance::with(['pics', 'activities.pics'])->findOrFail($id);
+        $gov = ItWhGovernance::with(['pics', 'activities.pics', 'activities.status'])->findOrFail($id);
         $users = User::whereNotIn('role', ['admin', 'project_manager'])->get();
-        return view('it-work-hub.governance.activities', compact('gov', 'users'));
+        $statuses = \App\Models\ItWhMasterStatus::where('category', 'Governance')->where('is_active', true)->orderBy('sort_order')->get();
+        return view('it-work-hub.governance.activities', compact('gov', 'users', 'statuses'));
     }
 
     public function updateActivities(Request $request, $id)
@@ -130,7 +131,7 @@ class ItWhGovernanceController extends Controller
                 'activities.*.deadline' => 'nullable|date',
                 'activities.*.adjustment_date' => 'nullable|date',
                 'activities.*.notes' => 'nullable|string',
-                'activities.*.status' => 'required|string',
+                'activities.*.status_id' => 'required|exists:it_wh_master_statuses,id',
                 'activities.*.progress' => 'required|integer|min:0|max:100',
                 'activities.*.sort_order' => 'required|integer',
                 'activities.*.pics' => 'nullable|array',
@@ -154,7 +155,7 @@ class ItWhGovernanceController extends Controller
                         'deadline' => $actData['deadline'] ?: null,
                         'adjustment_date' => $actData['adjustment_date'] ?: null,
                         'notes' => $actData['notes'] ?? null,
-                        'status' => $actData['status'],
+                        'status_id' => $actData['status_id'],
                         'progress' => $actData['progress'],
                         'sort_order' => $actData['sort_order'],
                     ]

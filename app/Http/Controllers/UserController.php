@@ -28,7 +28,7 @@ class UserController extends Controller
             'email'    => 'required|string|email|max:255|unique:users',
             'nik'      => 'required|string|max:50|unique:users',
             'phone_wa' => 'nullable|string|max:20',
-            'role'     => 'required|in:admin,project_manager,programmer',
+            'role'     => 'required|in:admin,project_manager,programmer,governance,operational',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
@@ -56,7 +56,7 @@ class UserController extends Controller
             'email'    => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
             'nik'      => ['required', 'string', 'max:50', Rule::unique('users')->ignore($user->id)],
             'phone_wa' => 'nullable|string|max:20',
-            'role'     => 'required|in:admin,project_manager,programmer',
+            'role'     => 'required|in:admin,project_manager,programmer,governance,operational',
         ]);
 
         $user->update($validated);

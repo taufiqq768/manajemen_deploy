@@ -76,6 +76,8 @@
                                 <option value="programmer" {{ old('role', $user->role) === 'programmer' ? 'selected' : '' }}>Programmer</option>
                                 <option value="project_manager" {{ old('role', $user->role) === 'project_manager' ? 'selected' : '' }}>Project Manager</option>
                                 <option value="admin" {{ old('role', $user->role) === 'admin' ? 'selected' : '' }}>Administrator</option>
+                                <option value="governance" {{ old('role', $user->role) === 'governance' ? 'selected' : '' }}>Governance</option>
+                                <option value="operational" {{ old('role', $user->role) === 'operational' ? 'selected' : '' }}>Operational</option>
                             </select>
                             @error('role')<p class="mt-1 text-xs text-red-500">{{ $message }}</p>@enderror
                         </div>

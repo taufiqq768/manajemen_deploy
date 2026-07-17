@@ -80,7 +80,7 @@
                 <p class="text-2xl font-bold text-slate-800 dark:text-white mt-1">{{ $stats['not_started'] }}</p>
             </div>
             <div class="flex-1 min-w-[140px] bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
-                <p class="text-[11px] font-bold text-blue-600 uppercase tracking-wider">Progress</p>
+                <p class="text-[11px] font-bold text-blue-600 uppercase tracking-wider">Development</p>
                 <p class="text-2xl font-bold text-blue-700 dark:text-blue-500 mt-1">{{ $stats['progress'] }}</p>
             </div>
             <div class="flex-1 min-w-[140px] bg-white dark:bg-slate-900 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
@@ -134,13 +134,9 @@
                                 <td class="px-1 py-1"><input type="text" class="input-name w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm font-medium text-slate-800 dark:text-slate-200 px-2 py-1.5 rounded" value="{{ $group->name }}"></td>
                                 <td class="px-1 py-1">
                                     <select onchange="updateGroupStatusColor(this)" class="status-dropdown w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
-                                        <option value="Not Started" class="text-slate-500" {{ $group->status == 'Not Started' ? 'selected' : '' }}>NOT STARTED</option>
-                                        <option value="Progress" class="text-blue-500" {{ $group->status == 'Progress' ? 'selected' : '' }}>PROGRESS</option>
-                                        <option value="Live" class="text-[#639922]" {{ $group->status == 'Live' ? 'selected' : '' }}>LIVE</option>
-                                        <option value="Live (Bug Fixing)" class="text-amber-500" {{ $group->status == 'Live (Bug Fixing)' ? 'selected' : '' }}>LIVE (BUG FIXING)</option>
-                                        <option value="Live w/ CR" class="text-purple-600" {{ $group->status == 'Live w/ CR' ? 'selected' : '' }}>LIVE W/ CR</option>
-                                        <option value="Hold" class="text-red-600" {{ $group->status == 'Hold' ? 'selected' : '' }}>HOLD</option>
-                                        <option value="Retired" class="text-slate-500" {{ $group->status == 'Retired' ? 'selected' : '' }}>RETIRED</option>
+                                        @foreach($statuses as $st)
+                                            <option value="{{ $st->id }}" style="color: {{ $st->color }}; background-color: #fff;" data-color="{{ $st->color }}" {{ $group->status_id == $st->id ? 'selected' : '' }}>{{ strtoupper($st->name) }}</option>
+                                        @endforeach
                                     </select>
                                 </td>
                                 <td class="px-1 py-1" style="min-width: 250px;">
@@ -182,14 +178,10 @@
             <td class="px-2 py-1 text-center font-medium text-slate-500 row-number"><span class="number-text"></span></td>
             <td class="px-1 py-1"><input type="text" class="input-name w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-sm font-medium text-slate-800 dark:text-slate-200 px-2 py-1.5 rounded" placeholder="Nama Group..."></td>
             <td class="px-1 py-1">
-                <select onchange="updateGroupStatusColor(this)" class="status-dropdown text-slate-500 w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
-                    <option value="Not Started" class="text-slate-500" selected>NOT STARTED</option>
-                    <option value="Progress" class="text-blue-500">PROGRESS</option>
-                    <option value="Live" class="text-[#639922]">LIVE</option>
-                    <option value="Live (Bug Fixing)" class="text-amber-500">LIVE (BUG FIXING)</option>
-                    <option value="Live w/ CR" class="text-purple-600">LIVE W/ CR</option>
-                    <option value="Hold" class="text-red-600">HOLD</option>
-                    <option value="Retired" class="text-slate-500">RETIRED</option>
+                <select onchange="updateGroupStatusColor(this)" class="status-dropdown w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
+                    @foreach($statuses as $st)
+                        <option value="{{ $st->id }}" style="color: {{ $st->color }}; background-color: #fff;" data-color="{{ $st->color }}" {{ $loop->first ? 'selected' : '' }}>{{ strtoupper($st->name) }}</option>
+                    @endforeach
                 </select>
             </td>
             <td class="px-1 py-1" style="min-width: 250px;">
@@ -213,17 +205,9 @@
     <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
     <script>
         function updateGroupStatusColor(select) {
-            select.classList.remove('text-red-600', 'text-orange-500', 'text-amber-500', 'text-blue-500', 'text-indigo-500', 'text-teal-500', 'text-[#639922]', 'text-slate-500', 'text-purple-600');
-            
-            switch (select.value) {
-                case 'Not Started': select.classList.add('text-slate-500'); break;
-                case 'Progress': select.classList.add('text-blue-500'); break;
-                case 'Live': select.classList.add('text-[#639922]'); break;
-                case 'Live (Bug Fixing)': select.classList.add('text-amber-500'); break;
-                case 'Live w/ CR': select.classList.add('text-purple-600'); break;
-                case 'Hold': select.classList.add('text-red-600'); break;
-                case 'Retired': select.classList.add('text-slate-500'); break;
-                default: select.classList.add('text-slate-500'); break;
+            const opt = select.options[select.selectedIndex];
+            if (opt && opt.dataset.color) {
+                select.style.color = opt.dataset.color;
             }
         }
 
@@ -270,7 +254,7 @@
                     id: row.dataset.id || null,
                     sort_order: index + 1,
                     name: row.querySelector('.input-name').value,
-                    status: row.querySelector('.status-dropdown').value,
+                    status_id: row.querySelector('.status-dropdown').value,
                     projects: Array.from(row.querySelector('.input-projects').selectedOptions).map(opt => opt.value),
                     deadline: row.querySelector('.input-deadline').value,
                     description: row.querySelector('.input-desc').value

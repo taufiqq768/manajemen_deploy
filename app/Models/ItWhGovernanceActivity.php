@@ -13,10 +13,15 @@ class ItWhGovernanceActivity extends Model
         'deadline',
         'adjustment_date',
         'notes',
-        'status',
+        'status_id',
         'progress',
         'sort_order',
     ];
+
+    public function status()
+    {
+        return $this->belongsTo(ItWhMasterStatus::class, 'status_id');
+    }
 
     protected $casts = [
         'start_date' => 'date',

@@ -172,16 +172,9 @@
                                     <td class="px-1 py-1">
                                         <select onchange="updateStatusColor(this)"
                                             class="status-dropdown w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
-                                            <option value="Not Started" {{ $activity->status == 'Not Started' ? 'selected' : '' }}>NOT STARTED</option>
-                                            <option value="Ureq Analysis" {{ $activity->status == 'Ureq Analysis' ? 'selected' : '' }}>UREQ ANALYSIS</option>
-                                            <option value="Programming" {{ $activity->status == 'Programming' ? 'selected' : '' }}>PROGRAMMING</option>
-                                            <option value="Tech Testing" {{ $activity->status == 'Tech Testing' ? 'selected' : '' }}>TECH TESTING</option>
-                                            <option value="SIT" {{ $activity->status == 'SIT' ? 'selected' : '' }}>SIT
-                                            </option>
-                                            <option value="UAT" {{ $activity->status == 'UAT' ? 'selected' : '' }}>UAT
-                                            </option>
-                                            <option value="Done" {{ $activity->status == 'Done' ? 'selected' : '' }}>DONE
-                                            </option>
+                                            @foreach($statuses as $st)
+                                                <option value="{{ $st->id }}" style="color: {{ $st->color }}; background-color: #fff;" data-color="{{ $st->color }}" {{ $activity->status_id == $st->id ? 'selected' : '' }}>{{ strtoupper($st->name) }}</option>
+                                            @endforeach
                                         </select>
                                     </td>
                                     <td class="px-2 py-1 text-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -271,16 +264,9 @@
                                     <td class="px-1 py-1">
                                         <select onchange="updateStatusColor(this)"
                                             class="status-dropdown w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
-                                            <option value="Not Started" {{ $activity->status == 'Not Started' ? 'selected' : '' }}>NOT STARTED</option>
-                                            <option value="Ureq Analysis" {{ $activity->status == 'Ureq Analysis' ? 'selected' : '' }}>UREQ ANALYSIS</option>
-                                            <option value="Programming" {{ $activity->status == 'Programming' ? 'selected' : '' }}>PROGRAMMING</option>
-                                            <option value="Tech Testing" {{ $activity->status == 'Tech Testing' ? 'selected' : '' }}>TECH TESTING</option>
-                                            <option value="SIT" {{ $activity->status == 'SIT' ? 'selected' : '' }}>SIT
-                                            </option>
-                                            <option value="UAT" {{ $activity->status == 'UAT' ? 'selected' : '' }}>UAT
-                                            </option>
-                                            <option value="Done" {{ $activity->status == 'Done' ? 'selected' : '' }}>DONE
-                                            </option>
+                                            @foreach($statuses as $st)
+                                                <option value="{{ $st->id }}" style="color: {{ $st->color }}; background-color: #fff;" data-color="{{ $st->color }}" {{ $activity->status_id == $st->id ? 'selected' : '' }}>{{ strtoupper($st->name) }}</option>
+                                            @endforeach
                                         </select>
                                     </td>
                                     <td class="px-2 py-1 text-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -370,16 +356,9 @@
                                     <td class="px-1 py-1">
                                         <select onchange="updateStatusColor(this)"
                                             class="status-dropdown w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
-                                            <option value="Not Started" {{ $activity->status == 'Not Started' ? 'selected' : '' }}>NOT STARTED</option>
-                                            <option value="Ureq Analysis" {{ $activity->status == 'Ureq Analysis' ? 'selected' : '' }}>UREQ ANALYSIS</option>
-                                            <option value="Programming" {{ $activity->status == 'Programming' ? 'selected' : '' }}>PROGRAMMING</option>
-                                            <option value="Tech Testing" {{ $activity->status == 'Tech Testing' ? 'selected' : '' }}>TECH TESTING</option>
-                                            <option value="SIT" {{ $activity->status == 'SIT' ? 'selected' : '' }}>SIT
-                                            </option>
-                                            <option value="UAT" {{ $activity->status == 'UAT' ? 'selected' : '' }}>UAT
-                                            </option>
-                                            <option value="Done" {{ $activity->status == 'Done' ? 'selected' : '' }}>DONE
-                                            </option>
+                                            @foreach($statuses as $st)
+                                                <option value="{{ $st->id }}" style="color: {{ $st->color }}; background-color: #fff;" data-color="{{ $st->color }}" {{ $activity->status_id == $st->id ? 'selected' : '' }}>{{ strtoupper($st->name) }}</option>
+                                            @endforeach
                                         </select>
                                     </td>
                                     <td class="px-2 py-1 text-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -437,14 +416,10 @@
                     placeholder="https://..."></td>
             <td class="px-1 py-1">
                 <select onchange="updateStatusColor(this)"
-                    class="status-dropdown text-red-600 w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
-                    <option value="Not Started" class="text-red-600" selected>NOT STARTED</option>
-                    <option value="Ureq Analysis" class="text-orange-500">UREQ ANALYSIS</option>
-                    <option value="Programming" class="text-amber-500">PROGRAMMING</option>
-                    <option value="Tech Testing" class="text-blue-500">TECH TESTING</option>
-                    <option value="SIT" class="text-indigo-500">SIT</option>
-                    <option value="UAT" class="text-teal-500">UAT</option>
-                    <option value="Done" class="text-[#639922]">DONE</option>
+                    class="status-dropdown w-full bg-transparent border-transparent hover:border-slate-300 focus:border-[#639922] focus:ring-1 focus:ring-[#639922] focus:bg-white text-[10px] font-bold px-2 py-1.5 rounded uppercase appearance-none cursor-pointer">
+                    @foreach($statuses as $st)
+                        <option value="{{ $st->id }}" style="color: {{ $st->color }}; background-color: #fff;" data-color="{{ $st->color }}" {{ $loop->first ? 'selected' : '' }}>{{ strtoupper($st->name) }}</option>
+                    @endforeach
                 </select>
             </td>
             <td class="px-2 py-1 text-center opacity-0 group-hover:opacity-100 transition-opacity"><button type="button"
@@ -458,17 +433,9 @@
         <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
         <script>
             function updateStatusColor(select) {
-                select.classList.remove('text-red-600', 'text-orange-500', 'text-amber-500', 'text-blue-500', 'text-indigo-500', 'text-teal-500', 'text-[#639922]', 'text-slate-500');
-
-                switch (select.value) {
-                    case 'Not Started': select.classList.add('text-red-600'); break;
-                    case 'Ureq Analysis': select.classList.add('text-orange-500'); break;
-                    case 'Programming': select.classList.add('text-amber-500'); break;
-                    case 'Tech Testing': select.classList.add('text-blue-500'); break;
-                    case 'SIT': select.classList.add('text-indigo-500'); break;
-                    case 'UAT': select.classList.add('text-teal-500'); break;
-                    case 'Done': select.classList.add('text-[#639922]'); break;
-                    default: select.classList.add('text-slate-500'); break;
+                const opt = select.options[select.selectedIndex];
+                if (opt && opt.dataset.color) {
+                    select.style.color = opt.dataset.color;
                 }
             }
 
@@ -527,7 +494,7 @@
                             notes: row.querySelector('.input-desc').value,
                             pics: Array.from(row.querySelector('.input-pics').selectedOptions).map(opt => opt.value),
                             document_link: row.querySelector('input[type="url"]').value,
-                            status: row.querySelector('.status-dropdown').value
+                            status_id: row.querySelector('.status-dropdown').value
                         };
                         if (activity.name.trim() !== '') {
                             activities.push(activity);

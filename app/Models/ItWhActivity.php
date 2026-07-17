@@ -15,9 +15,14 @@ class ItWhActivity extends Model
         'adjustment_date',
         'notes',
         'document_link',
-        'status',
+        'status_id',
         'sort_order',
     ];
+
+    public function status()
+    {
+        return $this->belongsTo(ItWhMasterStatus::class, 'status_id');
+    }
 
     protected $casts = [
         'start_date' => 'date',

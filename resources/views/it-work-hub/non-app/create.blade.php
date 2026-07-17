@@ -66,12 +66,11 @@
                         <div class="space-y-1">
                             <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Status Awal <span
                                     class="text-red-500">*</span></label>
-                            <select name="status" required
+                            <select name="status_id" required
                                 class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]">
-                                <option value="Not Started" {{ old('status') == 'Not Started' ? 'selected' : '' }}>Not
-                                    Started</option>
-                                <option value="Live" {{ old('status') == 'Live' ? 'selected' : '' }}>Live</option>
-                                <option value="Hold" {{ old('status') == 'Hold' ? 'selected' : '' }}>Hold</option>
+                                @foreach($statuses as $status)
+                                    <option value="{{ $status->id }}" {{ old('status_id') == $status->id ? 'selected' : '' }}>{{ $status->name }}</option>
+                                @endforeach
                             </select>
                         </div>
 
@@ -90,9 +89,13 @@
                         <div class="space-y-1">
                             <label class="text-sm font-medium text-slate-700 dark:text-slate-300">Business Process Owner
                                 (BPO)</label>
-                            <input type="text" name="bpo" value="{{ old('bpo') }}"
-                                class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]"
-                                placeholder="Divisi terkait">
+                            <select name="bpo_division_id" id="select-division"
+                                class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]">
+                                <option value="">Pilih Divisi...</option>
+                                @foreach($divisions as $div)
+                                    <option value="{{ $div->id }}" {{ old('bpo_division_id') == $div->id ? 'selected' : '' }}>{{ $div->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="space-y-1">
@@ -220,6 +223,10 @@
                 plugins: ['remove_button'],
                 hideSelected: true,
                 placeholder: "Pilih anggota tim/squad..."
+            });
+            new TomSelect('#select-division', {
+                placeholder: "Pilih divisi terkait...",
+                allowEmptyOption: true
             });
         });
     </script>

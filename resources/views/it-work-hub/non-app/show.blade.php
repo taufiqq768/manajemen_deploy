@@ -11,19 +11,8 @@
                 <div>
                     <div class="flex items-center gap-3">
                         <h2 class="text-2xl font-bold text-slate-800 dark:text-white">{{ $project->name }}</h2>
-                        @php
-                            $statusColors = [
-                                'Not Started' => 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400',
-                                'Live' => 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400',
-                                'Live w/ CR' => 'bg-purple-100 text-purple-700 dark:bg-purple-500/20 dark:text-purple-400',
-                                'Live w/ Bug' => 'bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-400',
-                                'Hold' => 'bg-red-100 text-red-700 dark:bg-red-500/20 dark:text-red-400',
-                                'Retired' => 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300',
-                            ];
-                            $color = $statusColors[$project->status] ?? 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400';
-                        @endphp
-                        <span
-                            class="px-2 py-1 rounded text-[10px] font-bold {{ $color }}">{{ strtoupper($project->status) }}</span>
+                        <span style="background-color: {{ $project->status ? $project->status->color . '15' : '#f1f5f9' }}; color: {{ $project->status ? $project->status->color : '#475569' }}; border: 1px solid {{ $project->status ? $project->status->color . '30' : '#e2e8f0' }};"
+                            class="px-2 py-1 rounded text-[10px] font-bold">{{ strtoupper($project->status ? $project->status->name : 'Not Started') }}</span>
                     </div>
                     <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">{{ $project->description ?? '-' }}</p>
                 </div>
@@ -61,8 +50,7 @@
                         </div>
                         <div>
                             <p class="text-xs text-slate-500 mb-1">BPO</p>
-                            <p class="font-medium text-sm text-slate-800 dark:text-slate-200">{{ $project->bpo ?? '-' }}
-                            </p>
+                            <p class="font-medium text-sm text-slate-800 dark:text-slate-200">{{ $project->bpoDivision?->name ?? '-' }}</p>
                         </div>
                         <div>
                             <p class="text-xs text-slate-500 mb-1">Priority</p>
@@ -380,7 +368,12 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">BPO</label>
-                                    <input type="text" name="bpo" value="{{ old('bpo', $project->bpo) }}" class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]">
+                                    <select name="bpo_division_id" class="w-full rounded-lg border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 text-sm focus:border-[#639922] focus:ring-[#639922]">
+                                        <option value="">- Pilih Divisi -</option>
+                                        @foreach($divisions as $div)
+                                            <option value="{{ $div->id }}" {{ $project->bpo_division_id == $div->id ? 'selected' : '' }}>{{ $div->name }}</option>
+                                        @endforeach
+                                    </select>
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">Priority</label>

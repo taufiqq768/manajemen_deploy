@@ -12,7 +12,7 @@ class ItWorkHubNonAppController extends Controller
 {
     public function longlist(Request $request)
     {
-        $query = ItWhNonappProject::with('squads');
+        $query = ItWhNonappProject::with(['squads', 'status', 'bpoDivision']);
 
         // Search logic
         if ($request->filled('search')) {
@@ -25,23 +25,27 @@ class ItWorkHubNonAppController extends Controller
         // Stats
         $stats = [
             'total' => ItWhNonappProject::count(),
-            'not_started' => ItWhNonappProject::where('status', 'Not Started')->count(),
-            'development' => ItWhNonappProject::where('status', 'Development')->count(),
-            'live' => ItWhNonappProject::where('status', 'Live')->count(),
-            'live_cr' => ItWhNonappProject::where('status', 'Live w/ CR')->count(),
-            'live_bug' => ItWhNonappProject::where('status', 'Live w/ Bug')->count(),
-            'hold' => ItWhNonappProject::whereIn('status', ['Hold', 'Retired'])->count(),
+            'not_started' => ItWhNonappProject::whereHas('status', fn($q) => $q->where('name', 'Not Started'))->count(),
+            'development' => ItWhNonappProject::whereHas('status', fn($q) => $q->where('name', 'Development'))->count(),
+            'live' => ItWhNonappProject::whereHas('status', fn($q) => $q->where('name', 'Live'))->count(),
+            'live_cr' => ItWhNonappProject::whereHas('status', fn($q) => $q->where('name', 'Live w/ CR'))->count(),
+            'live_bug' => ItWhNonappProject::whereHas('status', fn($q) => $q->where('name', 'Live w/ Bug'))->count(),
+            'hold' => ItWhNonappProject::whereHas('status', fn($q) => $q->whereIn('name', ['Hold', 'Retired']))->count(),
         ];
 
-        return view('it-work-hub.non-app.longlist', compact('projects', 'stats'));
+        $statuses = \App\Models\ItWhMasterStatus::where('category', 'Project Non-App')->where('is_active', true)->orderBy('sort_order')->get();
+
+        return view('it-work-hub.non-app.longlist', compact('projects', 'stats', 'statuses'));
     }
 
     public function create()
     {
         // Ambil data user selain admin dan project_manager untuk Squad
         $users = User::whereNotIn('role', ['admin', 'project_manager'])->get();
+        $statuses = \App\Models\ItWhMasterStatus::where('category', 'Project Non-App')->where('is_active', true)->orderBy('sort_order')->get();
+        $divisions = \App\Models\ItWhMasterDivision::where('is_active', true)->orderBy('name')->get();
 
-        return view('it-work-hub.non-app.create', compact('users'));
+        return view('it-work-hub.non-app.create', compact('users', 'statuses', 'divisions'));
     }
 
     public function store(Request $request)
@@ -50,10 +54,10 @@ class ItWorkHubNonAppController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'priority' => 'required|in:High,Medium,Low',
-            'status' => 'required|string',
+            'status_id' => 'required|exists:it_wh_master_statuses,id',
             'squads' => 'required|array',
             'squads.*' => 'exists:users,id',
-            'bpo' => 'nullable|string|max:255',
+            'bpo_division_id' => 'nullable|exists:it_wh_master_divisions,id',
             'progress' => 'required|integer|min:0|max:100',
             'pain_point_uraian' => 'nullable|string',
             'pain_point_impact' => 'nullable|string',
@@ -66,8 +70,8 @@ class ItWorkHubNonAppController extends Controller
             'name' => $validated['name'],
             'description' => $validated['description'],
             'priority' => $validated['priority'],
-            'status' => $validated['status'],
-            'bpo' => $validated['bpo'],
+            'status_id' => $validated['status_id'],
+            'bpo_division_id' => $validated['bpo_division_id'] ?? null,
             'progress' => $validated['progress'],
             'pain_point_uraian' => $validated['pain_point_uraian'],
             'pain_point_impact' => $validated['pain_point_impact'],
@@ -84,9 +88,10 @@ class ItWorkHubNonAppController extends Controller
 
     public function show($id)
     {
-        $project = \App\Models\ItWhNonappProject::with(['squads', 'documents'])->findOrFail($id);
+        $project = \App\Models\ItWhNonappProject::with(['squads', 'documents', 'status', 'bpoDivision'])->findOrFail($id);
         $users = \App\Models\User::whereNotIn('role', ['admin', 'project_manager'])->get();
-        return view('it-work-hub.non-app.show', compact('project', 'users'));
+        $divisions = \App\Models\ItWhMasterDivision::where('is_active', true)->orderBy('name')->get();
+        return view('it-work-hub.non-app.show', compact('project', 'users', 'divisions'));
     }
 
     public function update(Request $request, $id)
@@ -94,7 +99,7 @@ class ItWorkHubNonAppController extends Controller
         $validated = $request->validate([
             'squads' => 'nullable|array',
             'squads.*' => 'exists:users,id',
-            'bpo' => 'nullable|string|max:255',
+            'bpo_division_id' => 'nullable|exists:it_wh_master_divisions,id',
             'pain_point_uraian' => 'nullable|string',
             'pain_point_impact' => 'nullable|string',
             'priority' => 'required|in:High,Medium,Low',
@@ -105,7 +110,7 @@ class ItWorkHubNonAppController extends Controller
 
         $project = \App\Models\ItWhNonappProject::findOrFail($id);
         $project->update([
-            'bpo' => $validated['bpo'] ?? null,
+            'bpo_division_id' => $validated['bpo_division_id'] ?? null,
             'pain_point_uraian' => $validated['pain_point_uraian'] ?? null,
             'pain_point_impact' => $validated['pain_point_impact'] ?? null,
             'priority' => $validated['priority'],
@@ -140,11 +145,11 @@ class ItWorkHubNonAppController extends Controller
     public function updateStatus(Request $request, $id)
     {
         $request->validate([
-            'status' => 'required|string',
+            'status_id' => 'required|exists:it_wh_master_statuses,id',
         ]);
 
         $project = \App\Models\ItWhNonappProject::findOrFail($id);
-        $project->status = $request->status;
+        $project->status_id = $request->status_id;
         $project->save();
 
         return response()->json(['success' => true, 'message' => 'Status project berhasil diperbarui.']);
@@ -152,9 +157,10 @@ class ItWorkHubNonAppController extends Controller
 
     public function activities($id)
     {
-        $project = ItWhNonappProject::with(['squads', 'activities.pics'])->findOrFail($id);
+        $project = ItWhNonappProject::with(['squads', 'activities.pics', 'activities.status'])->findOrFail($id);
         $users = User::whereNotIn('role', ['admin', 'project_manager'])->get();
-        return view('it-work-hub.non-app.activities', compact('project', 'users'));
+        $statuses = \App\Models\ItWhMasterStatus::where('category', 'Activity')->where('is_active', true)->orderBy('sort_order')->get();
+        return view('it-work-hub.non-app.activities', compact('project', 'users', 'statuses'));
     }
 
     public function updateActivities(Request $request, $id)
@@ -166,17 +172,17 @@ class ItWorkHubNonAppController extends Controller
         try {
             $request->validate([
                 'activities' => 'present|array',
-            'activities.*.id' => 'nullable',
-            'activities.*.name' => 'required|string',
-            'activities.*.start_date' => 'nullable|date',
-            'activities.*.deadline' => 'nullable|date',
-            'activities.*.adjustment_date' => 'nullable|date',
-            'activities.*.notes' => 'nullable|string',
-            'activities.*.status' => 'required|string',
-            'activities.*.sort_order' => 'required|integer',
-            'activities.*.pics' => 'nullable|array',
-            'activities.*.pics.*' => 'exists:users,id',
-        ]);
+                'activities.*.id' => 'nullable',
+                'activities.*.name' => 'required|string',
+                'activities.*.start_date' => 'nullable|date',
+                'activities.*.deadline' => 'nullable|date',
+                'activities.*.adjustment_date' => 'nullable|date',
+                'activities.*.notes' => 'nullable|string',
+                'activities.*.status_id' => 'required|exists:it_wh_master_statuses,id',
+                'activities.*.sort_order' => 'required|integer',
+                'activities.*.pics' => 'nullable|array',
+                'activities.*.pics.*' => 'exists:users,id',
+            ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             \Illuminate\Support\Facades\Log::error('Validation failed', $e->errors());
             throw $e;
@@ -184,21 +190,21 @@ class ItWorkHubNonAppController extends Controller
 
         try {
             $incomingIds = [];
-        $activitiesData = $request->input('activities', []);
+            $activitiesData = $request->input('activities', []);
 
-        foreach ($activitiesData as $actData) {
-            $activity = ItWhNonappActivity::updateOrCreate(
-                ['id' => (isset($actData['id']) && is_numeric($actData['id'])) ? $actData['id'] : null, 'it_wh_nonapp_project_id' => $project->id],
-                [
-                    'name' => $actData['name'],
-                    'start_date' => $actData['start_date'] ?: null,
-                    'deadline' => $actData['deadline'] ?: null,
-                    'adjustment_date' => $actData['adjustment_date'] ?: null,
-                    'notes' => $actData['notes'] ?? null,
-                    'status' => $actData['status'],
-                    'sort_order' => $actData['sort_order'],
-                ]
-            );
+            foreach ($activitiesData as $actData) {
+                $activity = ItWhNonappActivity::updateOrCreate(
+                    ['id' => (isset($actData['id']) && is_numeric($actData['id'])) ? $actData['id'] : null, 'it_wh_nonapp_project_id' => $project->id],
+                    [
+                        'name' => $actData['name'],
+                        'start_date' => $actData['start_date'] ?: null,
+                        'deadline' => $actData['deadline'] ?: null,
+                        'adjustment_date' => $actData['adjustment_date'] ?: null,
+                        'notes' => $actData['notes'] ?? null,
+                        'status_id' => $actData['status_id'],
+                        'sort_order' => $actData['sort_order'],
+                    ]
+                );
 
             if (isset($actData['pics'])) {
                 $activity->pics()->sync($actData['pics']);

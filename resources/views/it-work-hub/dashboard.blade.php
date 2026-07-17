@@ -356,6 +356,7 @@
             const bgColor = 'transparent';
 
             // ── Color Palettes ──────────
+            const DB_STATUS_COLORS = @json($dbStatusColors ?? []);
             const STATUS_COLORS = {
                 // Shared Statuses
                 'Not Started':  '#94a3b8', // slate-400
@@ -371,6 +372,8 @@
                 'Live w/ CR':   '#a855f7', // purple-500
                 'Live w/ Bug':  '#f59e0b', // amber-500
                 'Live (Bug Fixing)': '#f59e0b', // amber-500
+                
+                ...DB_STATUS_COLORS
             };
 
             function getColors(labels) {
