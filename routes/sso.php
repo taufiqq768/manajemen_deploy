@@ -68,6 +68,13 @@ Route::prefix('api/sso')->name('api.sso.')->middleware('api')->group(function ()
 });
 
 /**
+ * SSO Integration for JIT Provisioning (Called by SSO Server)
+ */
+Route::prefix('api/sso-integration')->middleware('api')->group(function () {
+    Route::get('/check-role', [SSOController::class, 'checkRole']);
+});
+
+/**
  * Debug/Test Routes (jika APP_DEBUG=true)
  * 
  * Gunakan untuk testing dan diagnostics tanpa SSO Server

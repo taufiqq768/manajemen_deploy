@@ -669,5 +669,35 @@ class SSOController extends Controller
             ], 401);
         }
     }
+
+    /**
+     * SSO Integration JIT Provisioning
+     * Dipanggil oleh server SSO saat user belum ter-mapping di tabel user_roles SSO
+     * 
+     * GET /api/sso-integration/check-role?nik=...&api_key=...&api_secret=...
+     */
+    public function checkRole(Request $request)
+    {
+        $nik = $request->query('nik');
+        
+        if (!$nik) {
+            return response()->json(['status' => false]);
+        }
+
+        // Standarisasi NIK menjadi 8 digit (tambah 0 di depan jika kurang)
+        $nik = str_pad((string) $nik, 8, '0', STR_PAD_LEFT);
+
+        // Cari pegawai di database internal aplikasi ini
+        $user = \App\Models\User::where('nik', $nik)->first();
+
+        if ($user) {
+            return response()->json([
+                'status' => true,
+                'role' => $user->role ?? 'user'
+            ]);
+        }
+
+        return response()->json(['status' => false]);
+    }
 }
 
